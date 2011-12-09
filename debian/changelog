@@ -1,0 +1,12 @@
+horizon (2012.1~e1-0ubuntu~e2.20111201.1077.1) precise; urgency=low
+
+  [ Chuck Short ]
+  * Initial release.
+
+  [ Jamie Strandboge ]
+  * debian/patches/git-2012.1~e2~20111201.1077.patch: use 2012.1~e1 release
+    tarball and apply all git commits up to 2012.1~e2~20111201.1077. This
+    can be dropped in 2012.1~e2.
+  * rename python-djanog-horizon.postinst to python-django-horizon.postinst
+
+ -- Jamie Strandboge <jamie@ubuntu.com>  Fri, 02 Dec 2011 16:21:52 -0600
