@@ -1,4 +1,3 @@
-git-2012.1~e2~20111201.1077.patch
 fix-dashboard-django-wsgi.patch
 fix-dashboard-manage.patch
 openstack-config-settings.patch
