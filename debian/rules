@@ -21,8 +21,7 @@ override_dh_auto_install:
 	touch $(CURDIR)/debian/openstack-dashboard/usr/share/openstack-dashboard/quantum/__init__.py
 	touch $(CURDIR)/debian/openstack-dashboard/usr/share/openstack-dashboard/quantum/client.py
 
-	# Setup the configuration
-	ln -s /etc/openstack-dashboard/settings.py $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/local/local_settings.py
+	
 
 ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
 override_dh_auto_test:

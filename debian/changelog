@@ -1,9 +1,8 @@
 horizon (2012.1~e2-0ubuntu1) UNRELEASED; urgency=low
 
-  * New upstream release.
+  * New upstream release (LP: #904039)
   * debian/control: Update build-depends.
-  * debian/watch: Fix to fetch from launchpad ad well.
-  * debian/rules: Setup the configuration file.
+  * debian/watch: Fix to fetch from Launchpad ad well.
   
  -- Chuck Short <zulcss@ubuntu.com>  Fri, 16 Dec 2011 15:32:14 -0500
 
