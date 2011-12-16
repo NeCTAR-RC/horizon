@@ -1,10 +1,10 @@
-horizon (2012.1~e2-0ubuntu1) UNRELEASED; urgency=low
+horizon (2012.1~e2-0ubuntu1) precise; urgency=low
 
   * New upstream release (LP: #904039)
   * debian/control: Update build-depends.
   * debian/watch: Fix to fetch from Launchpad ad well.
   
- -- Chuck Short <zulcss@ubuntu.com>  Fri, 16 Dec 2011 15:32:14 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 16 Dec 2011 16:34:56 -0500
 
 horizon (2012.1~e2~20111209.1104-0ubuntu1) precise; urgency=low
 
