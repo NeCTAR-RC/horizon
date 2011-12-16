@@ -21,7 +21,7 @@ Build-Depends: debhelper (>= 8.0.0),
  pep8,
  python-sphinx,
  python-webob,
- python-xattr,
+ python-xattr
 Standards-Version: 3.9.2
 Homepage: http://launchpad.net/horizon
 
@@ -48,7 +48,7 @@ Depends: ${misc:Depends},
  python-crypto,
  python-cloudfiles,
  python-dateutil,
- pyhton-routes,
+ python-routes,
  python-sqlalchemy,
  python-webob,
  python-xattr,
