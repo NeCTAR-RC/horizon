@@ -1,3 +1,10 @@
+horizon (2012.1~e2-0ubuntu2) UNRELEASED; urgency=low
+
+  * Removed python-nova.postinst, let dh_python2 generate instead
+    since python-support is not a dependency. 
+
+ -- Chuck Short <zulcss@ubuntu.com>  Tue, 03 Jan 2012 10:50:26 -0500
+
 horizon (2012.1~e2-0ubuntu1) precise; urgency=low
 
   * New upstream release (LP: #904039)
