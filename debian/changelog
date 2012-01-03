@@ -7,6 +7,7 @@ horizon (2012.1~e2-0ubuntu2) UNRELEASED; urgency=low
   * Clean up debian/control.
   * Restart apache when installing the openstack dashboard.
     (LP: #905527)
+  * Dropped python-coverage.
 
   [Robie Basak]
   * debian/control: put python-django-horizon in Python section.
