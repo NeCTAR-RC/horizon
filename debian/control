@@ -58,7 +58,7 @@ Package: openstack-dashboard
 Architecture: all
 Depends: ${misc:Depends}, 
  ${python:Depends},
- python-django-horizon (>= ${source:Version}),
+ python-django-horizon,
  adduser,
  libapache2-mod-wsgi (>= 2.3),
  libjs-jquery,
@@ -69,3 +69,9 @@ Description: django web interface to Openstack
  uses the Django-Nova project to provide web based interactions with the
  OpenStack Nova cloud controller.
 
+Package: python-django-openstack
+Architecture: all
+Depends: ${misc:Depends}, python-django-horizon
+Description: dummy transitonal package from python-django-openstack to python-django-horizon
+ This transitional package from the python-django-openstack to the python-django-horizon 
+ package. Once this package and its dependencies are installed you can remove it.
