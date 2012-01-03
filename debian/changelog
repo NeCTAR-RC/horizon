@@ -5,10 +5,12 @@ horizon (2012.1~e2-0ubuntu2) UNRELEASED; urgency=low
     since python-support is not a dependency. 
   * Dropped python-openstack-compute from debian/control.
   * Clean up debian/control.
+  * Restart apache when installing the openstack dashboard.
+    (LP: #905527)
 
   [Robie Basak]
   * debian/control: put python-django-horizon in Python section.
-  * debian/control: lintian fixes:
+  * debian/control: lintian fixes (LP: #899427):
     - Put python-django-horizon in Python section
     - Remove definite article from Description
   * debian/copyright: fix dep5 syntax.
