@@ -26,6 +26,7 @@ Standards-Version: 3.9.2
 Homepage: http://launchpad.net/horizon
 
 Package: python-django-horizon
+Section: python
 Architecture: all
 Depends: ${misc:Depends}, 
  ${python:Depends}, 
@@ -60,8 +61,11 @@ Depends: ${misc:Depends},
  ${python:Depends},
  python-django-horizon (>= ${source:Version}),
  adduser,
- libapache2-mod-wsgi (>= 2.3)
-Description: a django web interface to Openstack
+ libapache2-mod-wsgi (>= 2.3),
+ libjs-jquery,
+ libjs-jquery-ui,
+ libjs-jquery-tablesorter
+Description: django web interface to Openstack
  The OpenStack Dashboard is a reference implementation of a Django site that
  uses the Django-Nova project to provide web based interactions with the
  OpenStack Nova cloud controller.
