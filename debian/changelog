@@ -1,7 +1,7 @@
-horizon (2012.1~e2-0ubuntu2) UNRELEASED; urgency=low
+horizon (2012.1~e3~20120113.1213-0ubuntu1) precise; urgency=low
 
   [Chuck Short]
-  * Removed python-nova.postinst, let dh_python2 generate instead
+  * Removed python-django-horizon.postinst, let dh_python2 generate instead
     since python-support is not a dependency. 
   * Dropped python-openstack-compute from debian/control.
   * Clean up debian/control.
@@ -19,7 +19,13 @@ horizon (2012.1~e2-0ubuntu2) UNRELEASED; urgency=low
   * debian/python-django-horizon.lintian-overrides: override for template shell
     script.
 
- -- Chuck Short <zulcss@ubuntu.com>  Tue, 03 Jan 2012 10:50:26 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 13 Jan 2012 10:59:49 +0100
+
+horizon (2012.1~e2-0ubuntu2) precise; urgency=low
+
+  * Rebuild to drop dependencies on python2.6.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 02 Jan 2012 10:58:49 +0100
 
 horizon (2012.1~e2-0ubuntu1) precise; urgency=low
 
