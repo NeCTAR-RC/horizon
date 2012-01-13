@@ -1,19 +1,14 @@
-Author: Chuck Short <zulcss@ubuntu.com>
-diff -Naurp horizon-2012.1.orig//openstack-dashboard/dashboard/manage.py horizon-2012.1//openstack-dashboard/dashboard/manage.py
---- horizon-2012.1.orig//openstack-dashboard/dashboard/manage.py	2011-11-29 11:59:52.000000000 -0500
-+++ horizon-2012.1//openstack-dashboard/dashboard/manage.py	2011-11-29 12:49:14.910159001 -0500
-@@ -21,11 +21,13 @@
- 
- from django.core.management import execute_manager
+diff -Naurp horizon-2012.1.orig//openstack-dashboard/manage.py horizon-2012.1//openstack-dashboard/manage.py
+--- horizon-2012.1.orig//openstack-dashboard/manage.py	2012-01-13 06:30:52.000000000 +0100
++++ horizon-2012.1//openstack-dashboard/manage.py	2012-01-13 11:17:01.438270002 +0100
+@@ -1,6 +1,10 @@
+ #!/usr/bin/env python
+ import os, sys
  
 +import sys
 +
-+sys.path.append("/usr/share/openstack-dashboard/")
++sys.path.append("/usr/share/openstack-dashboard")
++
+ if __name__ == "__main__":
+     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dashboard.settings")
  
- try:
-     import settings  # Assumed to be in the same directory.
- except ImportError:
--    import sys
-     sys.stderr.write("Error: Can't find the file 'settings.py' in the "
-     "directory containing %r. It appears you've customized things.\nYou'll "
-     "have to run django-admin.py, passing it your settings module.\n(If "
