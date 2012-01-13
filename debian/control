@@ -50,7 +50,7 @@ Depends: ${misc:Depends},
  python-xattr,
  python-novaclient,
  python-keystoneclient
-Description: Django module providing web based interaction with OpenStack Nova.
+Description: Django module providing web based interaction with OpenStack
  The Django-Nova project is a Django module that is used to provide web based
  interactions with the OpenStack Nova cloud controller.
 

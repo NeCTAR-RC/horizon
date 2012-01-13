@@ -10,6 +10,7 @@ horizon (2012.1~e3~20120113.1213-0ubuntu1) precise; urgency=low
   * Dropped python-coverage not needed.
   * Added transitional package for people updating from oneiric.
   * Rediffed patches.
+  * More linitian fixes.
 
   [Robie Basak]
   * debian/control: put python-django-horizon in Python section.
