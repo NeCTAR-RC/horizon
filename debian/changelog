@@ -10,6 +10,7 @@ horizon (2012.1~e3~20120104.1184-0ubuntu1) UNRELEASED; urgency=low
     (LP: #905527)
   * Dropped python-coverage not needed.
   * Added transitional package for people updating from oneiric.
+  * Dropped python-django-mailer.
 
   [Robie Basak]
   * debian/control: put python-django-horizon in Python section.
