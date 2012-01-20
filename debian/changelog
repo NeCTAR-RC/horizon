@@ -1,8 +1,8 @@
-horizon (2012.1~e3~20120120.1235-0ubuntu1) UNRELEASED; urgency=low
+horizon (2012.1~e3~20120120.1235-0ubuntu1) precise; urgency=low
 
   * New upstream release. 
 
- -- Chuck Short <zulcss@ubuntu.com>  Fri, 20 Jan 2012 13:32:30 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 20 Jan 2012 14:51:21 -0500
 
 horizon (2012.1~e3~20120113.1213-0ubuntu1) precise; urgency=low
 
