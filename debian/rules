@@ -23,7 +23,7 @@ override_dh_auto_install:
 
 	# Copy the configuration files
 	cp $(CURDIR)/openstack-dashboard/local/local_settings.py.example \
-		$(CURDIR)/openstack-dashboard/etc/openstack-dashboard/local_settings.py
+		$(CURDIR)/debian/openstack-dashboard/etc/openstack-dashboard/local_settings.py
 
 ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
 override_dh_auto_test:
