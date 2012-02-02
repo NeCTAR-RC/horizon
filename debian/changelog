@@ -1,3 +1,9 @@
+horizon (2012.1~e3-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/control: Drop dependencies we dont need. 
+
+ -- Chuck Short <zulcss@ubuntu.com>  Thu, 02 Feb 2012 10:17:52 -0500
+
 horizon (2012.1~e3-0ubuntu1) precise; urgency=low
 
   * New upstream version.
