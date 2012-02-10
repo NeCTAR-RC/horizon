@@ -1,10 +1,11 @@
-horizon (2012.1~e4~20120202.1300-0ubuntu3) UNRELEASED; urgency=low
+horizon (2012.1~e4~20120210.1331-0ubuntu1) precise; urgency=low
 
+  * New Upstream version
   * debian/control: 
    - Add python-coverage as a build dependency. 
    - Add python-novaclient as a build dependency.
 
- -- Chuck Short <zulcss@ubuntu.com>  Tue, 07 Feb 2012 08:47:13 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 10 Feb 2012 11:09:58 -0500
 
 horizon (2012.1~e4~20120202.1300-0ubuntu2) precise; urgency=low
 
