@@ -1,6 +1,7 @@
 horizon (2012.1~e4~20120210.1331-0ubuntu2) UNRELEASED; urgency=low
 
   * debian/patches/openstack-config-settings.patch: Refreshed.
+  * debian/copyright: Updated copyright.
 
  -- Chuck Short <zulcss@ubuntu.com>  Mon, 13 Feb 2012 08:51:08 -0500
 
