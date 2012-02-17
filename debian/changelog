@@ -1,11 +1,12 @@
-horizon (2012.1~e4~20120210.1331-0ubuntu2) UNRELEASED; urgency=low
+horizon (2012.1~e4~20120217.1354-0ubuntu1) precise; urgency=low
 
   * debian/patches/openstack-config-settings.patch: Refreshed.
   * debian/copyright: Updated copyright.
   * debian/rules: Diable tests since it doesnt work without a
     virtualenv.
+  * New upstream release.
 
- -- Chuck Short <zulcss@ubuntu.com>  Mon, 13 Feb 2012 11:26:01 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 17 Feb 2012 10:12:25 -0500
 
 horizon (2012.1~e4~20120210.1331-0ubuntu1) precise; urgency=low
 
