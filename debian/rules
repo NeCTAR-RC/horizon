@@ -8,10 +8,7 @@
 
 override_dh_auto_install:
 	# install horizon and dashboard
-	cd $(CURDIR)/horizon && \
-		python setup.py install --prefix=/usr --root=$(CURDIR)/debian/tmp \
-			--install-layout=deb
-
+	python setup.py install --root=$(CURDIR)/debian/tmp --no-compile --O0 --install-layout=deb
 	install -d -m 755 $(CURDIR)/debian/openstack-dashboard/etc/openstack-dashboard
 	install -d -m 755 $(CURDIR)/debian/openstack-dashboard/var/lib/openstack-dashboard
 	install -d -m 755 $(CURDIR)/debian/openstack-dashboard/var/log/openstack-dashboard
@@ -32,7 +29,9 @@ override_dh_auto_install:
 
 override_dh_auto-clean:
 	dh_clean
-	cd $(CURDIR)/horizon && python setup.py clean
+	rm -rf $(CURDIR)/horizon/build
+	rm -rf $(CURDIR)/horizon/horizon.egg-info
+	rm -rf $(CURDIR)/openstack_dashboard/openstack_dashboard.egg-info
 
 get-orig-source:
 	uscan --verbose --force-download --rename --destdir=../build-area
