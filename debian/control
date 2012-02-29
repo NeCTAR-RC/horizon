@@ -26,7 +26,7 @@ Build-Depends: debhelper (>= 8.0.0),
  python-sphinx,
  python-webob,
  python-xattr
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Homepage: http://launchpad.net/horizon
 
 Package: python-django-horizon

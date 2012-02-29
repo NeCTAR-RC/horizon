@@ -2,8 +2,9 @@ horizon (2012.1~e4~20120229.1407-0ubuntu1) UNRELEASED; urgency=low
 
   * New upstream version.
   * debian/rules: Update due to upstream build changes.
+  * debian/control: Update standards-version.
 
- -- Chuck Short <zulcss@ubuntu.com>  Wed, 29 Feb 2012 10:30:48 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Wed, 29 Feb 2012 10:35:12 -0500
 
 horizon (2012.1~e4~20120224.1386-0ubuntu1) precise; urgency=low
 
