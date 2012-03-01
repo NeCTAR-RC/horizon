@@ -8,8 +8,9 @@ horizon (2012.1~e4~20120229.1407-0ubuntu1) UNRELEASED; urgency=low
   * debian/patches/fix-dashboard-manage.patch: Refreshed
   * debian/openstack-dashboard.install: Update due to upstream build changes.
   * debian/dashboard: Update to upstream build changes.
+  * debian/pydist-overrides: Dont try to install python-django-nose-selenium.
 
- -- Chuck Short <zulcss@ubuntu.com>  Thu, 01 Mar 2012 09:47:10 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Thu, 01 Mar 2012 13:11:07 -0500
 
 horizon (2012.1~e4~20120224.1386-0ubuntu1) precise; urgency=low
 
