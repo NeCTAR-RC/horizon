@@ -6,6 +6,7 @@ horizon (2012.1~e4~20120229.1407-0ubuntu1) UNRELEASED; urgency=low
   * debian/patches/openstack-config-settings.patch: Dropped
   * debian/patches/fix-dashboard-django-wsgi.patch: Refreshed
   * debian/patches/fix-dashboard-manage.patch: Refreshed
+  * debian/openstack-dashboard.install: Update due to upstream build changes.
 
  -- Chuck Short <zulcss@ubuntu.com>  Wed, 29 Feb 2012 21:02:53 -0500
 

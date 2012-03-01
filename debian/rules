@@ -10,22 +10,21 @@ override_dh_auto_install:
 	# install horizon and dashboard
 	python setup.py install --root=$(CURDIR)/debian/tmp --no-compile -O0 --install-layout=deb
 	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard
-	cp -a $(CURDIR)/openstack_dashboard/local $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
-	cp -a $(CURDIR)/openstack_dashboard/settings.py $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
 	install -d -m 755 $(CURDIR)/debian/tmp/etc/openstack-dashboard
+	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/quantum
+	install -d -m 755 $(CURDIR)/debian/tmp/etc/apache2/conf.d
+	
+	cp -a $(CURDIR)/openstack_dashboard/ $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
+	cp -a $(CURDIR)/openstack_dashboard/settings.py $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
+	
+	touch $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/quantum/__init__.py
+	touch $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/quantum/client.py
+	cp -a $(CURDIR)/debian/dashboard.conf $(CURDIR)/debian/tmp/etc/apache2/conf.d
 	cp $(CURDIR)/openstack_dashboard/local/local_settings.py.example \
-		$(CURDIR)/debian/tmp/etc/openstack-dashboard/settings.py
+		$(CURDIR)/debian/tmp/etc/openstack-dashboard/local_settings.py
 	cp $(CURDIR)/manage.py \
 		 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/manage.py
-	ln -s /etc/openstack_dashboard/settings.py $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/local/local_settings.py
 
-	# Disable quantum
-	touch $(CURDIR)/debian/openstack-dashboard/usr/share/openstack-dashboard/quantum/__init__.py
-	touch $(CURDIR)/debian/openstack-dashboard/usr/share/openstack-dashboard/quantum/client.py
-
-	# Copy the configuration files
-	cp $(CURDIR)/openstack-dashboard/local/local_settings.py.example \
-		$(CURDIR)/debian/openstack-dashboard/etc/openstack-dashboard/local_settings.py
 
 #ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
 #override_dh_auto_test:
