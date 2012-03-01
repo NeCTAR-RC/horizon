@@ -1,3 +1,2 @@
-openstack-dashboard/dashboard usr/share/openstack-dashboard
-openstack-dashboard/local usr/share/openstack-dashboard
-debian/dashboard.conf etc/apache2/conf.d
+usr/share/openstack-dashboard
+etc/apache2/conf.d

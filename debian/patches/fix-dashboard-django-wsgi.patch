@@ -1,9 +1,8 @@
-Author: Chuck Short <zulcss@ubuntu.com>
-diff -Naurp horizon-2012.1.orig//openstack-dashboard/dashboard/wsgi/django.wsgi horizon-2012.1//openstack-dashboard/dashboard/wsgi/django.wsgi
---- horizon-2012.1.orig//openstack-dashboard/dashboard/wsgi/django.wsgi	2011-11-29 11:59:52.000000000 -0500
-+++ horizon-2012.1//openstack-dashboard/dashboard/wsgi/django.wsgi	2011-11-29 12:50:49.694159000 -0500
-@@ -7,6 +7,8 @@ from django.conf import settings
- os.environ['DJANGO_SETTINGS_MODULE'] = 'dashboard.settings'
+diff -Naurp horizon.orig/openstack_dashboard/wsgi/django.wsgi horizon/openstack_dashboard/wsgi/django.wsgi
+--- horizon.orig/openstack_dashboard/wsgi/django.wsgi	2012-02-29 20:52:57.116846675 -0500
++++ horizon/openstack_dashboard/wsgi/django.wsgi	2012-02-29 20:54:12.828846647 -0500
+@@ -9,6 +9,8 @@ sys.path.insert(0, os.path.join(os.path.
+ os.environ['DJANGO_SETTINGS_MODULE'] = 'openstack_dashboard.settings'
  sys.stdout = sys.stderr
  
 +sys.path.append("/usr/share/openstack-dashboard/")
