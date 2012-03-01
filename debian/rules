@@ -24,7 +24,7 @@ override_dh_auto_install:
 		$(CURDIR)/debian/tmp/etc/openstack-dashboard/local_settings.py
 	cp $(CURDIR)/manage.py \
 		 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/manage.py
-	ln -s /etc/openstack-dashboard/settings.py $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/local/local_settings.py
+	ln -s /etc/openstack-dashboard/settings.py $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py
 
 
 #ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))

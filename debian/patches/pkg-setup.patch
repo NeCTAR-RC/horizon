@@ -10,7 +10,7 @@ diff -Naurp horizon.orig/setup.py horizon/setup.py
        author='Devin Carlen',
        author_email='devin.carlen@gmail.com',
        packages=find_packages(),
-+      include_package_data=True
++      include_package_data=True,
        zip_safe=False,
        install_requires=parse_requirements(PIP_REQUIRES, TEST_REQUIRES),
        dependency_links=parse_dependency_links(PIP_REQUIRES, TEST_REQUIRES),
