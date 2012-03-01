@@ -4,8 +4,11 @@ horizon (2012.1~e4~20120229.1407-0ubuntu1) UNRELEASED; urgency=low
   * debian/rules: Update due to upstream build changes.
   * debian/control: Update standards-version.
   * debian/control: Add build depends on python-rackspace-cloudfiles.
+  * debian/patches/openstack-config-settings.patch: Dropped
+  * debian/patches/fix-dashboard-django-wsgi.patch: Refreshed
+  * debian/patches/fix-dashboard-manage.patch: Refreshed
 
- -- Chuck Short <zulcss@ubuntu.com>  Wed, 29 Feb 2012 20:46:43 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Wed, 29 Feb 2012 21:02:53 -0500
 
 horizon (2012.1~e4~20120224.1386-0ubuntu1) precise; urgency=low
 
