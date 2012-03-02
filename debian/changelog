@@ -11,8 +11,6 @@ horizon (2012.1~e4~20120229.1407-0ubuntu1) UNRELEASED; urgency=low
   * debian/pydist-overrides: Dont try to install python-django-nose-selenium.
   * debian/openstack-dashboard.install: Add missing config files.
   * debian/rules: Fix broken settings.py
-  * debian/patches/pkg-setup.patch: Copy missing templates, shameously
-    taken from debian
 
  -- Chuck Short <zulcss@ubuntu.com>  Thu, 01 Mar 2012 15:47:28 -0500
 
