@@ -1,4 +1,4 @@
-horizon (2012.1~e4-0ubuntu1) UNRELEASED; urgency=low
+horizon (2012.1~e4-0ubuntu1) precise; urgency=low
 
   * New upstream version.
   * debian/rules: Update due to upstream build changes.
@@ -15,7 +15,7 @@ horizon (2012.1~e4-0ubuntu1) UNRELEASED; urgency=low
     taken from debian
   * debian/patches/fix-broken-tarbll.patch: Add missing files.
 
- -- Chuck Short <zulcss@ubuntu.com>  Fri, 02 Mar 2012 11:42:52 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 02 Mar 2012 12:11:59 -0500
 
 horizon (2012.1~e4~20120224.1386-0ubuntu1) precise; urgency=low
 
