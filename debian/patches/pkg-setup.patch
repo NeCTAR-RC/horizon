@@ -1,16 +1,16 @@
-diff -Naurp horizon.orig/MANIFEST.inf horizon/MANIFEST.inf
---- horizon.orig/MANIFEST.inf	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/MANIFEST.inf	2012-03-01 15:45:51.933108169 -0500
+diff -Naurp horizon-2012.1.orig/MANIFEST.inf horizon-2012.1/MANIFEST.inf
+--- horizon-2012.1.orig/MANIFEST.inf	1969-12-31 19:00:00.000000000 -0500
++++ horizon-2012.1/MANIFEST.inf	2012-03-02 12:01:13.142846863 -0500
 @@ -0,0 +1 @@
 +recursive-include horizon *.html *.js *.csv *.template *.mo
-diff -Naurp horizon.orig/setup.py horizon/setup.py
---- horizon.orig/setup.py	2012-03-01 15:44:22.549106304 -0500
-+++ horizon/setup.py	2012-03-01 15:45:31.549107959 -0500
-@@ -76,6 +76,7 @@ setup(name="horizon",
+diff -Naurp horizon-2012.1.orig/setup.py horizon-2012.1/setup.py
+--- horizon-2012.1.orig/setup.py	2012-03-01 05:01:06.000000000 -0500
++++ horizon-2012.1/setup.py	2012-03-02 12:01:51.870848117 -0500
+@@ -36,6 +36,7 @@ setup(name="horizon",
        author='Devin Carlen',
        author_email='devin.carlen@gmail.com',
        packages=find_packages(),
-+      include_package_data=True,
-       zip_safe=False,
-       install_requires=parse_requirements(PIP_REQUIRES, TEST_REQUIRES),
-       dependency_links=parse_dependency_links(PIP_REQUIRES, TEST_REQUIRES),
++      include+package_data=True,
+       package_data={'horizon': [s[len('horizon/'):] for s in
+                                 findall('horizon/templates') \
+                                 + findall('horizon/dashboards/nova/templates') \
