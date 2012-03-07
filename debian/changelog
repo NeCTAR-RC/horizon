@@ -1,3 +1,12 @@
+horizon (2012.1~rc1~20120307.1471-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version.
+  * debian/rules: Fix symlink when installing horizon.
+    (LP: #947118)
+  * debian/control: Add python-django-nose as a dep. (LP: #944235)
+
+ -- Chuck Short <zulcss@ubuntu.com>  Wed, 07 Mar 2012 11:29:43 -0500
+
 horizon (2012.1~e4-0ubuntu1) precise; urgency=low
 
   * New upstream version.
