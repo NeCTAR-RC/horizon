@@ -1,3 +1,9 @@
+horizon (2012.1~rc1~20120308.1479-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/control: Update run-time depends. 
+
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 09 Mar 2012 13:48:19 -0500
+
 horizon (2012.1~rc1~20120308.1479-0ubuntu1) precise; urgency=low
 
   * New upstream version.
