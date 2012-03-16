@@ -1,3 +1,13 @@
+horizon (2012.1~rc1~20120315.1545-0ubuntu1) precise; urgency=low
+
+  [Adam Gandelman]
+  * New upstream release. 
+
+  [Chuck Short]
+  * debian/control: Update run-time depends
+
+ -- Adam Gandelman <adamg@canonical.com>  Fri, 16 Mar 2012 12:29:27 -0700
+
 horizon (2012.1~rc1~20120308.1479-0ubuntu1) precise; urgency=low
 
   * New upstream version.
