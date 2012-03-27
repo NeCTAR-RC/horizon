@@ -1,10 +1,10 @@
-Description: Fix run_tests.sh to run in buildds.
+Description: Make the tests run again in Ubuntu.
 Author: Chuck Short <zulcss@ubuntu.com>
-Forwarded: No
+Forwarded: no
 diff -Naurp horizon-2012.1.orig/run_tests.sh horizon-2012.1/run_tests.sh
 --- horizon-2012.1.orig/run_tests.sh	2012-03-20 12:31:23.000000000 -0400
-+++ horizon-2012.1/run_tests.sh	2012-03-27 09:21:11.103687310 -0400
-@@ -269,25 +269,25 @@ function run_tests {
++++ horizon-2012.1/run_tests.sh	2012-03-27 09:36:10.299709229 -0400
+@@ -269,35 +269,35 @@ function run_tests {
    sanity_check
  
    echo "Running Horizon application tests"
@@ -42,3 +42,15 @@ diff -Naurp horizon-2012.1.orig/run_tests.sh horizon-2012.1/run_tests.sh
    fi
    # Remove the leftover coverage files from the -p flag earlier.
    rm -f .coverage.*
+ 
+-  if [ $(($HORIZON_RESULT || $DASHBOARD_RESULT)) -eq 0 ]; then
++  if [ $(($HORIZON_RESULT)) -eq 0 ]; then
+     echo "Tests completed successfully."
+   else
+     echo "Tests failed."
+   fi
+-  exit $(($HORIZON_RESULT || $DASHBOARD_RESULT))
++  exit $(($HORIZON_RESULT))
+ }
+ 
+ function run_makemessages {
