@@ -1,3 +1,13 @@
+horizon (2012.1~rc1-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/dashboard: Update to point to right files. (LP: #966069)
+  * debian/control: Use python-cherrypy3
+  * debian/rules: Update pythonpath in order to run tests.
+  * debian/patches/fix-coverage-binary-name.patch: Make the testsuite
+    run.
+
+ -- Chuck Short <zulcss@ubuntu.com>  Tue, 27 Mar 2012 09:07:05 -0400
+
 horizon (2012.1~rc1-0ubuntu1) precise; urgency=low
 
   * New upstream release. 
