@@ -1,3 +1,11 @@
+horizon (2012.1~rc1-0ubuntu2) precise; urgency=low
+
+  * debian/control: Add python-memcache 
+  * debain/dashboard.conf: Update to match current upstream documentation
+    (LP: #966069)
+
+ -- Adam Gandelman <adamg@canonical.com>  Mon, 26 Mar 2012 17:24:03 -0700
+
 horizon (2012.1~rc1-0ubuntu1) precise; urgency=low
 
   * New upstream release. 
