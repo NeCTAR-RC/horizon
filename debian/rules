@@ -19,7 +19,7 @@ override_dh_auto_install:
 	
 	touch $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/quantum/__init__.py
 	touch $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/quantum/client.py
-	cp -a $(CURDIR)/debian/dashboard.conf $(CURDIR)/debian/tmp/etc/apache2/conf.d
+	cp -a $(CURDIR)/debian/openstack-dashboard.conf $(CURDIR)/debian/tmp/etc/apache2/conf.d
 	cp $(CURDIR)/openstack_dashboard/local/local_settings.py.example \
 		$(CURDIR)/debian/tmp/etc/openstack-dashboard/local_settings.py
 	cp $(CURDIR)/manage.py \

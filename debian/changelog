@@ -12,6 +12,11 @@ horizon (2012.1~rc1-0ubuntu2) UNRELEASED; urgency=low
   * debain/dashboard.conf: Update to match current upstream documentation
     (LP: #966069)
 
+  [ Adrien Cunin ]
+  * Renamed Apache config file from dashboard.conf to openstack-dashboard.conf
+    (LP: #965410)
+    - Updated post{inst,rm} and added preinst to handle correctly the rename
+
  -- Adam Gandelman <adamg@canonical.com>  Mon, 26 Mar 2012 17:24:03 -0700
 
 horizon (2012.1~rc1-0ubuntu1) precise; urgency=low
