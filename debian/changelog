@@ -1,5 +1,13 @@
-horizon (2012.1~rc1-0ubuntu2) precise; urgency=low
+horizon (2012.1~rc1-0ubuntu2) UNRELEASED; urgency=low
 
+  [ Chuck Short ]
+  * debian/control: Use python-cherrypy3
+  * debian/rules: Update pythonpath in order to run tests.
+  * debian/patches/fix-coverage-binary-name.patch: Make the testsuite
+    run.
+  * debian/rules: Fail build if tests fail.
+
+  [ Adam Gandelman ]
   * debian/control: Add python-memcache 
   * debain/dashboard.conf: Update to match current upstream documentation
     (LP: #966069)
