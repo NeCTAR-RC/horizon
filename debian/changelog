@@ -1,13 +1,18 @@
 horizon (2012.1~rc1-0ubuntu2) UNRELEASED; urgency=low
 
-  * debian/dashboard: Update to point to right files. (LP: #966069)
+  [ Chuck Short ]
   * debian/control: Use python-cherrypy3
   * debian/rules: Update pythonpath in order to run tests.
   * debian/patches/fix-coverage-binary-name.patch: Make the testsuite
     run.
   * debian/rules: Fail build if tests fail.
 
- -- Chuck Short <zulcss@ubuntu.com>  Tue, 27 Mar 2012 09:27:46 -0400
+  [ Adam Gandelman ]
+  * debian/control: Add python-memcache 
+  * debain/dashboard.conf: Update to match current upstream documentation
+    (LP: #966069)
+
+ -- Adam Gandelman <adamg@canonical.com>  Mon, 26 Mar 2012 17:24:03 -0700
 
 horizon (2012.1~rc1-0ubuntu1) precise; urgency=low
 
