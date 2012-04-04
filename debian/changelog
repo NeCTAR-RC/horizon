@@ -1,6 +1,7 @@
-horizon (2012.1~rc1-0ubuntu2) UNRELEASED; urgency=low
+horizon (2012.1~rc2-0ubuntu1) precise; urgency=low
 
   [ Chuck Short ]
+  * New usptream release.
   * debian/control: Use python-cherrypy3
   * debian/rules: Update pythonpath in order to run tests.
   * debian/patches/fix-coverage-binary-name.patch: Make the testsuite
@@ -17,7 +18,7 @@ horizon (2012.1~rc1-0ubuntu2) UNRELEASED; urgency=low
     (LP: #965410)
     - Updated post{inst,rm} and added preinst to handle correctly the rename
 
- -- Adam Gandelman <adamg@canonical.com>  Mon, 26 Mar 2012 17:24:03 -0700
+ -- Chuck Short <zulcss@ubuntu.com>  Wed, 04 Apr 2012 07:21:15 -0400
 
 horizon (2012.1~rc1-0ubuntu1) precise; urgency=low
 
