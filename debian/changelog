@@ -1,9 +1,9 @@
-horizon (2012.1-0ubuntu2) UNRELEASED; urgency=low
+horizon (2012.1-0ubuntu2) precise; urgency=low
 
   * Make openstack-dashboard Pre-Depends: dpkg (>= 1.15.7.2) for
     dpkg-maintscript-helper.
 
- -- Colin Watson <cjwatson@ubuntu.com>  Tue, 10 Apr 2012 17:57:55 +0100
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 10 Apr 2012 17:58:25 +0100
 
 horizon (2012.1-0ubuntu1) precise; urgency=low
 
