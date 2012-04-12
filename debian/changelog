@@ -1,3 +1,11 @@
+horizon (2012.1-0ubuntu3) precise; urgency=low
+
+  * debian/patches/add_juju_settings_panel.patch, debian/rules,
+    debian/juju.png: Add an Ubuntu-specific panel to easily generate
+    Juju environments.yaml
+
+ -- Adam Gandelman <adamg@canonical.com>  Wed, 11 Apr 2012 20:33:36 -0700
+
 horizon (2012.1-0ubuntu1) precise; urgency=low
 
   * New upstream release. 
@@ -14,7 +22,7 @@ horizon (2012.1~rc2-0ubuntu1) precise; urgency=low
     run.
   * debian/rules: Fail build if tests fail.
 
-  [ Adam Gandelman ]
+  [ A Gandelman ]
   * debian/control: Add python-memcache 
   * debain/dashboard.conf: Update to match current upstream documentation
     (LP: #966069)
