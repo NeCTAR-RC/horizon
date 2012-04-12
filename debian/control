@@ -59,6 +59,7 @@ Description: Django module providing web based interaction with OpenStack
 
 Package: openstack-dashboard
 Architecture: all
+Pre-Depends: dpkg (>= 1.15.7.2)
 Depends: ${misc:Depends}, 
  ${python:Depends},
  python-django-horizon,
