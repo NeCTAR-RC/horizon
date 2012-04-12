@@ -1,3 +1,22 @@
+horizon (2012.1-0ubuntu3) precise; urgency=low
+
+  [ Adam Gandelman ]
+  * debian/patches/add_juju_settings_panel.patch, debian/rules,
+    debian/juju.png: Add an Ubuntu-specific panel to easily generate
+    Juju environments.yaml
+
+  [ Chuck Short ]
+  * debian/patches/turn-off-debug.patch: Turn off debugging.
+
+ -- Chuck Short <zulcss@ubuntu.com>  Thu, 12 Apr 2012 10:48:08 -0400
+
+horizon (2012.1-0ubuntu2) precise; urgency=low
+
+  * Make openstack-dashboard Pre-Depends: dpkg (>= 1.15.7.2) for
+    dpkg-maintscript-helper.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 10 Apr 2012 17:58:25 +0100
+
 horizon (2012.1-0ubuntu1) precise; urgency=low
 
   * New upstream release. 
@@ -15,7 +34,7 @@ horizon (2012.1~rc2-0ubuntu1) precise; urgency=low
     run.
   * debian/rules: Fail build if tests fail.
 
-  [ Adam Gandelman ]
+  [ A Gandelman ]
   * debian/control: Add python-memcache 
   * debain/dashboard.conf: Update to match current upstream documentation
     (LP: #966069)
