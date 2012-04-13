@@ -2,3 +2,4 @@ fix-dashboard-django-wsgi.patch
 fix-dashboard-manage.patch
 fix-coverage-binary-name.patch
 add_juju_settings_panel.patch
+turn-off-debug.patch
