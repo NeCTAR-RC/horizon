@@ -1,3 +1,9 @@
+Author: Adam Gandelman <adamg@canonical.com>
+Subject: Allow optionally loading a custom Ubuntu CSS
+
+This patch  adds the ability to override the default style.css with an ubuntu.css
+by dropping it in /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/css/
+
 --- a/horizon/templatetags/branding.py
 +++ b/horizon/templatetags/branding.py
 @@ -22,12 +22,29 @@
