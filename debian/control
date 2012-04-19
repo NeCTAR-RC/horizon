@@ -81,6 +81,7 @@ Description: dummy transitonal package from python-django-openstack to python-dj
  package. Once this package and its dependencies are installed you can remove it.
 
 Package: openstack-dashboard-ubuntu-theme
+Architecture: all
 Pre-Depends: dpkg (>= 1.15.7.2)
 Depends: ${misc:Depends},                                                  
  ${python:Depends},
