@@ -1,5 +1,5 @@
-ubuntu.css /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/css/ubuntu.css
-images/dots.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img/dots.png
-images/favicon.ico /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img/favicon.png
-images/header_stripes.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img/header_stripes.png
-images/ubuntu.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img/ubuntu.png
+debian/images/ubuntu.css /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/css
+debian/images/dots.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img
+debian/images/favicon.ico /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img
+debian/images/header_stripes.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img
+debian/images/ubuntu.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img
