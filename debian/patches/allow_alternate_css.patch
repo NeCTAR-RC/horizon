@@ -4,7 +4,7 @@
  Template tags for customizing Horizon.
  """
  
-+import os path
++import os.path
  from django import template
  from django.conf import settings
  
@@ -32,7 +32,8 @@
      def render(self, context):
 --- a/openstack_dashboard/templates/_stylesheets.html
 +++ b/openstack_dashboard/templates/_stylesheets.html
-@@ -1,6 +1,6 @@
+@@ -1,6 +1,7 @@
++{% load branding %}
  {% comment %} CSS {% endcomment %}
  <link href='{{ STATIC_URL }}bootstrap/css/bootstrap.min.css' media='screen' rel='stylesheet' />
 -<link href='{{ STATIC_URL }}dashboard/css/style.css' media='screen' rel='stylesheet' />
