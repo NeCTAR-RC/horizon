@@ -3,6 +3,8 @@ horizon (2012.1-0ubuntu5) precise; urgency=low
   * debian/patches/turn-off-debug.patch: Enable again
   * debian/openstack-dashboard.conf: Add an Alias mapping '/static'
     to '/usr/share/opensack-dashboard/openstack_dashboard/static/'' 
+  * debian/patches/allow_alternate_css.patch: Allow loading of ubuntu.css
+    if it exists
 
  -- Adam Gandelman <adamg@canonical.com>  Fri, 13 Apr 2012 12:54:23 -0700
 

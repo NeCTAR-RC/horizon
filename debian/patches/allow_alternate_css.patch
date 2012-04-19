@@ -1,0 +1,42 @@
+--- a/horizon/templatetags/branding.py
++++ b/horizon/templatetags/branding.py
+@@ -22,12 +22,29 @@
+ Template tags for customizing Horizon.
+ """
+ 
++import os path
+ from django import template
+ from django.conf import settings
+ 
+ 
+ register = template.Library()
+ 
++# Ubuntu branding css will be dropped here when the theme
++# package is installed
++UBUNTU_CSS = '/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/css/ubuntu.css'
++
++
++class ChooseCss(template.Node):
++    def render(self, context):
++        if os.path.exists(UBUNTU_CSS):
++            return 'ubuntu.css'
++        else:
++            return 'style.css'
++
++@register.tag
++def choose_css(parser, token):
++    return ChooseCss()
++
+ 
+ class SiteBrandingNode(template.Node):
+     def render(self, context):
+--- a/openstack_dashboard/templates/_stylesheets.html
++++ b/openstack_dashboard/templates/_stylesheets.html
+@@ -1,6 +1,6 @@
+ {% comment %} CSS {% endcomment %}
+ <link href='{{ STATIC_URL }}bootstrap/css/bootstrap.min.css' media='screen' rel='stylesheet' />
+-<link href='{{ STATIC_URL }}dashboard/css/style.css' media='screen' rel='stylesheet' />
++<link href='{{ STATIC_URL }}dashboard/css/{% choose_css %}' media='screen' rel='stylesheet' />
+ 
+ {% comment %} Favicon {% endcomment %}
+ <link rel="shortcut icon" href="{{ STATIC_URL }}dashboard/img/favicon.ico"/>
