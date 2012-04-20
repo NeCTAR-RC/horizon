@@ -162,11 +162,11 @@ body {
 }
 
 .sidebar .nav-tabs {
-    margin-top: -34px;
+    margin-top: 10px;
 }
 
 .sidebar .nav-tabs li.active a {
-    background-color: #edf9ff;
+    background-color: #f2f2f2;
 }
 
 h1.brand {
