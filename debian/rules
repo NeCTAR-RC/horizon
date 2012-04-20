@@ -26,7 +26,7 @@ override_dh_auto_install:
 		 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/manage.py
 	ln -fs /etc/openstack-dashboard/local_settings.py \
 		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py
-	cp $(CURDIR)/debian/images/juju.png \
+	cp $(CURDIR)/debian/theme/juju.png \
 		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img/juju.png
 
 
