@@ -6,7 +6,7 @@ horizon (2012.1-0ubuntu5) precise; urgency=low
     (LP: #980787) 
   * debian/patches/allow_alternate_css.patch: Allow loading of ubuntu.css
     if it exists
-
+  * debian/control: Drop libjs-jquery dependencies
  -- Adam Gandelman <adamg@canonical.com>  Fri, 13 Apr 2012 12:54:23 -0700
 
 horizon (2012.1-0ubuntu4) precise; urgency=low

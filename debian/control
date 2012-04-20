@@ -64,10 +64,7 @@ Depends: ${misc:Depends},
  ${python:Depends},
  python-django-horizon,
  adduser,
- libapache2-mod-wsgi (>= 2.3),
- libjs-jquery,
- libjs-jquery-ui,
- libjs-jquery-tablesorter
+ libapache2-mod-wsgi (>= 2.3)
 Description: django web interface to Openstack
  The OpenStack Dashboard is a reference implementation of a Django site that
  uses the Django-Nova project to provide web based interactions with the
