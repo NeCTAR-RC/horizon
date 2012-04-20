@@ -251,7 +251,7 @@ Index: horizon/horizon/dashboards/settings/templates/settings/juju/download_form
 +{% endblock %}
 +
 +{% block modal-footer %}
-+    <input class="btn btn-primary pull-right" type="submit" value="{% trans "Download Juju Environmnet Config" %}" />
++    <input class="btn btn-primary pull-right" type="submit" value="{% trans "Download Juju Environment Config" %}" />
 +    {% if hide %}<a href="{% url horizon:settings:juju:index %}" class="btn secondary cancel close">{% trans "Cancel" %}</a>{% endif %}
 +{% endblock %}
 Index: horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template
