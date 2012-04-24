@@ -1,3 +1,15 @@
+horizon (2012.1-0ubuntu6) precise; urgency=low
+
+  [ Adam Gandelman ]
+  * debian/openstack-dashboard.links: Create symlink to horizon's static js
+    files. (LP: #987535)
+
+  [ Jamie Strandboge ]
+  * debian/control: don't Build-Depends on python-cherrypy3. It is used by
+    only the dashboard tests and they are disabled in Ubuntu builds
+
+ -- Adam Gandelman <adamg@canonical.com>  Tue, 24 Apr 2012 10:43:12 -0700
+
 horizon (2012.1-0ubuntu5) precise; urgency=low
 
   [ Adam Gandelman ]

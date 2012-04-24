@@ -4,7 +4,6 @@ Priority: extra
 Maintainer: Chuck Short <zulcss@ubuntu.com>
 Build-Depends: debhelper (>= 8.0.0),
  python-all (>= 2.6.6-3~),
- python-cherrypy3,
  python-eventlet,
  python-glance,
  python-setuptools,
