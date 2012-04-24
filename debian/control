@@ -65,6 +65,7 @@ Depends: ${misc:Depends},
  python-django-horizon,
  adduser,
  libapache2-mod-wsgi (>= 2.3)
+Recommends: openstack-dashboard-ubuntu-theme
 Description: django web interface to Openstack
  The OpenStack Dashboard is a reference implementation of a Django site that
  uses the Django-Nova project to provide web based interactions with the
@@ -79,7 +80,6 @@ Description: dummy transitonal package from python-django-openstack to python-dj
 
 Package: openstack-dashboard-ubuntu-theme
 Architecture: all
-Pre-Depends: dpkg (>= 1.15.7.2)
 Depends: ${misc:Depends},                                                  
  ${python:Depends},
  openstack-dashboard
