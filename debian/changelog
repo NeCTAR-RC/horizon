@@ -1,5 +1,18 @@
+horizon (2012.1-0ubuntu6) precise; urgency=low
+
+  [ Adam Gandelman ]
+  * debian/openstack-dashboard.links: Create symlink to horizon's static js
+    files. (LP: #987535)
+
+  [ Jamie Strandboge ]
+  * debian/control: don't Build-Depends on python-cherrypy3. It is used by
+    only the dashboard tests and they are disabled in Ubuntu builds
+
+ -- Adam Gandelman <adamg@canonical.com>  Tue, 24 Apr 2012 10:43:12 -0700
+
 horizon (2012.1-0ubuntu5) precise; urgency=low
 
+  [ Adam Gandelman ]
   * debian/patches/turn-off-debug.patch: Enable again
   * debian/openstack-dashboard.conf: Add an Alias mapping '/static'
     to '/usr/share/opensack-dashboard/openstack_dashboard/static/'
@@ -7,7 +20,11 @@ horizon (2012.1-0ubuntu5) precise; urgency=low
   * debian/patches/allow_alternate_css.patch: Allow loading of ubuntu.css
     and favicon if they exists
   * debian/control: Drop libjs-jquery dependencies
- -- Adam Gandelman <adamg@canonical.com>  Fri, 13 Apr 2012 12:54:23 -0700
+  
+  [ Dave Walker (Daviey) ]
+  * debian/control: Drop duplicate depends python-cloudfiles. 
+
+ -- Dave Walker (Daviey) <DaveWalker@ubuntu.com>  Mon, 23 Apr 2012 10:04:39 +0100
 
 horizon (2012.1-0ubuntu4) precise; urgency=low
 
