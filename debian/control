@@ -51,6 +51,7 @@ Depends: ${misc:Depends},
  python-keystoneclient,
  python-memcache,
  python-django-nose
+Recommends: memcached
 Description: Django module providing web based interaction with OpenStack
  The Django-Nova project is a Django module that is used to provide web based
  interactions with the OpenStack Nova cloud controller.

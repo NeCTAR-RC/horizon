@@ -1,3 +1,11 @@
+horizon (2012.1-0ubuntu8) precise-proposed; urgency=low
+
+  * debian/control: Added memcached as a Recommends of python-django-horizon,
+    to ensure a memcached is running and can be used via default install.
+    - LP: #988435
+
+ -- Dave Walker (Daviey) <DaveWalker@ubuntu.com>  Wed, 25 Apr 2012 18:30:00 +0100
+
 horizon (2012.1-0ubuntu7) precise; urgency=low
 
   * debian/patches/use-memcache.patch: Use memcache for session engine by
