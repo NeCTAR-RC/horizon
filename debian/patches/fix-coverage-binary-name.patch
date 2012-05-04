@@ -1,10 +1,7 @@
-Description: Make the tests run again in Ubuntu.
-Author: Chuck Short <zulcss@ubuntu.com>
-Forwarded: no
-diff -Naurp horizon-2012.1.orig/run_tests.sh horizon-2012.1/run_tests.sh
---- horizon-2012.1.orig/run_tests.sh	2012-03-20 12:31:23.000000000 -0400
-+++ horizon-2012.1/run_tests.sh	2012-03-27 09:36:10.299709229 -0400
-@@ -269,35 +269,35 @@ function run_tests {
+diff -Naurp horizon-2012.2.orig/run_tests.sh horizon-2012.2/run_tests.sh
+--- horizon-2012.2.orig/run_tests.sh	2012-05-03 19:47:00.000000000 -0400
++++ horizon-2012.2/run_tests.sh	2012-05-04 09:44:49.136820448 -0400
+@@ -272,8 +272,8 @@ function run_tests {
    sanity_check
  
    echo "Running Horizon application tests"
@@ -15,21 +12,14 @@ diff -Naurp horizon-2012.1.orig/run_tests.sh horizon-2012.1/run_tests.sh
    # get results of the Horizon tests
    HORIZON_RESULT=$?
  
--  echo "Running openstack_dashboard tests"
--  if [ $selenium -eq 1 ]; then
--      ${command_wrapper} coverage run -p $root/manage.py test openstack_dashboard --settings=horizon.tests.testsettings --with-selenium --with-cherrypyliveserver $testargs
--    else
--      ${command_wrapper} coverage run -p $root/manage.py test openstack_dashboard --settings=horizon.tests.testsettings $testargs
--  fi
-+  #echo "Running openstack_dashboard tests"
-+  #if [ $selenium -eq 1 ]; then
-+  #    ${command_wrapper} python-coverage run -p $root/manage.py test openstack_dashboard --settings=horizon.tests.testsettings --with-selenium --with-cherrypyliveserver $testargs
-+  #  else
-+  #    ${command_wrapper} python-coverage run -p $root/manage.py test openstack_dashboard --settings=horizon.tests.testsettings $testargs
-+  #fi
+@@ -281,15 +281,15 @@ function run_tests {
+   if [ $selenium -eq 1 ]; then
+     export WITH_SELENIUM=1
+   fi
+-  ${command_wrapper} coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testargs
++  ${command_wrapper} python-coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testargs
    # get results of the openstack_dashboard tests
--  DASHBOARD_RESULT=$?
-+  #DASHBOARD_RESULT=$?
+   DASHBOARD_RESULT=$?
  
    if [ $with_coverage -eq 1 ]; then
      echo "Generating coverage reports"
@@ -42,15 +32,3 @@ diff -Naurp horizon-2012.1.orig/run_tests.sh horizon-2012.1/run_tests.sh
    fi
    # Remove the leftover coverage files from the -p flag earlier.
    rm -f .coverage.*
- 
--  if [ $(($HORIZON_RESULT || $DASHBOARD_RESULT)) -eq 0 ]; then
-+  if [ $(($HORIZON_RESULT)) -eq 0 ]; then
-     echo "Tests completed successfully."
-   else
-     echo "Tests failed."
-   fi
--  exit $(($HORIZON_RESULT || $DASHBOARD_RESULT))
-+  exit $(($HORIZON_RESULT))
- }
- 
- function run_makemessages {
