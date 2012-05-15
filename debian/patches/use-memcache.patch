@@ -1,0 +1,19 @@
+Description: Use memcache session engine by default
+ This is to avoid frequent log outs, as sessions are not shared across workers.
+Author: Dave Walker (Daviey) <DaveWalker@ubuntu.com>
+Bug: https://launchpad.net/bugs/968850
+
+--- a/openstack_dashboard/local/local_settings.py.example
++++ b/openstack_dashboard/local/local_settings.py.example
+@@ -26,10 +26,7 @@
+ 
+ LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
+ 
+-# We recommend you use memcached for development; otherwise after every reload
+-# of the django development server, you will have to login again. To use
+-# memcached set CACHE_BACKED to something like 'memcached://127.0.0.1:11211/'
+-CACHE_BACKEND = 'locmem://'
++CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+ 
+ # Send email to the console by default
+ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
