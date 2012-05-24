@@ -1,10 +1,11 @@
-horizon (2012.2~f1~20120523.r1754-0ubuntu1) UNRELEASED; urgency=low
+horizon (2012.2~f1-0ubuntu1) quantal; urgency=low
 
   * New usptream release. 
   * Prepare for quantal:
     - debian/patches/fix-coverage-binary-name.patch: Refreshed.
+  * Temporarily pass the testsuite.
 
- -- Chuck Short <zulcss@ubuntu.com>  Fri, 04 May 2012 09:41:00 -0400
+ -- Chuck Short <zulcss@ubuntu.com>  Thu, 24 May 2012 14:33:20 -0400
 
 horizon (2012.1-0ubuntu8) precise-proposed; urgency=low
 
