@@ -1,7 +1,6 @@
-Index: horizon/horizon/dashboards/settings/dashboard.py
-===================================================================
---- horizon.orig/horizon/dashboards/settings/dashboard.py	2012-04-11 20:01:15.375885784 -0700
-+++ horizon/horizon/dashboards/settings/dashboard.py	2012-04-11 20:02:56.531890920 -0700
+diff -Naurp horizon.orig/horizon/dashboards/settings/dashboard.py horizon/horizon/dashboards/settings/dashboard.py
+--- horizon.orig/horizon/dashboards/settings/dashboard.py	2012-05-31 14:08:31.380889052 -0400
++++ horizon/horizon/dashboards/settings/dashboard.py	2012-05-31 14:09:09.112889071 -0400
 @@ -16,6 +16,7 @@
  #    under the License.
  
@@ -10,7 +9,7 @@ Index: horizon/horizon/dashboards/settings/dashboard.py
  
  import horizon
  
-@@ -23,7 +24,15 @@
+@@ -23,7 +24,15 @@ import horizon
  class Settings(horizon.Dashboard):
      name = _("Settings")
      slug = "settings"
@@ -27,16 +26,9 @@ Index: horizon/horizon/dashboards/settings/dashboard.py
      default_panel = 'user'
      nav = False
  
-Index: horizon/horizon/dashboards/settings/juju/__init__.py
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ horizon/horizon/dashboards/settings/juju/__init__.py	2012-04-11 20:02:56.531890920 -0700
-@@ -0,0 +1 @@
-+# Horizon Juju settings panel
-Index: horizon/horizon/dashboards/settings/juju/forms.py
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ horizon/horizon/dashboards/settings/juju/forms.py	2012-04-11 20:02:56.535890920 -0700
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/forms.py horizon/horizon/dashboards/settings/juju/forms.py
+--- horizon.orig/horizon/dashboards/settings/juju/forms.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/forms.py	2012-05-31 14:09:09.116889042 -0400
 @@ -0,0 +1,96 @@
 +# vim: tabstop=4 shiftwidth=4 softtabstop=4
 +
@@ -134,10 +126,14 @@ Index: horizon/horizon/dashboards/settings/juju/forms.py
 +        response['Content-Disposition'] = 'attachment; filename=environments.yaml'
 +        response['Content-Length'] = str(len(response.content))
 +        return response
-Index: horizon/horizon/dashboards/settings/juju/panel.py
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ horizon/horizon/dashboards/settings/juju/panel.py	2012-04-11 20:02:56.535890920 -0700
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/__init__.py horizon/horizon/dashboards/settings/juju/__init__.py
+--- horizon.orig/horizon/dashboards/settings/juju/__init__.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/__init__.py	2012-05-31 14:09:09.112889071 -0400
+@@ -0,0 +1 @@
++# Horizon Juju settings panel
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/panel.py horizon/horizon/dashboards/settings/juju/panel.py
+--- horizon.orig/horizon/dashboards/settings/juju/panel.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/panel.py	2012-05-31 14:09:09.116889042 -0400
 @@ -0,0 +1,28 @@
 +# vim: tabstop=4 shiftwidth=4 softtabstop=4
 +# Copyright 2012 Openstack, LLC
@@ -167,10 +163,9 @@ Index: horizon/horizon/dashboards/settings/juju/panel.py
 +
 +
 +dashboard.Settings.register(JujuPanel)
-Index: horizon/horizon/dashboards/settings/juju/urls.py
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ horizon/horizon/dashboards/settings/juju/urls.py	2012-04-11 20:02:56.535890920 -0700
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/urls.py horizon/horizon/dashboards/settings/juju/urls.py
+--- horizon.orig/horizon/dashboards/settings/juju/urls.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/urls.py	2012-05-31 14:09:09.116889042 -0400
 @@ -0,0 +1,24 @@
 +# vim: tabstop=4 shiftwidth=4 softtabstop=4
 +
@@ -196,10 +191,9 @@ Index: horizon/horizon/dashboards/settings/juju/urls.py
 +urlpatterns = patterns('horizon.dashboards.settings.juju.views',
 +    url(r'^$', IndexView.as_view(), name='index'),
 +)
-Index: horizon/horizon/dashboards/settings/juju/views.py
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ horizon/horizon/dashboards/settings/juju/views.py	2012-04-11 20:02:56.535890920 -0700
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/views.py horizon/horizon/dashboards/settings/juju/views.py
+--- horizon.orig/horizon/dashboards/settings/juju/views.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/views.py	2012-05-31 14:09:09.116889042 -0400
 @@ -0,0 +1,28 @@
 +# vim: tabstop=4 shiftwidth=4 softtabstop=4
 +
@@ -229,10 +223,9 @@ Index: horizon/horizon/dashboards/settings/juju/views.py
 +class IndexView(forms.ModalFormView):
 +    form_class = DownloadJujuEnvironment
 +    template_name = 'settings/juju/index.html'
-Index: horizon/horizon/dashboards/settings/templates/settings/juju/download_form.html
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ horizon/horizon/dashboards/settings/templates/settings/juju/download_form.html	2012-04-11 20:02:56.535890920 -0700
+diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/download_form.html horizon/horizon/dashboards/settings/templates/settings/juju/download_form.html
+--- horizon.orig/horizon/dashboards/settings/templates/settings/juju/download_form.html	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/templates/settings/juju/download_form.html	2012-05-31 14:09:09.116889042 -0400
 @@ -0,0 +1,20 @@
 +{% extends "horizon/common/_modal_form.html" %}
 +{% load i18n %}
@@ -254,10 +247,9 @@ Index: horizon/horizon/dashboards/settings/templates/settings/juju/download_form
 +    <input class="btn btn-primary pull-right" type="submit" value="{% trans "Download Juju Environment Config" %}" />
 +    {% if hide %}<a href="{% url horizon:settings:juju:index %}" class="btn secondary cancel close">{% trans "Cancel" %}</a>{% endif %}
 +{% endblock %}
-Index: horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template	2012-04-11 20:02:56.535890920 -0700
+diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template
+--- horizon.orig/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template	2012-05-31 14:09:09.116889042 -0400
 @@ -0,0 +1,21 @@
 +# To use Juju with your Openstack cloud:
 +#    1. Run: apt-get install juju
@@ -280,10 +272,9 @@ Index: horizon/horizon/dashboards/settings/templates/settings/juju/environments.
 +    s3-uri: {{ s3_url }}
 +    default-series: precise
 +    default-image-id: ami-00000001
-Index: horizon/horizon/dashboards/settings/templates/settings/juju/index.html
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ horizon/horizon/dashboards/settings/templates/settings/juju/index.html	2012-04-11 20:02:56.535890920 -0700
+diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/index.html horizon/horizon/dashboards/settings/templates/settings/juju/index.html
+--- horizon.orig/horizon/dashboards/settings/templates/settings/juju/index.html	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/templates/settings/juju/index.html	2012-05-31 14:09:09.116889042 -0400
 @@ -0,0 +1,11 @@
 +{% extends 'settings/base.html' %}
 +{% load i18n %}
@@ -296,13 +287,12 @@ Index: horizon/horizon/dashboards/settings/templates/settings/juju/index.html
 +{% block settings_main %}
 +  {% include "settings/juju/download_form.html" %}
 +{% endblock %}
-Index: horizon/openstack_dashboard/local/local_settings.py.example
-===================================================================
---- horizon.orig/openstack_dashboard/local/local_settings.py.example	2012-04-11 19:52:21.843349000 -0700
-+++ horizon/openstack_dashboard/local/local_settings.py.example	2012-04-11 20:12:50.747921080 -0700
-@@ -7,6 +7,12 @@
- PROD = False
- USE_SSL = False
+diff -Naurp horizon.orig/openstack_dashboard/local/local_settings.py.example horizon/openstack_dashboard/local/local_settings.py.example
+--- horizon.orig/openstack_dashboard/local/local_settings.py.example	2012-05-31 14:08:31.396889052 -0400
++++ horizon/openstack_dashboard/local/local_settings.py.example	2012-05-31 14:09:09.116889042 -0400
+@@ -13,6 +13,12 @@ PROD = False
+ # https://docs.djangoproject.com/en/1.4/ref/settings/#secure-proxy-ssl-header
+ # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
  
 +# Ubuntu-specific: Enables an extra panel in the 'Settings' section
 +# that easily generates a Juju environments.yaml for download,

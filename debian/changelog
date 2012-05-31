@@ -1,3 +1,10 @@
+horizon (2012.2~f2~20120530.1777-0ubuntu2) UNRELEASED; urgency=low
+
+  * New upstream release. 
+  * debian/patches/add_juju_settings_panel.patch: Refreshed
+
+ -- Chuck Short <zulcss@ubuntu.com>  Thu, 31 May 2012 14:10:37 -0400
+
 horizon (2012.2~f1-0ubuntu1) quantal; urgency=low
 
   * New usptream release. 
