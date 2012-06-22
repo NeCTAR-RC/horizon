@@ -1,12 +1,17 @@
-horizon (2012.2~f2~20120530.1777-0ubuntu2) quantal; urgency=low
+horizon (2012.2~f2~20120622.1833-0ubuntu1) quantal; urgency=low
 
+  [ Chuck Short ]
+  * New upstream version.
+  * debian/copyright: Fix lintian warnings.
+
+  [ Adam Gandelman ]
   * Disabled during Folsom dev cycle, to be refreshed against first Folsom RC:
     - debian/patches/add_juju_settings_panel.patch
     - debian/patches/allow_alternate_css.patch
   * debian/patches/fix-coverage-binary-name.patch: Refreshed.
   * debian/patches/turn-off-debug.patch: Refreshed.
 
- -- Adam Gandelman <adamg@canonical.com>  Mon, 18 Jun 2012 16:35:19 -0700
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 22 Jun 2012 11:31:06 -0400
 
 horizon (2012.2~f2~20120530.1777-0ubuntu1) quantal; urgency=low
 

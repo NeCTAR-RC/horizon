@@ -4,9 +4,9 @@ Source: http://github.com/openstack/horizon
 
 Files: *
 Copyright: 2010 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.
-Copyright: 2011 Nebula, Inc.
-Copyright: 2011 OpenStack LLC
-Copyright: 2011 Midokura KK
+           2011 Nebula, Inc.
+           2011 OpenStack LLC
+            2011 Midokura KK
 License: Apache-2
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
