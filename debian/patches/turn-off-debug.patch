@@ -1,7 +1,7 @@
 Index: horizon/openstack_dashboard/local/local_settings.py.example
 ===================================================================
---- horizon.orig/openstack_dashboard/local/local_settings.py.example	2012-06-20 15:13:24.780980297 -0700
-+++ horizon/openstack_dashboard/local/local_settings.py.example	2012-06-20 15:13:51.544979315 -0700
+--- horizon.orig/openstack_dashboard/local/local_settings.py.example	2012-07-03 14:07:21.176118117 -0700
++++ horizon/openstack_dashboard/local/local_settings.py.example	2012-07-03 14:07:47.016119233 -0700
 @@ -2,7 +2,7 @@
  
  from django.utils.translation import ugettext_lazy as _

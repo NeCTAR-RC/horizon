@@ -1,6 +1,7 @@
-diff -Naurp horizon.orig/manage.py horizon/manage.py
---- horizon.orig/manage.py	2012-02-29 20:52:57.112846675 -0500
-+++ horizon/manage.py	2012-02-29 21:00:01.768846737 -0500
+Index: horizon/manage.py
+===================================================================
+--- horizon.orig/manage.py	2012-07-03 14:07:21.268118122 -0700
++++ horizon/manage.py	2012-07-03 14:07:32.136118591 -0700
 @@ -3,6 +3,7 @@
  import os
  import sys

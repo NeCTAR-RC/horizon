@@ -1,3 +1,9 @@
+horizon (2012.2~f2~20120622.1833-0ubuntu2) quantal; urgency=low
+
+  * debian/patches/{use-memcache.patch, turn-off-debug.patch}: Refresh. 
+
+ -- Adam Gandelman <adamg@canonical.com>  Tue, 03 Jul 2012 14:09:15 -0700
+
 horizon (2012.2~f2~20120622.1833-0ubuntu1) quantal; urgency=low
 
   [ Chuck Short ]

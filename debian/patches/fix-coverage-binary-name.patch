@@ -1,8 +1,8 @@
 Index: horizon/run_tests.sh
 ===================================================================
---- horizon.orig/run_tests.sh	2012-06-18 16:29:47.000000000 -0700
-+++ horizon/run_tests.sh	2012-06-18 16:32:09.127154790 -0700
-@@ -273,8 +273,8 @@
+--- horizon.orig/run_tests.sh	2012-07-03 14:07:21.216118119 -0700
++++ horizon/run_tests.sh	2012-07-03 14:07:37.464118821 -0700
+@@ -270,8 +270,8 @@
  
    echo "Running Horizon application tests"
    export NOSE_XUNIT_FILE=horizon/nosetests.xml
@@ -13,7 +13,7 @@ Index: horizon/run_tests.sh
    # get results of the Horizon tests
    HORIZON_RESULT=$?
  
-@@ -283,15 +283,15 @@
+@@ -280,15 +280,15 @@
      export WITH_SELENIUM=1
    fi
    export NOSE_XUNIT_FILE=openstack_dashboard/nosetests.xml
