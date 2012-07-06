@@ -1,3 +1,9 @@
+horizon (2012.2~f2-0ubuntu1) quantal; urgency=low
+
+  * New usptream version. 
+
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 06 Jul 2012 11:38:55 -0400
+
 horizon (2012.2~f2~20120622.1833-0ubuntu2) quantal; urgency=low
 
   * debian/patches/{use-memcache.patch, turn-off-debug.patch}: Refresh. 
