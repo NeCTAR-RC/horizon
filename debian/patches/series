@@ -7,3 +7,4 @@ turn-off-debug.patch
 # Disabled during Folsom dev cycle.
 #allow_alternate_css.patch
 use-memcache.patch
+fix-ubuntu-tests.patch
