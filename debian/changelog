@@ -1,7 +1,9 @@
-horizon (2012.2~f2-0ubuntu2) UNRELEASED; urgency=low
+horizon (2012.2~f3~20120712.1907-0ubuntu1) UNRELEASED; urgency=low
 
+  * New upstream release.
   * debian/patches/fix-ubuntu-tests.patch: Fix test suites again to 
     run during the builds. 
+  * debian/watch: Update.
 
  -- Chuck Short <zulcss@ubuntu.com>  Tue, 10 Jul 2012 11:48:03 -0400
 
