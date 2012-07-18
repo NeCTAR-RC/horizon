@@ -1,10 +1,11 @@
 Description: Fix running test suite on quantal.
 Author: Chuck Short <zulcss@ubuntu.com>
 Forwarded: no
-diff -Naupr horizon-2012.2.orig/horizon/tests/testsettings.py horizon-2012.2/horizon/tests/testsettings.py
---- horizon-2012.2.orig/horizon/tests/testsettings.py	2012-07-12 18:46:52.000000000 -0500
-+++ horizon-2012.2/horizon/tests/testsettings.py	2012-07-13 07:59:25.901863893 -0500
-@@ -91,7 +91,6 @@ SITE_BRANDING = 'OpenStack'
+Index: horizon/horizon/tests/testsettings.py
+===================================================================
+--- horizon.orig/horizon/tests/testsettings.py	2012-07-18 13:15:04.000000000 -0700
++++ horizon/horizon/tests/testsettings.py	2012-07-18 13:17:08.669818620 -0700
+@@ -91,7 +91,6 @@
  TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
  NOSE_ARGS = ['--nocapture',
               '--nologcapture',
@@ -12,10 +13,11 @@ diff -Naupr horizon-2012.2.orig/horizon/tests/testsettings.py horizon-2012.2/hor
               '--cover-package=horizon',
               '--cover-inclusive']
  
-diff -Naupr horizon-2012.2.orig/run_tests.sh horizon-2012.2/run_tests.sh
---- horizon-2012.2.orig/run_tests.sh	2012-07-12 18:46:52.000000000 -0500
-+++ horizon-2012.2/run_tests.sh	2012-07-13 08:00:00.017864706 -0500
-@@ -266,14 +266,14 @@ function run_tests {
+Index: horizon/run_tests.sh
+===================================================================
+--- horizon.orig/run_tests.sh	2012-07-18 13:16:45.000000000 -0700
++++ horizon/run_tests.sh	2012-07-18 13:17:57.037816493 -0700
+@@ -266,14 +266,14 @@
    # get results of the Horizon tests
    HORIZON_RESULT=$?
  
@@ -24,7 +26,7 @@ diff -Naupr horizon-2012.2.orig/run_tests.sh horizon-2012.2/run_tests.sh
 -    export WITH_SELENIUM=1
 -  fi
 -  export NOSE_XUNIT_FILE=openstack_dashboard/nosetests.xml
--  ${command_wrapper} coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testargs
+-  ${command_wrapper} python-coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testargs
 -  # get results of the openstack_dashboard tests
 -  DASHBOARD_RESULT=$?
 +#  echo "Running openstack_dashboard tests"
@@ -32,7 +34,7 @@ diff -Naupr horizon-2012.2.orig/run_tests.sh horizon-2012.2/run_tests.sh
 +#    export WITH_SELENIUM=1
 +#  fi
 +#  export NOSE_XUNIT_FILE=openstack_dashboard/nosetests.xml
-+#  ${command_wrapper} coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testargs
++#  ${command_wrapper} python-coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testargs
 +#  # get results of the openstack_dashboard tests
 +#  DASHBOARD_RESULT=$?
  
