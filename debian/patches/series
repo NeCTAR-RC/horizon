@@ -1,0 +1,10 @@
+fix-dashboard-django-wsgi.patch
+fix-dashboard-manage.patch
+fix-coverage-binary-name.patch
+add_juju_settings_panel.patch
+turn-off-debug.patch
+allow_alternate_css.patch
+use-memcache.patch
+CVE-2012-2094.patch
+CVE-2012-2144.patch
+#misc.patch

@@ -1,0 +1,11 @@
+diff -Naurp horizon.orig/manage.py horizon/manage.py
+--- horizon.orig/manage.py	2012-02-29 20:52:57.112846675 -0500
++++ horizon/manage.py	2012-02-29 21:00:01.768846737 -0500
+@@ -3,6 +3,7 @@
+ import os
+ import sys
+ 
++sys.path.append("/usr/share/openstack-dashboard")
+ 
+ if __name__ == "__main__":
+     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openstack_dashboard.settings")
