@@ -1,0 +1,17 @@
+*.pyc
+*.swp
+.environment_version
+.selenium_log
+.coverage*
+.noseids
+coverage.xml
+pep8.txt
+pylint.txt
+reports
+horizon.egg-info
+openstack_dashboard/local/local_settings.py
+docs/build/
+docs/source/sourcecode
+.venv
+build
+dist
