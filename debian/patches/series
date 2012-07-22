@@ -5,4 +5,5 @@ add_juju_settings_panel.patch
 turn-off-debug.patch
 allow_alternate_css.patch
 use-memcache.patch
+upstream/fix-image-properties.patch
 #misc.patch

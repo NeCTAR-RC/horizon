@@ -1,0 +1,45 @@
+From 5e20e7cc11a15820ebc8b829ee485780268eb8e1 Mon Sep 17 00:00:00 2001
+From: Jay Pipes <jaypipes@gmail.com>
+Date: Sun, 17 Jun 2012 13:21:46 -0400
+Subject: [PATCH] Ensure existing image properties are not deleted
+
+Fixes LP #1014226
+
+Passing the X-Glance-Registry-Purge-Props: false
+header to the image_update Glance client method
+prevents previously-set image properties from being
+marked deleted.
+
+Change-Id: I91e927f8c95205cae11bad0d93361f1c9951d62d
+---
+ horizon/api/glance.py                                        |    2 +-
+ horizon/dashboards/nova/images_and_snapshots/images/forms.py |    3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/horizon/api/glance.py b/horizon/api/glance.py
+index cda7cb2..531dcbd 100644
+--- a/horizon/api/glance.py
++++ b/horizon/api/glance.py
+@@ -130,7 +130,7 @@ def image_list_detailed(request, marker=None, filters=None):
+                                                             marker=marker,
+                                                             filters=filters)
+     images = [Image(i) for i in image_dicts]
+-    if(len(images) > limit):
++    if len(images) > limit:
+         return (images[0:-1], True)
+     else:
+         return (images, False)
+diff --git a/horizon/dashboards/nova/images_and_snapshots/images/forms.py b/horizon/dashboards/nova/images_and_snapshots/images/forms.py
+index bc4851d..b597163 100644
+--- a/horizon/dashboards/nova/images_and_snapshots/images/forms.py
++++ b/horizon/dashboards/nova/images_and_snapshots/images/forms.py
+@@ -83,6 +83,9 @@ class UpdateImageForm(forms.SelfHandlingForm):
+             meta['properties']['architecture'] = data['architecture']
+ 
+         try:
++            # Ensure we do not delete properties that have already been
++            # set on an image.
++            meta['features'] = {'X-Glance-Registry-Purge-Props': False}
+             api.image_update(request, image_id, meta)
+             messages.success(request, _('Image was successfully updated.'))
+         except:
