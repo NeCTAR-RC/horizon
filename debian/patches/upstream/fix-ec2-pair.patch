@@ -1,0 +1,44 @@
+From ffd103143223a99673275f97e937ffd9f0911cb5 Mon Sep 17 00:00:00 2001
+From: Sam Morrison <sorrison@gmail.com>
+Date: Sun, 17 Jun 2012 13:56:59 +1000
+Subject: [PATCH] Return the correct ec2 access/secret when generating
+ ec2rc.sh.
+
+Fixes bug 1014185
+
+Horizon was returning the 1st ec2 pair instead of the one
+linked to the tenant for users in multiple tenants.
+
+Change-Id: Ie392b58a776f2fe7dfdbe22d8558c88e96e37082
+---
+ horizon/dashboards/settings/ec2/forms.py |   14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/horizon/dashboards/settings/ec2/forms.py b/horizon/dashboards/settings/ec2/forms.py
+index 1105aa6..20051a1 100644
+--- a/horizon/dashboards/settings/ec2/forms.py
++++ b/horizon/dashboards/settings/ec2/forms.py
+@@ -61,14 +61,12 @@ class DownloadX509Credentials(forms.SelfHandlingForm):
+     def handle(self, request, data):
+         def find_or_create_access_keys(request, tenant_id):
+             keys = api.keystone.list_ec2_credentials(request, request.user.id)
+-            if keys:
+-                #TODO(jakedahn): Once real CRUD is created, we can allow user
+-                #                to generate per access/secret pair.
+-                return keys[0]
+-            else:
+-                return api.keystone.create_ec2_credentials(request,
+-                                                           request.user.id,
+-                                                           tenant_id)
++            for key in keys:
++                if key.tenant_id == tenant_id:
++                    return key
++            return api.keystone.create_ec2_credentials(request,
++                                                       request.user.id,
++                                                       tenant_id)
+         try:
+             # NOTE(jakedahn): Keystone errors unless we specifically scope
+             #                 the token to tenant before making the call.
+-- 
+1.7.10
+
