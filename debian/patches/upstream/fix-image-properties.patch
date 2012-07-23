@@ -43,3 +43,17 @@ index bc4851d..b597163 100644
              api.image_update(request, image_id, meta)
              messages.success(request, _('Image was successfully updated.'))
          except:
+diff --git a/horizon/dashboards/nova/images_and_snapshots/images/tests.py b/horizon/dashboards/nova/images_and_snapshots/images/tests.py
+index aa02325..8c66250 100644
+--- a/horizon/dashboards/nova/images_and_snapshots/images/tests.py
++++ b/horizon/dashboards/nova/images_and_snapshots/images/tests.py
+@@ -54,7 +54,8 @@ class ImageViewTests(test.TestCase):
+                          'container_format': u'new_format',
+                          'is_public': False,
+                          'disk_format': u'new_disk_format',
+-                         'properties': {}}
++                         'properties': {},
++                         'features': {'X-Glance-Registry-Purge-Props': False}}
+ 
+         self.mox.StubOutWithMock(api, 'image_get_meta')
+         self.mox.StubOutWithMock(api, 'image_update')
