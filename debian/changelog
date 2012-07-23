@@ -1,3 +1,9 @@
+horizon (2012.1.1+20120622-1) precise; urgency=low
+
+  * UNRELEASED
+
+ -- Russell Sim <russell.sim@gmail.com>  Mon, 09 Jul 2012 15:40:44 +1000
+
 horizon (2012.1-0ubuntu8.1) precise-security; urgency=low
 
   * SECURITY UPDATE: fix XSS when refreshing logs
