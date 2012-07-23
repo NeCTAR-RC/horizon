@@ -1,0 +1,28 @@
+From 83f66be66f0610493a502b2ae23f21efccbfdf7a Mon Sep 17 00:00:00 2001
+From: Sam Morrison <sorrison@gmail.com>
+Date: Tue, 24 Apr 2012 18:08:08 +1000
+Subject: [PATCH] Adds S3_URL to generated ec2rc.sh template.
+
+Fixes bug 987678
+
+Change-Id: I5e4d82b0724a7827fa73625160381bf2df58905b
+---
+ AUTHORS                                                           |    1 +
+ horizon/dashboards/settings/ec2/forms.py                          |    5 +++++
+ .../dashboards/settings/templates/settings/ec2/ec2rc.sh.template  |    1 +
+ 3 files changed, 7 insertions(+)
+
+diff --git a/horizon/dashboards/settings/templates/settings/ec2/ec2rc.sh.template b/horizon/dashboards/settings/templates/settings/ec2/ec2rc.sh.template
+index 76f51eb..0b6f7e2 100644
+--- a/horizon/dashboards/settings/templates/settings/ec2/ec2rc.sh.template
++++ b/horizon/dashboards/settings/templates/settings/ec2/ec2rc.sh.template
+@@ -10,5 +10,6 @@ export EC2_PRIVATE_KEY=${NOVA_KEY_DIR}/pk.pem
+ export EC2_CERT=${NOVA_KEY_DIR}/cert.pem
+ export NOVA_CERT=${NOVA_KEY_DIR}/cacert.pem
+ export EUCALYPTUS_CERT=${NOVA_CERT} # euca-bundle-image seems to require this set
++{% if s3_endpoint %}export S3_URL={{ s3_endpoint }}{% endif %}
+ alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_PRIVATE_KEY} --user 42 --ec2cert ${NOVA_CERT}"
+ alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL} --ec2cert ${NOVA_CERT}"
+-- 
+1.7.10
+
