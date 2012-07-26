@@ -1,11 +1,11 @@
 Description: Fix running test suite on quantal.
 Author: Chuck Short <zulcss@ubuntu.com>
 Forwarded: no
-Index: horizon/horizon/tests/testsettings.py
+Index: horizon-2012.2/horizon/tests/testsettings.py
 ===================================================================
---- horizon.orig/horizon/tests/testsettings.py	2012-07-18 13:15:04.000000000 -0700
-+++ horizon/horizon/tests/testsettings.py	2012-07-18 13:17:08.669818620 -0700
-@@ -91,7 +91,6 @@
+--- horizon-2012.2.orig/horizon/tests/testsettings.py	2012-07-25 17:41:22.000000000 -0700
++++ horizon-2012.2/horizon/tests/testsettings.py	2012-07-25 17:43:15.322507107 -0700
+@@ -96,7 +96,6 @@
  TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
  NOSE_ARGS = ['--nocapture',
               '--nologcapture',
@@ -13,26 +13,20 @@ Index: horizon/horizon/tests/testsettings.py
               '--cover-package=horizon',
               '--cover-inclusive']
  
-Index: horizon/run_tests.sh
+Index: horizon-2012.2/run_tests.sh
 ===================================================================
---- horizon.orig/run_tests.sh	2012-07-18 13:16:45.000000000 -0700
-+++ horizon/run_tests.sh	2012-07-18 13:17:57.037816493 -0700
-@@ -266,14 +266,14 @@
+--- horizon-2012.2.orig/run_tests.sh	2012-07-25 17:42:42.000000000 -0700
++++ horizon-2012.2/run_tests.sh	2012-07-25 17:44:13.794504535 -0700
+@@ -270,11 +270,11 @@
    # get results of the Horizon tests
    HORIZON_RESULT=$?
  
 -  echo "Running openstack_dashboard tests"
--  if [ $selenium -eq 1 ]; then
--    export WITH_SELENIUM=1
--  fi
 -  export NOSE_XUNIT_FILE=openstack_dashboard/nosetests.xml
 -  ${command_wrapper} python-coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testargs
 -  # get results of the openstack_dashboard tests
 -  DASHBOARD_RESULT=$?
 +#  echo "Running openstack_dashboard tests"
-+#  if [ $selenium -eq 1 ]; then
-+#    export WITH_SELENIUM=1
-+#  fi
 +#  export NOSE_XUNIT_FILE=openstack_dashboard/nosetests.xml
 +#  ${command_wrapper} python-coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testargs
 +#  # get results of the openstack_dashboard tests
