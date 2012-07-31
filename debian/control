@@ -31,8 +31,8 @@ Homepage: http://launchpad.net/horizon
 Package: python-django-horizon
 Section: python
 Architecture: all
-Depends: ${misc:Depends}, 
- ${python:Depends}, 
+Depends: ${misc:Depends},
+ ${python:Depends},
  python-django (>= 1.4),
  python-glance,
  python-nova,
@@ -50,7 +50,8 @@ Depends: ${misc:Depends},
  python-novaclient,
  python-keystoneclient,
  python-memcache,
- python-django-nose
+ python-django-nose,
+ python-glanceclient
 Recommends: memcached
 Description: Django module providing web based interaction with OpenStack
  The Django-Nova project is a Django module that is used to provide web based
@@ -59,7 +60,7 @@ Description: Django module providing web based interaction with OpenStack
 Package: openstack-dashboard
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.7.2)
-Depends: ${misc:Depends}, 
+Depends: ${misc:Depends},
  ${python:Depends},
  python-django-horizon,
  adduser,
@@ -74,12 +75,12 @@ Package: python-django-openstack
 Architecture: all
 Depends: ${misc:Depends}, python-django-horizon
 Description: dummy transitonal package from python-django-openstack to python-django-horizon
- This transitional package from the python-django-openstack to the python-django-horizon 
+ This transitional package from the python-django-openstack to the python-django-horizon
  package. Once this package and its dependencies are installed you can remove it.
 
 Package: openstack-dashboard-ubuntu-theme
 Architecture: all
-Depends: ${misc:Depends},                                                  
+Depends: ${misc:Depends},
  ${python:Depends},
  openstack-dashboard
 Description: Ubuntu theme for the Openstack dashboard

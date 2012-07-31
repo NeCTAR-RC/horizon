@@ -2,9 +2,10 @@ horizon (2012.2~f3~20120712.1907-0ubuntu1) UNRELEASED; urgency=low
 
   [ Chuck Short ]
   * New upstream release.
-  * debian/patches/fix-ubuntu-tests.patch: Fix test suites again to 
-    run during the builds. 
+  * debian/patches/fix-ubuntu-tests.patch: Fix test suites again to
+    run during the builds.
   * debian/watch: Update.
+  * debian/control: Add python-glanceclient. (LP: #1030911)
 
   [ Adam Gandelman ]
   * debian/control: Bump required python-django version to 1.4.
@@ -13,13 +14,13 @@ horizon (2012.2~f3~20120712.1907-0ubuntu1) UNRELEASED; urgency=low
 
 horizon (2012.2~f2-0ubuntu1) quantal; urgency=low
 
-  * New usptream version. 
+  * New usptream version.
 
  -- Chuck Short <zulcss@ubuntu.com>  Fri, 06 Jul 2012 11:38:55 -0400
 
 horizon (2012.2~f2~20120622.1833-0ubuntu2) quantal; urgency=low
 
-  * debian/patches/{use-memcache.patch, turn-off-debug.patch}: Refresh. 
+  * debian/patches/{use-memcache.patch, turn-off-debug.patch}: Refresh.
 
  -- Adam Gandelman <adamg@canonical.com>  Tue, 03 Jul 2012 14:09:15 -0700
 
@@ -40,7 +41,7 @@ horizon (2012.2~f2~20120622.1833-0ubuntu1) quantal; urgency=low
 
 horizon (2012.2~f2~20120530.1777-0ubuntu1) quantal; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
   * debian/patches/add_juju_settings_panel.patch: Refreshed
   * debian/patches/turn-off-debug.patch: Refreshed
 
@@ -48,7 +49,7 @@ horizon (2012.2~f2~20120530.1777-0ubuntu1) quantal; urgency=low
 
 horizon (2012.2~f1-0ubuntu1) quantal; urgency=low
 
-  * New usptream release. 
+  * New usptream release.
   * Prepare for quantal:
     - debian/patches/fix-coverage-binary-name.patch: Refreshed.
   * Temporarily pass the testsuite.
@@ -89,13 +90,13 @@ horizon (2012.1-0ubuntu5) precise; urgency=low
   * debian/patches/turn-off-debug.patch: Enable again
   * debian/openstack-dashboard.conf: Add an Alias mapping '/static'
     to '/usr/share/opensack-dashboard/openstack_dashboard/static/'
-    (LP: #980787) 
+    (LP: #980787)
   * debian/patches/allow_alternate_css.patch: Allow loading of ubuntu.css
     and favicon if they exists
   * debian/control: Drop libjs-jquery dependencies
-  
+
   [ Dave Walker (Daviey) ]
-  * debian/control: Drop duplicate depends python-cloudfiles. 
+  * debian/control: Drop duplicate depends python-cloudfiles.
 
  -- Dave Walker (Daviey) <DaveWalker@ubuntu.com>  Mon, 23 Apr 2012 10:04:39 +0100
 
@@ -127,7 +128,7 @@ horizon (2012.1-0ubuntu2) precise; urgency=low
 
 horizon (2012.1-0ubuntu1) precise; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
   * debian/patches/turn-off-debug.patch: Turn off debugging.
 
  -- Chuck Short <zulcss@ubuntu.com>  Thu, 12 Apr 2012 10:46:00 -0400
@@ -143,7 +144,7 @@ horizon (2012.1~rc2-0ubuntu1) precise; urgency=low
   * debian/rules: Fail build if tests fail.
 
   [ A Gandelman ]
-  * debian/control: Add python-memcache 
+  * debian/control: Add python-memcache
   * debain/dashboard.conf: Update to match current upstream documentation
     (LP: #966069)
 
@@ -156,14 +157,14 @@ horizon (2012.1~rc2-0ubuntu1) precise; urgency=low
 
 horizon (2012.1~rc1-0ubuntu1) precise; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
 
  -- Chuck Short <zulcss@ubuntu.com>  Tue, 20 Mar 2012 14:49:24 -0400
 
 horizon (2012.1~rc1~20120315.1545-0ubuntu1) precise; urgency=low
 
   [Adam Gandelman]
-  * New upstream release. 
+  * New upstream release.
 
   [Chuck Short]
   * debian/control: Update run-time depends
@@ -201,7 +202,7 @@ horizon (2012.1~e4-0ubuntu1) precise; urgency=low
 
 horizon (2012.1~e4~20120224.1386-0ubuntu1) precise; urgency=low
 
-  * New upstream version. 
+  * New upstream version.
 
  -- Chuck Short <zulcss@ubuntu.com>  Fri, 24 Feb 2012 10:49:27 -0500
 
@@ -218,23 +219,23 @@ horizon (2012.1~e4~20120217.1354-0ubuntu1) precise; urgency=low
 horizon (2012.1~e4~20120210.1331-0ubuntu1) precise; urgency=low
 
   * New Upstream version
-  * debian/control: 
-   - Add python-coverage as a build dependency. 
+  * debian/control:
+   - Add python-coverage as a build dependency.
    - Add python-novaclient as a build dependency.
 
  -- Chuck Short <zulcss@ubuntu.com>  Fri, 10 Feb 2012 11:09:58 -0500
 
 horizon (2012.1~e4~20120202.1300-0ubuntu2) precise; urgency=low
 
-  * debian/control: Add python-keystoneclient as a build 
-    dependency. 
+  * debian/control: Add python-keystoneclient as a build
+    dependency.
 
  -- Chuck Short <zulcss@ubuntu.com>  Fri, 03 Feb 2012 13:29:27 -0500
 
 horizon (2012.1~e4~20120202.1300-0ubuntu1) precise; urgency=low
 
   * New upstream version.
-  * debian/control: Drop dependencies we dont need. 
+  * debian/control: Drop dependencies we dont need.
 
  -- Chuck Short <zulcss@ubuntu.com>  Fri, 03 Feb 2012 09:55:54 -0500
 
@@ -242,13 +243,13 @@ horizon (2012.1~e3-0ubuntu1) precise; urgency=low
 
   * New upstream version.
   * debian/conffiles: Don't wipe out local_settings.py on upgrade.
-    (LP: #914257) 
+    (LP: #914257)
 
  -- Chuck Short <zulcss@ubuntu.com>  Thu, 26 Jan 2012 09:52:53 -0500
 
 horizon (2012.1~e3~20120120.1235-0ubuntu1) precise; urgency=low
 
-  * New upstream release. 
+  * New upstream release.
 
  -- Chuck Short <zulcss@ubuntu.com>  Fri, 20 Jan 2012 14:51:21 -0500
 
@@ -256,7 +257,7 @@ horizon (2012.1~e3~20120113.1213-0ubuntu1) precise; urgency=low
 
   [Chuck Short]
   * Removed python-django-horizon.postinst, let dh_python2 generate instead
-    since python-support is not a dependency. 
+    since python-support is not a dependency.
   * Dropped python-openstack-compute from debian/control.
   * Clean up debian/control.
   * Restart apache when installing the openstack dashboard.
@@ -288,7 +289,7 @@ horizon (2012.1~e2-0ubuntu1) precise; urgency=low
   * New upstream release (LP: #904039)
   * debian/control: Update build-depends.
   * debian/watch: Fix to fetch from Launchpad ad well.
-  
+
  -- Chuck Short <zulcss@ubuntu.com>  Fri, 16 Dec 2011 16:34:56 -0500
 
 horizon (2012.1~e2~20111209.1104-0ubuntu1) precise; urgency=low
