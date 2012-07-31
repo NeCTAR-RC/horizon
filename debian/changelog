@@ -6,6 +6,9 @@ horizon (2012.2~f3~20120712.1907-0ubuntu1) UNRELEASED; urgency=low
     run during the builds.
   * debian/watch: Update.
   * debian/control: Add python-glanceclient. (LP: #1030911)
+  * debian/openstack-dashboard.conf: Don't hijack apache's webroot. (LP:
+    #1020313)
+  * debian/control: Update horizon deps to reflect reality.
 
   [ Adam Gandelman ]
   * debian/control: Bump required python-django version to 1.4.

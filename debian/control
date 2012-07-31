@@ -4,27 +4,14 @@ Priority: extra
 Maintainer: Chuck Short <zulcss@ubuntu.com>
 Build-Depends: debhelper (>= 8.0.0),
  python-all (>= 2.6.6-3~),
- python-eventlet,
- python-glance,
  python-setuptools,
- python-kombu,
  python-mox,
- python-paste,
- python-pastedeploy,
- python-crypto,
- python-cloudfiles,
  python-django-nose,
  python-nose,
- python-dateutil,
- python-routes,
- python-sqlalchemy,
- python-keystoneclient,
- python-novaclient,
- python-coverage,
+ python-netaddr,
+ pylint,
  pep8,
- python-sphinx,
- python-webob,
- python-xattr
+ python-sphinx
 Standards-Version: 3.9.3
 Homepage: http://launchpad.net/horizon
 
@@ -34,24 +21,13 @@ Architecture: all
 Depends: ${misc:Depends},
  ${python:Depends},
  python-django (>= 1.4),
- python-glance,
- python-nova,
- python-cloudfiles,
- python-eventlet,
- python-kombu,
- python-paste,
- python-pastedeploy,
- python-crypto,
- python-dateutil,
- python-routes,
- python-sqlalchemy,
- python-webob,
- python-xattr,
- python-novaclient,
+ python-glanceclient,
  python-keystoneclient,
+ python-novaclient,
+ python-cloudfiles,
  python-memcache,
- python-django-nose,
- python-glanceclient
+ python-tz,
+ python-lockfile
 Recommends: memcached
 Description: Django module providing web based interaction with OpenStack
  The Django-Nova project is a Django module that is used to provide web based
