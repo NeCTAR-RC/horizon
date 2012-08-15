@@ -19,7 +19,9 @@ Package: python-django-horizon
 Section: python
 Architecture: all
 Depends: python-cloudfiles,
+ lessc,
  python-django (>= 1.4),
+ python-compressor,
  python-cinderclient,
  python-glanceclient,
  python-keystoneclient,
