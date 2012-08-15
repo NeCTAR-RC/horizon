@@ -28,7 +28,7 @@ override_dh_auto_install:
 		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py
 	cp $(CURDIR)/debian/theme/juju.png \
 		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img/juju.png
-
+	chown -R www-data:www-data /usr/share/openstack-dashboard/openstack_dashboard/static
 
 ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
 override_dh_auto_test:
