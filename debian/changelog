@@ -14,11 +14,12 @@ horizon (2012.2~f3~20120712.1907-0ubuntu1) UNRELEASED; urgency=low
   * debian/control: Bump required python-django version to 1.4.
   * wrap-and-sort.
   * Fix (LP: #1036571):
-      - debian/rules, openstack-dashboard.{links, dirs}: Add appropriate
-        symlinks and directories to allow Horizon to function with the package
-        lessc. (LP: #1036571)
+      - debian/rules, openstack-dashboard.{links, dirs, postinst}: Add required
+        symlinks and directories to allow Horizon to function with the packaged
+        lessc.
       - debian/control: Add python-{cinder, swift, quantum}client,
         python-django-openstack-auth, python-netaddr, python-compressor, lessc.
+  * debian/rules: Improve dh_auto_clean.
 
  -- Chuck Short <zulcss@ubuntu.com>  Tue, 10 Jul 2012 11:48:03 -0400
 

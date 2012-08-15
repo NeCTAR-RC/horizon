@@ -11,6 +11,11 @@ if [ "$1" = "configure" ]; then
 	if [ -x /etc/init.d/apache2 ]; then
 		invoke-rc.d --quiet apache2 reload
 	fi
+
+  if [ -e /usr/share/openstack-dashboard/openstack_dashboard/static ] ; then
+    chown -R www-data:www-data \
+      /usr/share/openstack-dashboard/openstack_dashboard/static
+  fi
 fi
 
 #DEBHELPER#
