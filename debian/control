@@ -25,8 +25,11 @@ Depends: python-cloudfiles,
  python-keystoneclient,
  python-lockfile,
  python-memcache,
+ python-netaddr,
  python-novaclient,
+ python-swiftclient,
  python-tz,
+ python-quantumclient,
  ${misc:Depends},
  ${python:Depends}
 Recommends: memcached
