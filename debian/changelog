@@ -1,4 +1,4 @@
-horizon (2012.2~f3~20120712.1907-0ubuntu1) UNRELEASED; urgency=low
+horizon (2012.2~f3~20120712.1907-0ubuntu1) quantal; urgency=low
 
   [ Chuck Short ]
   * New upstream release.
@@ -21,7 +21,7 @@ horizon (2012.2~f3~20120712.1907-0ubuntu1) UNRELEASED; urgency=low
         python-django-openstack-auth, python-netaddr, python-compressor, lessc.
   * debian/rules: Improve dh_auto_clean.
 
- -- Chuck Short <zulcss@ubuntu.com>  Tue, 10 Jul 2012 11:48:03 -0400
+ -- Chuck Short <zulcss@ubuntu.com>  Thu, 16 Aug 2012 14:01:33 -0500
 
 horizon (2012.2~f2-0ubuntu1) quantal; urgency=low
 
