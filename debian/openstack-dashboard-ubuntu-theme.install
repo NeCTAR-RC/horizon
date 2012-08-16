@@ -1,5 +1,5 @@
-debian/theme/ubuntu.css /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/css
 debian/theme/dots.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img
 debian/theme/favicon-ubuntu.ico /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img
 debian/theme/header_stripes.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img
+debian/theme/ubuntu.css /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/css
 debian/theme/ubuntu.png /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img

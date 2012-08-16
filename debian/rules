@@ -29,7 +29,6 @@ override_dh_auto_install:
 	cp $(CURDIR)/debian/theme/juju.png \
 		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img/juju.png
 
-
 ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
 override_dh_auto_test:
 	PYTHONPATH=. bash run_tests.sh -N || true
@@ -37,9 +36,12 @@ endif
 
 override_dh_auto_clean:
 	dh_clean
-	rm -rf $(CURDIR)/horizon/build
-	rm -rf $(CURDIR)/horizon/horizon.egg-info
-	rm -rf $(CURDIR)/openstack_dashboard/openstack_dashboard.egg-info
+	rm -rf $(CURDIR)/build
+	rm -rf $(CURDIR)/horizon.egg-info
+	rm -rf $(CURDIR)/debian/openstack-dashboard
+	rm -rf $(CURDIR)/debian/python-django-horizon
+	rm -rf $(CURDIR)/debian/tmp
+	find . -name "*.pyc" -exec rm {} \;
 
 get-orig-source:
 	uscan --verbose --force-download --rename --destdir=../build-area
