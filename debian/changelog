@@ -1,3 +1,10 @@
+horizon (2012.2~f3-0ubuntu2) quantal; urgency=low
+
+  * Depend on python-openstack-auth rather than on the removed
+    python-django-openstack-auth.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 22 Aug 2012 10:34:11 +0100
+
 horizon (2012.2~f3-0ubuntu1) quantal; urgency=low
 
   [ Chuck Short ]
