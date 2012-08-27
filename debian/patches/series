@@ -5,6 +5,7 @@ add_juju_settings_panel.patch
 turn-off-debug.patch
 allow_alternate_css.patch
 use-memcache.patch
+fix-swift-object-url.patch
 upstream/fix-image-properties.patch
 upstream/fix-ec2-pair.patch
 upstream/fix-s3-generated-url.patch

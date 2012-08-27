@@ -1,0 +1,14 @@
+diff --git a/horizon/dashboards/nova/containers/urls.py b/horizon/dashboards/nova/containers/urls.py
+index 9ba2159..693b5f7 100644
+--- a/horizon/dashboards/nova/containers/urls.py
++++ b/horizon/dashboards/nova/containers/urls.py
+@@ -32,7 +32,7 @@ urlpatterns = patterns('horizon.dashboards.nova.containers.views',
+     url(r'^create/$', CreateView.as_view(), name='create'),
+     url(OBJECTS % r'$', ObjectIndexView.as_view(), name='object_index'),
+     url(OBJECTS % r'upload$', UploadView.as_view(), name='object_upload'),
+-    url(OBJECTS % r'(?P<object_name>[^/]+)/copy$',
++    url(OBJECTS % r'(?P<object_name>.+)/copy$',
+         CopyView.as_view(), name='object_copy'),
+-    url(OBJECTS % r'(?P<object_name>[^/]+)/download$',
++    url(OBJECTS % r'(?P<object_name>.+)/download$',
+         'object_download', name='object_download'))
