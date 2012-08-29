@@ -7,6 +7,7 @@ horizon (2012.2~f3-0ubuntu3) UNRELEASED; urgency=low
   [ Soren Hansen ]
   * Update debian/watch to account for symbolically named tarballs and
     use newer URL.
+  * Fix Launchpad URLs in debian/watch.
 
  -- Adam Gandelman <adamg@canonical.com>  Thu, 23 Aug 2012 18:57:54 -0700
 
