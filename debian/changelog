@@ -6,6 +6,7 @@ horizon (2012.2~f3-0ubuntu3) UNRELEASED; urgency=low
   * debian/patches/set_login_redirects.patch: Configure login URLs in
     local_settings.py according to the default apache configuration
     installed. (LP: #1037349)
+  * debian/patches/fix-dashboard-manage.patch: Refresh.
 
   [ Soren Hansen ]
   * Update debian/watch to account for symbolically named tarballs and
