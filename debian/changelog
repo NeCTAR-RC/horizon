@@ -1,3 +1,20 @@
+horizon (2012.1.1+20120830-1) precise; urgency=low
+
+  [ Tihomir Trifonov ]
+  * Fixed validation check for ICMP rules
+  * Added --only-selenium option in run_tests.sh
+
+  [ Gabriel Hurley ]
+  * Corrects the CSV download link for overview pages.
+
+  [ Vincent Untz ]
+  * Do not crash when deleting image or volume with no name
+
+  [ Paul McMillan ]
+  * Fix open redirect in Horizon.
+
+ -- Sam Morrison <sorrison@gmail.com>  Wed, 05 Sep 2012 11:15:58 +1000
+
 horizon (2012.1.1+20120622-2) precise; urgency=low
 
   * Added swift object url fix
