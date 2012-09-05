@@ -1,3 +1,9 @@
+horizon (2012.1.1+20120830-2) precise; urgency=low
+
+  * Updated coverage debian patch
+
+ -- Sam Morrison <sorrison@gmail.com>  Wed, 05 Sep 2012 11:22:56 +1000
+
 horizon (2012.1.1+20120830-1) precise; urgency=low
 
   [ Tihomir Trifonov ]
