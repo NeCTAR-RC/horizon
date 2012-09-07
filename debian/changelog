@@ -1,3 +1,23 @@
+horizon (2012.2~rc1~20120904.2043-0ubuntu1) UNRELEASED; urgency=low
+
+  [ Adam Gandelman ]
+  * debian/patches/fix-coverage-binary-name.patch: Drop, merge into
+    fix-ubuntu-tests.patch.
+  * debian/patches/set_login_redirects.patch: Configure login URLs in
+    local_settings.py according to the default apache configuration
+    installed. (LP: #1037349)
+  * debian/patches/fix-dashboard-manage.patch: Refresh.
+
+  [ Soren Hansen ]
+  * Update debian/watch to account for symbolically named tarballs and
+    use newer URL.
+  * Fix Launchpad URLs in debian/watch.
+
+  [ Chuck Short ]
+  * New upstream version
+
+ -- Adam Gandelman <adamg@canonical.com>  Thu, 23 Aug 2012 18:57:54 -0700
+
 horizon (2012.2~f3-0ubuntu2) quantal; urgency=low
 
   * Depend on python-openstack-auth rather than on the removed

@@ -1,6 +1,5 @@
 fix-dashboard-django-wsgi.patch
 fix-dashboard-manage.patch
-fix-coverage-binary-name.patch
 # Disabled during Folsom dev cycle.
 #add_juju_settings_panel.patch
 turn-off-debug.patch
@@ -8,3 +7,4 @@ turn-off-debug.patch
 #allow_alternate_css.patch
 use-memcache.patch
 fix-ubuntu-tests.patch
+set_login_redirects.patch
