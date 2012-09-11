@@ -1,0 +1,38 @@
+Author: Adam Gandelman <adamg@canonical.com>
+Date: Mon Sep 10 20:06:30 PDT 2012
+Subject: Remove comment template tags from compressed blocks.
+
+The version of python-django-compressor in Ubuntu suffers from the following bug:
+
+https://github.com/jezdez/django_compressor/issues/169
+
+Until we can get these removed upstream or fix/update python-django-compressor,
+in Ubuntu, simply remove the comments to ensure correct hashing and offline
+compression.
+
+Index: horizon-2012.2/horizon/templates/horizon/_scripts.html
+===================================================================
+--- horizon-2012.2.orig/horizon/templates/horizon/_scripts.html	2012-09-10 20:02:32.000000000 -0700
++++ horizon-2012.2/horizon/templates/horizon/_scripts.html	2012-09-10 20:03:30.502651949 -0700
+@@ -4,7 +4,6 @@
+ <script type="text/javascript" src="{% url horizon:jsi18n 'horizon' %}"></script>
+ 
+ {% compress js %}
+-{% comment %} jQuery and Plugins {% endcomment %}
+ <script src='{{ STATIC_URL }}horizon/lib/jquery/jquery.min.js' type='text/javascript' charset="utf-8"></script>
+ <script src='{{ STATIC_URL }}horizon/lib/jquery/jquery.cookie.js' type='text/javascript' charset="utf-8"></script>
+ <script src='{{ STATIC_URL }}horizon/lib/jquery/jquery.quicksearch.js' type='text/javascript' charset="utf-8"></script>
+@@ -14,13 +13,10 @@
+ <script src='{{ STATIC_URL }}horizon/lib/json2.js' type='text/javascript' charset="utf-8"></script>
+ <script src="{{ STATIC_URL }}horizon/lib/underscore/underscore-min.js" type="text/javascript" charset="utf-8"></script>
+ 
+-{% comment %} Bootstrap {% endcomment %}
+ <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+ 
+-{% comment %} Hogan.js (client-side templating) {% endcomment %}
+ <script src="{{ STATIC_URL }}horizon/lib/hogan-1.0.5.min.js" type="text/javascript" charset='utf-8'></script>
+ 
+-{% comment %} Horizon-specific JS {% endcomment %}
+ <script src='{{ STATIC_URL }}horizon/js/horizon.communication.js' type='text/javascript' charset='utf-8'></script>
+ <script src='{{ STATIC_URL }}horizon/js/horizon.cookies.js' type='text/javascript' charset='utf-8'></script>
+ <script src='{{ STATIC_URL }}horizon/js/horizon.forms.js' type='text/javascript' charset='utf-8'></script>
