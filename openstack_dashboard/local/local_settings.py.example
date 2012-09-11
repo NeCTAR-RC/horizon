@@ -2,7 +2,7 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 # Set SSL proxy settings:
@@ -38,7 +38,7 @@ LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 # We recommend you use memcached for development; otherwise after every reload
 # of the django development server, you will have to login again. To use
 # memcached set CACHE_BACKED to something like 'memcached://127.0.0.1:11211/'
-CACHE_BACKEND = 'locmem://'
+CACHE_BACKEND = 'memcached://127.0.0.1:11211'
 
 # Send email to the console by default
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -145,3 +145,19 @@ LOGGING = {
             }
         }
 }
+
+# Enable the Ubuntu theme if it is present.
+try:
+    from ubuntu_theme import *
+except ImportError:
+    pass
+
+# Default Ubuntu apache configuration uses /horizon as the application root.
+# Configure auth redirects here accordingly.
+LOGIN_URL='/horizon/auth/login/'
+LOGIN_REDIRECT_URL='/horizon'
+
+# The Ubuntu package includes pre-compressed JS and compiled CSS to allow
+# offline compression by default.  To enable online compression, install
+# the node-less package and enable the following option.
+COMPRESS_OFFLINE = True
