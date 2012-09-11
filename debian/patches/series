@@ -5,5 +5,4 @@ fix-dashboard-manage.patch
 # Disabled during Folsom dev cycle.
 #allow_alternate_css.patch
 fix-ubuntu-tests.patch
-remove_compressed_comments.patch
 ubuntu_local_settings.patch
