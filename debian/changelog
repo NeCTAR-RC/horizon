@@ -1,3 +1,19 @@
+horizon (2012.2~rc1~20120904.2043-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/ubuntu_local_settings.patch: Squash all patches that
+    touch local_settings.py.example into one.
+  * Drop node-less dependency (LP: #1024326).
+      - debian/patches/remove_compressed_comments.patch: Remove comment
+        template tags from compressed block.  With the current version of
+        compressor, these template tags throw off hashing.
+      - debian/static/openstack-dashboard: Pre-compressed and compiled JS, CSS
+        and compressor manifest.json.
+      - debian/patches/ubuntu_local_settings.patch: Set COMPRESS_OFFLINE=True
+        to enable offline compression and pre-compressed static files by
+        default.
+
+ -- Adam Gandelman <adamg@canonical.com>  Mon, 10 Sep 2012 20:04:25 -0700
+
 horizon (2012.2~rc1~20120904.2043-0ubuntu1) quantal; urgency=low
 
   [ Adam Gandelman ]
