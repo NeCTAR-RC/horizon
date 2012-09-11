@@ -8,6 +8,8 @@ horizon (2012.2~rc1~20120904.2043-0ubuntu2) UNRELEASED; urgency=low
     and compressor manifest.
   * debian/patches/disable_online_compression.patch: Set dashboard to use
     offline compression and pre-compressed static files by default.
+  * debian/patches/ubuntu_local_settings.patch: Squash all patches that
+    touch local_settings.py.example into one.
 
  -- Adam Gandelman <adamg@canonical.com>  Mon, 10 Sep 2012 20:04:25 -0700
 
