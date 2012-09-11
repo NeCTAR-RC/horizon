@@ -9,3 +9,4 @@ use-memcache.patch
 fix-ubuntu-tests.patch
 set_login_redirects.patch
 remove_compressed_comments.patch
+disable_online_compression.patch
