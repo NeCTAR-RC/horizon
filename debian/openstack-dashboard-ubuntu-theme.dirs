@@ -1,3 +1,4 @@
-/usr/share/openstack-dashboard-ubuntu-theme/static/dashboard/img
-/usr/share/openstack-dashboard-ubuntu-theme/static/dashboard/css
-/usr/share/openstack-dashboard-ubuntu-theme/templates/
+/usr/share/openstack-dashboard-ubuntu-theme/static/ubuntu
+/usr/share/openstack-dashboard-ubuntu-theme/static/ubuntu/img
+/usr/share/openstack-dashboard-ubuntu-theme/static/ubuntu/css
+/usr/share/openstack-dashboard-ubuntu-theme/templates
