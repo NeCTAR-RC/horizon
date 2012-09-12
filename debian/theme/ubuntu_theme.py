@@ -3,3 +3,5 @@
 # enable the Ubuntu theme for Horizon.  To disable, remove the
 # openstack-dashboard-ubuntu-theme package, or remove this file.
 STATIC_ROOT = '/usr/share/openstack-dashboard-ubuntu-theme/static'
+TEMPLATE_DIRS = ('/usr/share/openstack-dashboard-ubuntu-theme/templates', )
+
