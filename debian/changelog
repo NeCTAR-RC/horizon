@@ -1,3 +1,20 @@
+horizon (2012.2~rc1-0ubuntu1) quantal; urgency=low
+
+  [ Adam Gandelman ]
+  * debian/patches/ubuntu_local_settings.patch: Squash all patches that
+    touch local_settings.py.example into one.
+  * Drop node-less dependency (LP: #1024326).
+      - debian/static/openstack-dashboard: Pre-compressed and compiled JS, CSS
+        and compressor manifest.json.
+      - debian/patches/ubuntu_local_settings.patch: Set COMPRESS_OFFLINE=True
+        to enable offline compression and pre-compressed static files by
+        default.
+
+  [ Chuck Short ]
+  * New upstream release
+
+ -- Chuck Short <zulcss@ubuntu.com>  Wed, 12 Sep 2012 12:21:33 -0500
+
 horizon (2012.2~rc1~20120904.2043-0ubuntu1) quantal; urgency=low
 
   [ Adam Gandelman ]
