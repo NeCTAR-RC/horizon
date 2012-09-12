@@ -1,2 +1,3 @@
 /etc/openstack-dashboard/ubuntu_theme.py /usr/share/openstack-dashboard/openstack_dashboard/local/ubuntu_theme.py
 /usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/manifest.json /usr/share/openstack-dashboard-ubuntu-theme/static/dashboard/manifest.json
+/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/js/ /usr/share/openstack-dashboard-ubuntu-theme/static/dashboard/js
