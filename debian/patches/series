@@ -1,7 +1,7 @@
 fix-dashboard-django-wsgi.patch
 fix-dashboard-manage.patch
 # Disabled during Folsom dev cycle.
-#add_juju_settings_panel.patch
+add_juju_settings_panel.patch
 # Disabled during Folsom dev cycle.
 #allow_alternate_css.patch
 fix-ubuntu-tests.patch

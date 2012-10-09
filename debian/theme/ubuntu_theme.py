@@ -4,3 +4,6 @@
 # openstack-dashboard-ubuntu-theme package, or remove this file.
 TEMPLATE_DIRS = ('/usr/share/openstack-dashboard-ubuntu-theme/templates', )
 
+# Enable a panel in the Settings dashboard to allow generation of Juju
+# environment configuration.
+ENABLE_JUJU_PANEL = True
