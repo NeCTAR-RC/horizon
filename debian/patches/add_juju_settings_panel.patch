@@ -1,6 +1,7 @@
-diff -Naurp horizon.orig/horizon/dashboards/settings/dashboard.py horizon/horizon/dashboards/settings/dashboard.py
---- horizon.orig/horizon/dashboards/settings/dashboard.py	2012-05-31 14:08:31.380889052 -0400
-+++ horizon/horizon/dashboards/settings/dashboard.py	2012-05-31 14:09:09.112889071 -0400
+Index: horizon-2012.2/horizon/dashboards/settings/dashboard.py
+===================================================================
+--- horizon-2012.2.orig/horizon/dashboards/settings/dashboard.py	2012-10-09 11:54:50.986004892 -0700
++++ horizon-2012.2/horizon/dashboards/settings/dashboard.py	2012-10-09 11:54:57.058004668 -0700
 @@ -16,6 +16,7 @@
  #    under the License.
  
@@ -9,7 +10,7 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/dashboard.py horizon/horizo
  
  import horizon
  
-@@ -23,7 +24,15 @@ import horizon
+@@ -23,7 +24,15 @@
  class Settings(horizon.Dashboard):
      name = _("Settings")
      slug = "settings"
@@ -26,10 +27,11 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/dashboard.py horizon/horizo
      default_panel = 'user'
      nav = False
  
-diff -Naurp horizon.orig/horizon/dashboards/settings/juju/forms.py horizon/horizon/dashboards/settings/juju/forms.py
---- horizon.orig/horizon/dashboards/settings/juju/forms.py	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/horizon/dashboards/settings/juju/forms.py	2012-05-31 14:09:09.116889042 -0400
-@@ -0,0 +1,96 @@
+Index: horizon-2012.2/horizon/dashboards/settings/juju/forms.py
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ horizon-2012.2/horizon/dashboards/settings/juju/forms.py	2012-10-09 11:58:55.169995921 -0700
+@@ -0,0 +1,100 @@
 +# vim: tabstop=4 shiftwidth=4 softtabstop=4
 +
 +# Copyright 2012 Openstack, LLC
@@ -59,6 +61,7 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/juju/forms.py horizon/horiz
 +from horizon import api
 +from horizon import exceptions
 +from horizon import forms
++from horizon import messages
 +
 +import boto
 +import uuid
@@ -114,10 +117,13 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/juju/forms.py horizon/horiz
 +                       'juju_admin_secret': uuid.uuid4().hex,
 +                       'control_bucket': control_bucket
 +                      }
-+        except:
-+            exceptions.handle(request,
-+                              _('Unable to fetch generate Juju environment config.'),
-+                              redirect=request.build_absolute_uri())
++        except Exception, e:
++            # This will fail if there is not an S3 endpoint configured in the
++            # service catalog.
++            msg = "Could not generate Juju environment config: %s" % e
++            messages.error(request, msg)
++            redirect = request.build_absolute_uri()
++            raise exceptions.Http302(redirect)
 +
 +        response = shortcuts.render(request,
 +                                    'settings/juju/environments.yaml.template',
@@ -126,14 +132,16 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/juju/forms.py horizon/horiz
 +        response['Content-Disposition'] = 'attachment; filename=environments.yaml'
 +        response['Content-Length'] = str(len(response.content))
 +        return response
-diff -Naurp horizon.orig/horizon/dashboards/settings/juju/__init__.py horizon/horizon/dashboards/settings/juju/__init__.py
---- horizon.orig/horizon/dashboards/settings/juju/__init__.py	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/horizon/dashboards/settings/juju/__init__.py	2012-05-31 14:09:09.112889071 -0400
+Index: horizon-2012.2/horizon/dashboards/settings/juju/__init__.py
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ horizon-2012.2/horizon/dashboards/settings/juju/__init__.py	2012-10-09 11:54:57.058004668 -0700
 @@ -0,0 +1 @@
 +# Horizon Juju settings panel
-diff -Naurp horizon.orig/horizon/dashboards/settings/juju/panel.py horizon/horizon/dashboards/settings/juju/panel.py
---- horizon.orig/horizon/dashboards/settings/juju/panel.py	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/horizon/dashboards/settings/juju/panel.py	2012-05-31 14:09:09.116889042 -0400
+Index: horizon-2012.2/horizon/dashboards/settings/juju/panel.py
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ horizon-2012.2/horizon/dashboards/settings/juju/panel.py	2012-10-09 11:54:57.058004668 -0700
 @@ -0,0 +1,28 @@
 +# vim: tabstop=4 shiftwidth=4 softtabstop=4
 +# Copyright 2012 Openstack, LLC
@@ -163,9 +171,10 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/juju/panel.py horizon/horiz
 +
 +
 +dashboard.Settings.register(JujuPanel)
-diff -Naurp horizon.orig/horizon/dashboards/settings/juju/urls.py horizon/horizon/dashboards/settings/juju/urls.py
---- horizon.orig/horizon/dashboards/settings/juju/urls.py	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/horizon/dashboards/settings/juju/urls.py	2012-05-31 14:09:09.116889042 -0400
+Index: horizon-2012.2/horizon/dashboards/settings/juju/urls.py
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ horizon-2012.2/horizon/dashboards/settings/juju/urls.py	2012-10-09 11:54:57.058004668 -0700
 @@ -0,0 +1,24 @@
 +# vim: tabstop=4 shiftwidth=4 softtabstop=4
 +
@@ -191,10 +200,11 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/juju/urls.py horizon/horizo
 +urlpatterns = patterns('horizon.dashboards.settings.juju.views',
 +    url(r'^$', IndexView.as_view(), name='index'),
 +)
-diff -Naurp horizon.orig/horizon/dashboards/settings/juju/views.py horizon/horizon/dashboards/settings/juju/views.py
---- horizon.orig/horizon/dashboards/settings/juju/views.py	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/horizon/dashboards/settings/juju/views.py	2012-05-31 14:09:09.116889042 -0400
-@@ -0,0 +1,28 @@
+Index: horizon-2012.2/horizon/dashboards/settings/juju/views.py
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ horizon-2012.2/horizon/dashboards/settings/juju/views.py	2012-10-09 11:57:05.949999981 -0700
+@@ -0,0 +1,35 @@
 +# vim: tabstop=4 shiftwidth=4 softtabstop=4
 +
 +# Copyright 2012 Openstack, LLC
@@ -213,8 +223,10 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/juju/views.py horizon/horiz
 +
 +import logging
 +
++from django.core.urlresolvers import reverse_lazy
++
 +from horizon import forms
-+from horizon.dashboards.settings.juju.forms import DownloadJujuEnvironment 
++from horizon.dashboards.settings.juju.forms import DownloadJujuEnvironment
 +
 +
 +LOG = logging.getLogger(__name__)
@@ -223,9 +235,15 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/juju/views.py horizon/horiz
 +class IndexView(forms.ModalFormView):
 +    form_class = DownloadJujuEnvironment
 +    template_name = 'settings/juju/index.html'
-diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/download_form.html horizon/horizon/dashboards/settings/templates/settings/juju/download_form.html
---- horizon.orig/horizon/dashboards/settings/templates/settings/juju/download_form.html	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/horizon/dashboards/settings/templates/settings/juju/download_form.html	2012-05-31 14:09:09.116889042 -0400
++    success_url = reverse_lazy('horizon:settings:juju')
++
++    def form_valid(self, form):
++        return form.handle(self.request, form.cleaned_data)
++
+Index: horizon-2012.2/horizon/dashboards/settings/templates/settings/juju/download_form.html
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ horizon-2012.2/horizon/dashboards/settings/templates/settings/juju/download_form.html	2012-10-09 11:54:57.058004668 -0700
 @@ -0,0 +1,20 @@
 +{% extends "horizon/common/_modal_form.html" %}
 +{% load i18n %}
@@ -247,9 +265,10 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/dow
 +    <input class="btn btn-primary pull-right" type="submit" value="{% trans "Download Juju Environment Config" %}" />
 +    {% if hide %}<a href="{% url horizon:settings:juju:index %}" class="btn secondary cancel close">{% trans "Cancel" %}</a>{% endif %}
 +{% endblock %}
-diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template
---- horizon.orig/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template	2012-05-31 14:09:09.116889042 -0400
+Index: horizon-2012.2/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ horizon-2012.2/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template	2012-10-09 11:54:57.058004668 -0700
 @@ -0,0 +1,21 @@
 +# To use Juju with your Openstack cloud:
 +#    1. Run: apt-get install juju
@@ -272,9 +291,10 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/env
 +    s3-uri: {{ s3_url }}
 +    default-series: precise
 +    default-image-id: ami-00000001
-diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/index.html horizon/horizon/dashboards/settings/templates/settings/juju/index.html
---- horizon.orig/horizon/dashboards/settings/templates/settings/juju/index.html	1969-12-31 19:00:00.000000000 -0500
-+++ horizon/horizon/dashboards/settings/templates/settings/juju/index.html	2012-05-31 14:09:09.116889042 -0400
+Index: horizon-2012.2/horizon/dashboards/settings/templates/settings/juju/index.html
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ horizon-2012.2/horizon/dashboards/settings/templates/settings/juju/index.html	2012-10-09 11:54:57.058004668 -0700
 @@ -0,0 +1,11 @@
 +{% extends 'base.html' %}
 +{% load i18n %}
@@ -287,4 +307,3 @@ diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/ind
 +{% block settings_main %}
 +  {% include "settings/juju/download_form.html" %}
 +{% endblock %}
-
