@@ -304,6 +304,6 @@ Index: horizon-2012.2/horizon/dashboards/settings/templates/settings/juju/index.
 +  {% include "horizon/common/_page_header.html" with title=_("Download Juju Environment Config") %}
 +{% endblock page_header %}
 +
-+{% block settings_main %}
++{% block main %}
 +  {% include "settings/juju/download_form.html" %}
 +{% endblock %}
