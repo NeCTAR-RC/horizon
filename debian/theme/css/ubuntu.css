@@ -1942,7 +1942,7 @@ table .span12 {
 .btn-inverse,
 .btn-inverse:hover {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  color: #ffffff;
+  color: #fff;
 }
 .btn-primary.active,
 .btn-warning.active,
@@ -1950,33 +1950,45 @@ table .span12 {
 .btn-success.active,
 .btn-info.active,
 .btn-dark.active {
-  color: rgba(255, 255, 255, 0.75);
+  color: #fff,
+  background-color: #c44012;
+
 }
+
 .btn-primary {
-  background-color: #006dcc;
-  background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
-  background-image: -ms-linear-gradient(top, #0088cc, #0044cc);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
-  background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
-  background-image: -o-linear-gradient(top, #0088cc, #0044cc);
-  background-image: linear-gradient(top, #0088cc, #0044cc);
-  background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0088cc', endColorstr='#0044cc', GradientType=0);
-  border-color: #0044cc #0044cc #002a80;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+    color: #fff;
+    border: 1px solid #ab370f;
+    background-color: #DD4814;
+    background-image: linear-gradient(bottom, rgb(199,66,18) 0%, rgb(221,74,20) 100%);
+    background-image: -o-linear-gradient(bottom, rgb(199,66,18) 0%, rgb(221,74,20) 100%);
+    background-image: -moz-linear-gradient(bottom, rgb(199,66,18) 0%, rgb(221,74,20) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgb(199,66,18) 0%, rgb(221,74,20) 100%);
+    background-image: -ms-linear-gradient(bottom, rgb(199,66,18) 0%, rgb(221,74,20) 100%);
+    -webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 }
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary.active,
 .btn-primary.disabled,
 .btn-primary[disabled] {
-  background-color: #0044cc;
+  background-color: #DD4814;
 }
-.btn-primary:active,
-.btn-primary.active {
-  background-color: #003399 \9;
+/*.btn-primary.active {
+  background-color: #c44012 \9;
+}*/
+$.btn-primary:active,
+.btn-primary:active {
+    background-color: #DD4814;
+    background-image: linear-gradient(bottom, rgb(199,66,18) 0%, rgb(236,94,43) 100%);
+    background-image: -o-linear-gradient(bottom, rgb(199,66,18) 0%, rgb(236,94,43) 100%);
+    background-image: -moz-linear-gradient(bottom, rgb(199,66,18) 0%, rgb(236,94,43) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgb(199,66,18) 0%, rgb(236,94,43) 100%);
+    background-image: -ms-linear-gradient(bottom, rgb(199,66,18) 0%, rgb(236,94,43) 100%);
+    text-decoration: none;
 }
+
+
 .btn-warning {
   background-color: #faa732;
   background-image: -moz-linear-gradient(top, #fbb450, #f89406);
@@ -3777,17 +3789,17 @@ body {
   background-color: #fff;
   min-width: 890px;
 }
+
+
+
 /* Login Splash Page */
-#splash {
-  background: #fafafa;
-}
 #splash .login {
-  background: #ffffff url('../../dashboard/img/logo.png?bd0a834bae0e') no-repeat center 35px;
+  background: #DD4814 url(../img/ubuntu.png) no-repeat center 35px;
   position: absolute;
   top: 80px;
   left: 50%;
   margin: 0 0 0 -195px;
-  padding-top: 170px;
+  padding-top: 100px;
   width: 390px;
   border: 1px solid #e1e1e1;
   max-height: none;
@@ -3801,6 +3813,12 @@ body {
   -moz-background-clip: padding-box;
   background-clip: padding-box;
 }
+
+#splash .login form,
+#splash .login .modal-header {
+    background-color: #fff;
+}
+
 #splash .login input {
   width: 350px;
 }
@@ -3843,7 +3861,7 @@ h1.brand {
   padding-bottom: 40px;
 }
 h1.brand a {
-  background: url('../../dashboard/img/logo.png?bd0a834bae0e') top left no-repeat;
+  background: url(../img/ubuntu.png) top left no-repeat;
   display: block;
   float: left;
   width: 116px;

@@ -5,7 +5,7 @@ horizon (2012.2-0ubuntu2) quantal; urgency=low
     openstack-dashboard, and openstack-ubuntu-theme. (LP: #1061961)
   * debian/theme/css/ubuntu.css: Refreshed against Folsom. (LP: #1064420)
 
- -- Chuck Short <zulcss@ubuntu.com>  Tue, 09 Oct 2012 10:50:01 -0500
+ -- Adam Gandelman <adamg@canonical.com>  Tue, 09 Oct 2012 09:59:55 -0700
 
 horizon (2012.2-0ubuntu1) quantal; urgency=low
 
