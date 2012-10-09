@@ -1,10 +1,14 @@
 horizon (2012.2-0ubuntu2) quantal; urgency=low
 
-  [ Adam Gandelman ]
   * debian/control: Set strict version requirements between python-django-horizon,
-    openstack-dashboard, and openstack-ubuntu-theme. (LP: #1061961) 
+    openstack-dashboard, and openstack-ubuntu-theme. (LP: #1061961)
+  * debian/theme/css/ubuntu.css: Refreshed against Folsom. (LP: #1064420)
+  * debian/patches/add_juju_panel.patch: Update and refresh for Folsom
+    compatability. (LP: #1064605)
+  * debian/patches/allow_alternate_css.patch: Remove unapplied, obsolete
+    patch.
 
- -- Chuck Short <zulcss@ubuntu.com>  Tue, 09 Oct 2012 10:50:01 -0500
+ -- Adam Gandelman <adamg@canonical.com>  Tue, 09 Oct 2012 09:59:55 -0700
 
 horizon (2012.2-0ubuntu1) quantal; urgency=low
 
