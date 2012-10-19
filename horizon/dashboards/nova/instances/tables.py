@@ -17,6 +17,7 @@
 import logging
 
 from django import template
+from django.conf import settings
 from django.core import urlresolvers
 from django.template.defaultfilters import title
 from django.utils.http import urlencode
@@ -270,6 +271,12 @@ def get_power_state(instance):
     return POWER_STATES.get(getattr(instance, "OS-EXT-STS:power_state", 0), '')
 
 
+def get_cell(instance):
+    if instance.cell_name:
+        return instance.cell_name
+    return _("Not available")
+
+
 class InstancesTable(tables.DataTable):
     TASK_STATUS_CHOICES = (
         (None, True),
@@ -289,6 +296,8 @@ class InstancesTable(tables.DataTable):
                          link=("horizon:nova:instances:detail"),
                          verbose_name=_("Instance Name"))
     ip = tables.Column(get_ips, verbose_name=_("IP Address"))
+    if getattr(settings, 'OPENSTACK_CELLS_ENABLED', False):
+        cell = tables.Column(get_cell, verbose_name=_("Cell"))
     size = tables.Column(get_size,
                          verbose_name=_("Size"),
                          attrs={'data-type': 'size'})
