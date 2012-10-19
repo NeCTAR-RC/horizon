@@ -92,4 +92,28 @@ horizon.addInitFunction(function () {
   horizon.modals.addModalInitFunction(function (modal) {
     $(modal).find("#id_volume_type").change();
   });
+
+  horizon.modals.addModalInitFunction(function (modal) {
+    $cell_div = $('div.input select#id_cell').closest('div.form-field');
+    $subcell_div = $('div.input label[for^=id_subcell]').closest('div.form-field');
+    $subcell_div.hide();
+    $('#more-cells-button').on('click', function(evt) {
+      button = $(this);
+      evt.preventDefault();
+      evt.stopPropagation();
+      if ($subcell_div.is(':visible')) {
+        button.text(button.data('text-inactive'));
+        $subcell_div.hide();
+        $cell_div.show(200);
+      } else {
+        button.text(button.data('text-active'));
+        $cell_div.hide();
+        $subcell_div.show(200);
+      }
+    });
+    $('div.input select[id=id_cell]').on('change', function(evt) {
+      var val = $(this).val();
+      $('div.input input[value=' + val + ']').attr('checked', 'checked');
+    });
+  });
 });
