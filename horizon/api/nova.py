@@ -94,7 +94,7 @@ class Server(APIResourceWrapper):
              'image_name', 'VirtualInterfaces', 'flavor', 'key_name',
              'tenant_id', 'user_id', 'OS-EXT-STS:power_state',
              'OS-EXT-STS:task_state', 'OS-EXT-SRV-ATTR:instance_name',
-             'OS-EXT-SRV-ATTR:host']
+             'OS-EXT-SRV-ATTR:host', 'os-cells:cell_name']
 
     def __init__(self, apiresource, request):
         super(Server, self).__init__(apiresource)
@@ -113,6 +113,13 @@ class Server(APIResourceWrapper):
     @property
     def internal_name(self):
         return getattr(self, 'OS-EXT-SRV-ATTR:instance_name', "")
+
+    @property
+    def cell_name(self):
+        name = getattr(self, 'os-cells:cell_name', "")
+        if name:
+            name = name.replace('!', '-')
+        return name
 
     def reboot(self, hardness=REBOOT_HARD):
         novaclient(self.request).servers.reboot(self.id, hardness)
@@ -305,13 +312,14 @@ def keypair_list(request):
 
 def server_create(request, name, image, flavor, key_name, user_data,
                   security_groups, block_device_mapping, nics=None,
-                  instance_count=1):
+                  instance_count=1, scheduler_hints=None):
     return Server(novaclient(request).servers.create(
             name, image, flavor, userdata=user_data,
             security_groups=security_groups,
             key_name=key_name, block_device_mapping=block_device_mapping,
             nics=nics,
-            min_count=instance_count), request)
+            min_count=instance_count,
+            scheduler_hints=scheduler_hints), request)
 
 
 def server_delete(request, instance):
@@ -600,3 +608,29 @@ def get_x509_credentials(request):
 
 def get_x509_root_certificate(request):
     return novaclient(request).certs.get()
+
+
+def cells_get_children(request):
+    """Gets child cells of an api server."""
+    # TODO(kspear): This needs to be moved up to novaclient, and should
+    # be removed once novaclient supports this call.
+    cells = []
+    nclient = novaclient(request)
+    resp, body = nclient.client.get('/os-cells/detail')
+    if body:
+        cells = body.get('cells', [])
+    return cells
+
+
+def cells_get_names(request):
+    """Gets the names of every cell known by the api server."""
+    # TODO(kspear): This needs to be moved up to novaclient, and should
+    # be removed once novaclient supports this call.
+    cells = []
+    nclient = novaclient(request)
+    resp, body = nclient.client.get('/os-cells/info')
+    if body:
+        cells_dict = body.get('cell', {})
+        cells = cells_dict.get('subcells', [])
+        cells = map(lambda s: s.replace('!', '-'), cells)
+    return cells

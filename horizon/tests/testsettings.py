@@ -150,6 +150,8 @@ OPENSTACK_HYPERVISOR_FEATURES = {
     'can_set_mount_point': True
 }
 
+OPENSTACK_CELLS_ENABLED = False
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

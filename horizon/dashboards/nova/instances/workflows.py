@@ -20,6 +20,7 @@
 
 import logging
 
+from django.conf import settings
 from django.utils.text import normalize_newlines
 from django.utils.translation import ugettext as _
 
@@ -160,6 +161,60 @@ class VolumeOptions(workflows.Step):
             context['device_name'] = None
             context['delete_on_terminate'] = None
         return context
+
+
+class CellSelectionAction(workflows.Action):
+    cell = forms.DynamicChoiceField(label=_("Cell"),
+                             help_text=_("Cell to run the instance on."),
+                             required=False)
+    subcell = forms.ChoiceField(label=_("Cell"),
+                                help_text=_("Cell to run the instance on."),
+                                required=False,
+                                widget=forms.widgets.RadioSelect)
+
+    class Meta:
+        name = _("Cell")
+        help_text_template = ("nova/instances/"
+                              "_launch_cell_help.html")
+
+    def populate_cell_choices(self, request, context):
+        try:
+            cells = api.nova.cells_get_names(request)
+        except:
+            cells = []
+            exceptions.handle(request,
+                              _('Unable to retrieve available cell list.'))
+
+        self._cells_list = cells
+
+        cells_dict = {}
+        for cell in cells:
+            parent, sep, child = cell.partition('-')
+            if parent not in cells_dict:
+                cells_dict[parent] = []
+            if child:
+                cells_dict[parent].append((cell, cell))
+        self._cells_dict = cells_dict
+        choices = [ (name, name) for name in cells_dict.keys() ]
+        if choices:
+            choices.insert(0, ("", _("(Any cell)")))
+        else:
+            choices.insert(0, ("", _("No cells available.")))
+        return choices
+
+    def populate_subcell_choices(self, request, context):
+        choices = [(name, name) for name in self._cells_list]
+        if choices:
+            choices.insert(0, ("", _("(Any cell)")))
+        else:
+            choices.insert(0, ("", _("No cells available.")))
+        return choices
+
+
+class CellSelection(workflows.Step):
+    action_class = CellSelectionAction
+    contributes = ("cell", "subcell")
+    template_name = ("nova/instances/_launch_cell_step.html")
 
 
 class SetInstanceDetailsAction(workflows.Action):
@@ -493,6 +548,12 @@ class LaunchInstance(workflows.Workflow):
         else:
             nics = None
 
+        cell_name = context.get('subcell', context.get('cell', ''))
+        if cell_name:
+            cell_hint = { 'cell': cell_name }
+        else:
+            cell_hint = None
+
         try:
             api.nova.server_create(request,
                                    context['name'],
@@ -503,8 +564,13 @@ class LaunchInstance(workflows.Workflow):
                                    context['security_group_ids'],
                                    dev_mapping,
                                    nics=nics,
-                                   instance_count=int(context['count']))
+                                   instance_count=int(context['count']),
+                                   scheduler_hints=cell_hint)
             return True
         except:
             exceptions.handle(request)
             return False
+
+
+if getattr(settings, 'OPENSTACK_CELLS_ENABLED', False):
+    LaunchInstance.register(CellSelection)
