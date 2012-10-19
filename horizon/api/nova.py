@@ -265,12 +265,12 @@ def flavor_list(request):
 
 def tenant_floating_ip_list(request):
     """Fetches a list of all floating ips."""
-    return novaclient(request).floating_ips.list()
+    return [] #novaclient(request).floating_ips.list()
 
 
 def floating_ip_pools_list(request):
     """Fetches a list of all floating ip pools."""
-    return novaclient(request).floating_ip_pools.list()
+    return [] #novaclient(request).floating_ip_pools.list()
 
 
 def tenant_floating_ip_get(request, floating_ip_id):
