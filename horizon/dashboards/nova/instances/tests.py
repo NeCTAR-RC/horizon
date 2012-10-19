@@ -700,7 +700,8 @@ class InstanceTests(test.TestCase):
                                [sec_group.name],
                                block_device_mapping,
                                nics=nics,
-                               instance_count=IsA(int))
+                               instance_count=IsA(int),
+                               scheduler_hints=None)
 
         self.mox.ReplayAll()
 
@@ -890,7 +891,8 @@ class InstanceTests(test.TestCase):
                                [sec_group.name],
                                None,
                                nics=nics,
-                               instance_count=IsA(int)) \
+                               instance_count=IsA(int),
+                               scheduler_hints=None) \
                       .AndRaise(self.exceptions.keystone)
 
         self.mox.ReplayAll()

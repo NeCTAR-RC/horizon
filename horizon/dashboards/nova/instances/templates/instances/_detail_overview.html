@@ -12,6 +12,10 @@
     <dd>{{ instance.id }}</dd>
     <dt>{% trans "Status" %}</dt>
     <dd>{{ instance.status|title }}</dd>
+    {% if instance.cell_name %}
+    <dt>{% trans "Cell" %}</dt>
+    <dd>{{ instance.cell_name }}</dd>
+    {% endif %}
   </dl>
 </div>
 
