@@ -1,0 +1,10 @@
+Until this can be scripted and integrated into package build, updating the
+pre-compressed static CSS and JS requires a some manual steps:
+
+1. apt-get install node-less.
+2. Install dependencies of python-django-horizon.
+3. Run 'python ./manage.py compress --force'
+4. Currently, this will generate all compressed and compiled files plus a JSON
+   manifest in the static directoyr (static/dashboard/).
+5. Remove the old, obsolete CS, JS and manifest from debian/static/openstack-dashboard.
+6. Update the files in debian/static/openstack-dashboard with the new files.

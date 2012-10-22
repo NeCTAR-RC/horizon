@@ -1,0 +1,305 @@
+diff -Naurp horizon.orig/horizon/dashboards/settings/dashboard.py horizon/horizon/dashboards/settings/dashboard.py
+--- horizon.orig/horizon/dashboards/settings/dashboard.py	2012-05-31 14:08:31.380889052 -0400
++++ horizon/horizon/dashboards/settings/dashboard.py	2012-05-31 14:09:09.112889071 -0400
+@@ -16,6 +16,7 @@
+ #    under the License.
+ 
+ from django.utils.translation import ugettext_lazy as _
++from django.conf import settings
+ 
+ import horizon
+ 
+@@ -23,7 +24,15 @@ import horizon
+ class Settings(horizon.Dashboard):
+     name = _("Settings")
+     slug = "settings"
+-    panels = ('user', 'project', 'ec2')
++    try:
++        juju_panel = getattr(settings, 'ENABLE_JUJU_PANEL')
++        if juju_panel == True:
++            panels = ('user', 'project', 'ec2', 'juju')
++        else:
++            panels = ('user', 'project', 'ec2')
++    except AttributeError:
++            panels = ('user', 'project', 'ec2')
++
+     default_panel = 'user'
+     nav = False
+ 
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/forms.py horizon/horizon/dashboards/settings/juju/forms.py
+--- horizon.orig/horizon/dashboards/settings/juju/forms.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/forms.py	2012-05-31 14:09:09.116889042 -0400
+@@ -0,0 +1,96 @@
++# vim: tabstop=4 shiftwidth=4 softtabstop=4
++
++# Copyright 2012 Openstack, LLC
++# Copyright 2012 Canonical Ltd.
++#
++#    Licensed under the Apache License, Version 2.0 (the "License"); you may
++#    not use this file except in compliance with the License. You may obtain
++#    a copy of the License at
++#
++#         http://www.apache.org/licenses/LICENSE-2.0
++#
++#    Unless required by applicable law or agreed to in writing, software
++#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
++#    License for the specific language governing permissions and limitations
++#    under the License.
++
++import logging
++import tempfile
++import zipfile
++from contextlib import closing
++
++from django import http, shortcuts
++from django.template.loader import render_to_string
++from django.utils.translation import ugettext_lazy as _
++
++from horizon import api
++from horizon import exceptions
++from horizon import forms
++
++import boto
++import uuid
++
++LOG = logging.getLogger(__name__)
++
++
++class DownloadJujuEnvironment(forms.SelfHandlingForm):
++    # This is heavily based off the ec2 credentials form
++    tenant = forms.ChoiceField(label=_("Select a Project"))
++    @classmethod
++    def _instantiate(cls, request, *args, **kwargs):
++        return cls(request, *args, **kwargs)
++
++    def __init__(self, request, *args, **kwargs):
++        super(DownloadJujuEnvironment, self).__init__(*args, **kwargs)
++        tenant_choices = []
++        try:
++            tenant_list = api.keystone.tenant_list(request)
++        except:
++            tenant_list = []
++            exceptions.handle(request, _("Unable to retrieve tenant list."))
++
++        for tenant in tenant_list:
++            if tenant.enabled:
++                tenant_choices.append((tenant.id, tenant.name))
++        if not tenant_choices:
++            self.fields['tenant'].choices = ('', 'No Available Tenants')
++        else:
++            self.fields['tenant'].choices = tenant_choices
++
++    def handle(self, request, data):
++        def find_or_create_access_keys(request, tenant_id):
++            keys = api.keystone.list_ec2_credentials(request, request.user.id)
++            if keys:
++                return keys[0]
++            else:
++                return api.keystone.create_ec2_credentials(request,
++                                                           request.user.id,
++                                                           tenant_id)
++        try:
++            api.keystone.token_create_scoped(request,
++                                             data.get('tenant'),
++                                             request.user.token)
++            keys = find_or_create_access_keys(request, data.get('tenant'))
++            tenant_id = data['tenant']
++            tenant_name = dict(self.fields['tenant'].choices)[tenant_id]
++            control_bucket = "juju-openstack-%s-%s" % (tenant_name, str(uuid.uuid4())[19:])
++            context = {'ec2_access_key': keys.access,
++                       'ec2_secret_key': keys.secret,
++                       'ec2_url': api.url_for(request, 'ec2'),
++                       's3_url': api.url_for(request, 's3'),
++                       'juju_admin_secret': uuid.uuid4().hex,
++                       'control_bucket': control_bucket
++                      }
++        except:
++            exceptions.handle(request,
++                              _('Unable to fetch generate Juju environment config.'),
++                              redirect=request.build_absolute_uri())
++
++        response = shortcuts.render(request,
++                                    'settings/juju/environments.yaml.template',
++                                    context,
++                                    content_type='text/plain')
++        response['Content-Disposition'] = 'attachment; filename=environments.yaml'
++        response['Content-Length'] = str(len(response.content))
++        return response
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/__init__.py horizon/horizon/dashboards/settings/juju/__init__.py
+--- horizon.orig/horizon/dashboards/settings/juju/__init__.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/__init__.py	2012-05-31 14:09:09.112889071 -0400
+@@ -0,0 +1 @@
++# Horizon Juju settings panel
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/panel.py horizon/horizon/dashboards/settings/juju/panel.py
+--- horizon.orig/horizon/dashboards/settings/juju/panel.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/panel.py	2012-05-31 14:09:09.116889042 -0400
+@@ -0,0 +1,28 @@
++# vim: tabstop=4 shiftwidth=4 softtabstop=4
++# Copyright 2012 Openstack, LLC
++# Copyright 2012 Canonical Ltd.
++#
++#    Licensed under the Apache License, Version 2.0 (the "License"); you may
++#    not use this file except in compliance with the License. You may obtain
++#    a copy of the License at
++#
++#         http://www.apache.org/licenses/LICENSE-2.0
++#
++#    Unless required by applicable law or agreed to in writing, software
++#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
++#    License for the specific language governing permissions and limitations
++#    under the License.
++
++from django.utils.translation import ugettext_lazy as _
++
++import horizon
++from horizon.dashboards.settings import dashboard
++
++
++class JujuPanel(horizon.Panel):
++    name = _("Juju Environment Config")
++    slug = 'juju'
++
++
++dashboard.Settings.register(JujuPanel)
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/urls.py horizon/horizon/dashboards/settings/juju/urls.py
+--- horizon.orig/horizon/dashboards/settings/juju/urls.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/urls.py	2012-05-31 14:09:09.116889042 -0400
+@@ -0,0 +1,24 @@
++# vim: tabstop=4 shiftwidth=4 softtabstop=4
++
++# Copyright 2012 Openstack, LLC
++# Copyright 2012 Canonical Ltd.
++#
++#    Licensed under the Apache License, Version 2.0 (the "License"); you may
++#    not use this file except in compliance with the License. You may obtain
++#    a copy of the License at
++#
++#         http://www.apache.org/licenses/LICENSE-2.0
++#
++#    Unless required by applicable law or agreed to in writing, software
++#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
++#    License for the specific language governing permissions and limitations
++#    under the License.
++
++from django.conf.urls.defaults import patterns, url
++
++from .views import IndexView
++
++urlpatterns = patterns('horizon.dashboards.settings.juju.views',
++    url(r'^$', IndexView.as_view(), name='index'),
++)
+diff -Naurp horizon.orig/horizon/dashboards/settings/juju/views.py horizon/horizon/dashboards/settings/juju/views.py
+--- horizon.orig/horizon/dashboards/settings/juju/views.py	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/juju/views.py	2012-05-31 14:09:09.116889042 -0400
+@@ -0,0 +1,28 @@
++# vim: tabstop=4 shiftwidth=4 softtabstop=4
++
++# Copyright 2012 Openstack, LLC
++#
++#    Licensed under the Apache License, Version 2.0 (the "License"); you may
++#    not use this file except in compliance with the License. You may obtain
++#    a copy of the License at
++#
++#         http://www.apache.org/licenses/LICENSE-2.0
++#
++#    Unless required by applicable law or agreed to in writing, software
++#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
++#    License for the specific language governing permissions and limitations
++#    under the License.
++
++import logging
++
++from horizon import forms
++from horizon.dashboards.settings.juju.forms import DownloadJujuEnvironment 
++
++
++LOG = logging.getLogger(__name__)
++
++
++class IndexView(forms.ModalFormView):
++    form_class = DownloadJujuEnvironment
++    template_name = 'settings/juju/index.html'
+diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/download_form.html horizon/horizon/dashboards/settings/templates/settings/juju/download_form.html
+--- horizon.orig/horizon/dashboards/settings/templates/settings/juju/download_form.html	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/templates/settings/juju/download_form.html	2012-05-31 14:09:09.116889042 -0400
+@@ -0,0 +1,20 @@
++{% extends "horizon/common/_modal_form.html" %}
++{% load i18n %}
++
++
++{% block modal-body %}
++<div class="left">
++    <fieldset>
++    {% include "horizon/common/_form_fields.html" %}
++    </fieldset>
++</div>
++<div class="right">
++    <h3>{% trans "Description:" %}</h3>
++    <p>{% trans 'Clicking "Download Juju Environment Config" will download a file which includes a Juju environment configured for your cloud.<br><center><img src='/static/dashboard/img/juju.png'></center><br>To find out more about Juju visit <a href='http://juju.ubuntu.com'>http://juju.ubuntu.com</a>' %}</p>
++</div>
++{% endblock %}
++
++{% block modal-footer %}
++    <input class="btn btn-primary pull-right" type="submit" value="{% trans "Download Juju Environment Config" %}" />
++    {% if hide %}<a href="{% url horizon:settings:juju:index %}" class="btn secondary cancel close">{% trans "Cancel" %}</a>{% endif %}
++{% endblock %}
+diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template
+--- horizon.orig/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/templates/settings/juju/environments.yaml.template	2012-05-31 14:09:09.116889042 -0400
+@@ -0,0 +1,21 @@
++# To use Juju with your Openstack cloud:
++#    1. Run: apt-get install juju
++#    2. Copy this file to $HOME/.juju/environments.yaml
++#    3. Modify the 'default-image-id' to match an Ubuntu cloud image
++#       AMI that has been published to your cloud.
++#    4. Run 'juju bootstrap' and deploy services!
++#
++# To find out more about juju visit http://juju.ubuntu.com
++
++juju: environments
++environments:
++  openstack:
++    type: ec2
++    control-bucket: {{ control_bucket }}
++    admin-secret: {{ juju_admin_secret }}
++    access-key: {{ ec2_access_key }}
++    secret-key: {{ ec2_secret_key }}
++    ec2-uri: {{ ec2_url }}
++    s3-uri: {{ s3_url }}
++    default-series: precise
++    default-image-id: ami-00000001
+diff -Naurp horizon.orig/horizon/dashboards/settings/templates/settings/juju/index.html horizon/horizon/dashboards/settings/templates/settings/juju/index.html
+--- horizon.orig/horizon/dashboards/settings/templates/settings/juju/index.html	1969-12-31 19:00:00.000000000 -0500
++++ horizon/horizon/dashboards/settings/templates/settings/juju/index.html	2012-05-31 14:09:09.116889042 -0400
+@@ -0,0 +1,11 @@
++{% extends 'settings/base.html' %}
++{% load i18n %}
++{% block title %}{% trans "Download Juju Environment Config" %}{% endblock %}
++
++{% block page_header %}
++  {% include "horizon/common/_page_header.html" with title=_("Download Juju Environment Config") %}
++{% endblock page_header %}
++
++{% block settings_main %}
++  {% include "settings/juju/download_form.html" %}
++{% endblock %}
+diff -Naurp horizon.orig/openstack_dashboard/local/local_settings.py.example horizon/openstack_dashboard/local/local_settings.py.example
+--- horizon.orig/openstack_dashboard/local/local_settings.py.example	2012-05-31 14:08:31.396889052 -0400
++++ horizon/openstack_dashboard/local/local_settings.py.example	2012-05-31 14:09:09.116889042 -0400
+@@ -13,6 +13,12 @@ PROD = False
+ # https://docs.djangoproject.com/en/1.4/ref/settings/#secure-proxy-ssl-header
+ # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+ 
++# Ubuntu-specific: Enables an extra panel in the 'Settings' section
++# that easily generates a Juju environments.yaml for download,
++# preconfigured with endpoints and credentails required for bootstrap
++# and service deployment.
++ENABLE_JUJU_PANEL = True
++
+ # Note: You should change this value
+ SECRET_KEY = 'elj1IWiLoWHgcyYxFVLj7cM5rGOOxWl0'
+ 
