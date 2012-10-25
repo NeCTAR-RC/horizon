@@ -7,3 +7,4 @@ fix-dashboard-manage.patch
 fix-ubuntu-tests.patch
 ubuntu_local_settings.patch
 nectar/disable_cinder.patch
+backports/quota-summary-1055929.patch
