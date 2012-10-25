@@ -1,3 +1,9 @@
+horizon (2012.2-1nectar2) precise-folsom; urgency=low
+
+  * Backported quota summary fix
+
+ -- Sam Morrison <sorrison@gmail.com>  Thu, 25 Oct 2012 13:22:35 +1100
+
 horizon (2012.2-1nectar1) precise-folsom; urgency=low
 
   * Disable cinder
