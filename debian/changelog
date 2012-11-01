@@ -1,3 +1,10 @@
+horizon (2012.2-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/patches/add_juju_settings_pannel.patch: Disable during
+    Grizzly dev. cycle. 
+
+ -- Adam Gandelman <adamg@canonical.com>  Thu, 01 Nov 2012 17:36:08 +0100
+
 horizon (2012.2-0ubuntu2) quantal; urgency=low
 
   * debian/control: Set strict version requirements between python-django-horizon,
