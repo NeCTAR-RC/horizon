@@ -1,3 +1,13 @@
+horizon (2012.2+20121114-1) precise-folsom; urgency=low
+
+  [ Julie Pichon ]
+  * When editing an image, correctly set the 'is_public' checkbox.
+
+  [ Matthias Runge ]
+  * Fixes JavaScript count bug in tables.
+
+ -- Sam Morrison <sorrison@gmail.com>  Thu, 15 Nov 2012 15:12:49 +1100
+
 horizon (2012.2-1nectar4) precise-folsom; urgency=low
 
   * Added patch to series
