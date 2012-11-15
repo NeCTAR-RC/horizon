@@ -1,3 +1,9 @@
+horizon (2012.2-1nectar4) precise-folsom; urgency=low
+
+  * Added patch to series
+
+ -- Sam Morrison <sorrison@gmail.com>  Thu, 15 Nov 2012 13:30:06 +1100
+
 horizon (2012.2-1nectar3) precise-folsom; urgency=low
 
   * Disable floating IPs
