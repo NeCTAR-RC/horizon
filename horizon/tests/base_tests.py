@@ -238,7 +238,7 @@ class HorizonTests(BaseHorizonTests):
         # Get a clean, logged out client instance.
         self.setActiveUser()
         resp = self.client.get(url)
-        redirect_url = "?".join([urlresolvers.reverse("login"),
+        redirect_url = "?".join(['http://testserver' + settings.LOGIN_URL,
                                  "next=%s" % url])
         self.assertRedirectsNoFollow(resp, redirect_url)
         # Simulate ajax call
@@ -246,8 +246,7 @@ class HorizonTests(BaseHorizonTests):
         # Response should be HTTP 401 with redirect header
         self.assertEquals(resp.status_code, 401)
         self.assertEquals(resp["X-Horizon-Location"],
-                          "?".join([urlresolvers.reverse("login"),
-                                    "next=%s" % url]))
+                          redirect_url)
 
     def test_required_services(self):
         horizon.register(MyDash)
@@ -321,7 +320,7 @@ class HorizonTests(BaseHorizonTests):
         dogs = horizon.get_dashboard("dogs")
         puppies = dogs.get_panel("puppies")
         url = puppies.get_absolute_url()
-        redirect_url = "?".join([urlresolvers.reverse("login"),
+        redirect_url = "?".join([settings.LOGIN_URL,
                                  "next=%s" % url])
 
         self.setActiveUser()
