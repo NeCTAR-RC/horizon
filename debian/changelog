@@ -1,3 +1,9 @@
+horizon (2012.2+20121114-2) precise-folsom; urgency=low
+
+  * Backported patch to fix login url redirect
+
+ -- Sam Morrison <sorrison@gmail.com>  Mon, 19 Nov 2012 15:05:28 +1100
+
 horizon (2012.2+20121114-1) precise-folsom; urgency=low
 
   [ Julie Pichon ]
