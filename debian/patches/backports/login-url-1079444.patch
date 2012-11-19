@@ -1,0 +1,91 @@
+commit 26998f4024e16adc8b9dd4ab113ca05e11811012
+Author: Kieran Spear <kispear@gmail.com>
+Date:   Fri Nov 16 17:20:51 2012 +1100
+
+    Honour LOGIN_URL when redirecting to login page
+    
+    Currently the redirect is always made to the url of the 'login' view.
+    This change makes redirects go to LOGIN_URL, so the default login view
+    can be replaced with a view at another url/name.
+    
+    Fixes bug 1079444.
+    
+    Change-Id: Ib56200679668dd053d3c6ac24807d2a2affc0df8
+
+diff --git a/horizon/middleware.py b/horizon/middleware.py
+index 940e5ad..ab4de10 100644
+--- a/horizon/middleware.py
++++ b/horizon/middleware.py
+@@ -25,8 +25,10 @@ import logging
+ 
+ from django import http
+ from django import shortcuts
++from django.conf import settings
+ from django.contrib import messages as django_messages
+ from django.contrib.auth import REDIRECT_FIELD_NAME
++from django.contrib.auth.views import redirect_to_login
+ from django.core.urlresolvers import reverse
+ from django.utils import timezone
+ from django.utils.encoding import iri_to_uri
+@@ -59,20 +61,23 @@ class HorizonMiddleware(object):
+         """
+         if isinstance(exception, (exceptions.NotAuthorized,
+                                   exceptions.NotAuthenticated)):
+-            auth_url = reverse("login")
++            auth_url = settings.LOGIN_URL
+             next_url = iri_to_uri(request.get_full_path())
+             if next_url != auth_url:
+-                param = "?%s=%s" % (REDIRECT_FIELD_NAME, next_url)
+-                redirect_to = "".join((auth_url, param))
++                field_name = REDIRECT_FIELD_NAME
+             else:
+-                redirect_to = auth_url
++                field_name = None
++            login_url = request.build_absolute_uri(auth_url)
++            response = redirect_to_login(next_url, login_url=login_url,
++                                         redirect_field_name=field_name)
++
+             # TODO(gabriel): Find a way to display an appropriate message to
+             # the user *on* the login form...
+             if request.is_ajax():
+                 response_401 = http.HttpResponse(status=401)
+-                response_401['X-Horizon-Location'] = redirect_to
++                response_401['X-Horizon-Location'] = response['location']
+                 return response_401
+-            return shortcuts.redirect(redirect_to)
++            return response
+ 
+         # If an internal "NotFound" error gets this far, return a real 404.
+         if isinstance(exception, exceptions.NotFound):
+diff --git a/horizon/tests/base_tests.py b/horizon/tests/base_tests.py
+index 011eecd..a4558f0 100644
+--- a/horizon/tests/base_tests.py
++++ b/horizon/tests/base_tests.py
+@@ -238,7 +238,7 @@ class HorizonTests(BaseHorizonTests):
+         # Get a clean, logged out client instance.
+         self.setActiveUser()
+         resp = self.client.get(url)
+-        redirect_url = "?".join([urlresolvers.reverse("login"),
++        redirect_url = "?".join(['http://testserver' + settings.LOGIN_URL,
+                                  "next=%s" % url])
+         self.assertRedirectsNoFollow(resp, redirect_url)
+         # Simulate ajax call
+@@ -246,8 +246,7 @@ class HorizonTests(BaseHorizonTests):
+         # Response should be HTTP 401 with redirect header
+         self.assertEquals(resp.status_code, 401)
+         self.assertEquals(resp["X-Horizon-Location"],
+-                          "?".join([urlresolvers.reverse("login"),
+-                                    "next=%s" % url]))
++                          redirect_url)
+ 
+     def test_required_services(self):
+         horizon.register(MyDash)
+@@ -321,7 +320,7 @@ class HorizonTests(BaseHorizonTests):
+         dogs = horizon.get_dashboard("dogs")
+         puppies = dogs.get_panel("puppies")
+         url = puppies.get_absolute_url()
+-        redirect_url = "?".join([urlresolvers.reverse("login"),
++        redirect_url = "?".join([settings.LOGIN_URL,
+                                  "next=%s" % url])
+ 
+         self.setActiveUser()
