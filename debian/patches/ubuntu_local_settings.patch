@@ -1,31 +1,16 @@
-Author: Adam Gandelman <adamg@canonical.com>
-Date: Mon Sep 10 20:53:00 PDT 2012
-Subject: Squash all patches that update the default local_settings.py.example.
-
-This patch combines all previous patches that update local_settings.py.example.
-The example local_settings.py is what gets installed as the default installation
-in Ubuntu package.
-
-Previous patches were:
-    * turn-off-debug.patch
-    * use-memcache.patch (LP: #968850)
-    * set_login_redirects.patch (LP: #1037349)
-    * disable_online_compression.patch (LP: #1024326)
-
-Index: horizon-2013.1/openstack_dashboard/local/local_settings.py.example
-===================================================================
---- horizon-2013.1.orig/openstack_dashboard/local/local_settings.py.example	2012-09-11 21:09:15.000000000 -0700
-+++ horizon-2013.1/openstack_dashboard/local/local_settings.py.example	2012-09-11 21:11:53.957057760 -0700
-@@ -2,7 +2,7 @@
+diff -Naurp horizon-2013.1.orig/openstack_dashboard/local/local_settings.py.example horizon-2013.1/openstack_dashboard/local/local_settings.py.example
+--- horizon-2013.1.orig/openstack_dashboard/local/local_settings.py.example	2012-11-20 22:59:38.000000000 -0600
++++ horizon-2013.1/openstack_dashboard/local/local_settings.py.example	2012-11-21 12:35:19.701240407 -0600
+@@ -4,7 +4,7 @@ from django.utils.translation import uge
  
- from django.utils.translation import ugettext_lazy as _
+ from openstack_dashboard import exceptions
  
 -DEBUG = True
 +DEBUG = False
  TEMPLATE_DEBUG = DEBUG
  
  # Set SSL proxy settings:
-@@ -38,7 +38,7 @@
+@@ -49,13 +49,29 @@ LOCAL_PATH = os.path.dirname(os.path.abs
  # We recommend you use memcached for development; otherwise after every reload
  # of the django development server, you will have to login again. To use
  # memcached set CACHE_BACKED to something like 'memcached://127.0.0.1:11211/'
@@ -34,11 +19,9 @@ Index: horizon-2013.1/openstack_dashboard/local/local_settings.py.example
  
  # Send email to the console by default
  EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-@@ -145,3 +145,19 @@
-             }
-         }
- }
-+
+ # Or send them to /dev/null
+ #EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+ 
 +# Enable the Ubuntu theme if it is present.
 +try:
 +    from ubuntu_theme import *
@@ -54,3 +37,7 @@ Index: horizon-2013.1/openstack_dashboard/local/local_settings.py.example
 +# offline compression by default.  To enable online compression, install
 +# the node-less package and enable the following option.
 +COMPRESS_OFFLINE = True
++
+ # Configure these for your outgoing email host
+ # EMAIL_HOST = 'smtp.my-company.com'
+ # EMAIL_PORT = 25
