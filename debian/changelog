@@ -1,7 +1,11 @@
 horizon (2013.1~g1~20121121.2128-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Adam Gandelman ]
   * debian/patches/add_juju_settings_pannel.patch: Disable during
     Grizzly dev. cycle. 
+
+  [ Chuck Short ]
+  * New upstream relase.
 
  -- Adam Gandelman <adamg@canonical.com>  Thu, 01 Nov 2012 17:36:08 +0100
 
