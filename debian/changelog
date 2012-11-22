@@ -1,4 +1,4 @@
-horizon (2013.1~g1~20121121.2128-0ubuntu1) UNRELEASED; urgency=low
+horizon (2013.1~g1~20121122.r2132-0ubuntu1) UNRELEASED; urgency=low
 
   [ Adam Gandelman ]
   * debian/patches/add_juju_settings_pannel.patch: Disable during
