@@ -1,4 +1,4 @@
-horizon (2013.1~g1~20121122.r2132-0ubuntu1) UNRELEASED; urgency=low
+horizon (2013.1~g1-0ubuntu1) UNRELEASED; urgency=low
 
   [ Adam Gandelman ]
   * debian/patches/add_juju_settings_pannel.patch: Disable during
@@ -6,6 +6,7 @@ horizon (2013.1~g1~20121122.r2132-0ubuntu1) UNRELEASED; urgency=low
 
   [ Chuck Short ]
   * New upstream relase.
+  * Refreshed patches.
 
  -- Adam Gandelman <adamg@canonical.com>  Thu, 01 Nov 2012 17:36:08 +0100
 
