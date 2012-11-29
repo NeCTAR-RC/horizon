@@ -1,0 +1,246 @@
+diff --git a/horizon/api/nova.py b/horizon/api/nova.py
+index 3bf209f..67e7b97 100644
+--- a/horizon/api/nova.py
++++ b/horizon/api/nova.py
+@@ -91,7 +91,7 @@ class Server(APIResourceWrapper):
+              'image_name', 'VirtualInterfaces', 'flavor', 'key_name',
+              'tenant_id', 'user_id', 'OS-EXT-STS:power_state',
+              'OS-EXT-STS:task_state', 'OS-EXT-SRV-ATTR:instance_name',
+-             'OS-EXT-SRV-ATTR:host']
++             'OS-EXT-SRV-ATTR:host', 'os-cells:cell_name']
+ 
+     def __init__(self, apiresource, request):
+         super(Server, self).__init__(apiresource)
+@@ -111,6 +111,13 @@ class Server(APIResourceWrapper):
+     def internal_name(self):
+         return getattr(self, 'OS-EXT-SRV-ATTR:instance_name', "")
+ 
++    @property
++    def cell_name(self):
++        name = getattr(self, 'os-cells:cell_name', "")
++        if name:
++            name = name.replace('!', '-')
++        return name
++
+     def reboot(self, hardness=REBOOT_HARD):
+         novaclient(self.request).servers.reboot(self.id, hardness)
+ 
+@@ -296,13 +303,14 @@ def keypair_list(request):
+ 
+ def server_create(request, name, image, flavor, key_name, user_data,
+                   security_groups, block_device_mapping, nics=None,
+-                  instance_count=1):
++                  instance_count=1, scheduler_hints=None):
+     return Server(novaclient(request).servers.create(
+             name, image, flavor, userdata=user_data,
+             security_groups=security_groups,
+             key_name=key_name, block_device_mapping=block_device_mapping,
+             nics=nics,
+-            min_count=instance_count), request)
++            min_count=instance_count,
++            scheduler_hints=scheduler_hints), request)
+ 
+ 
+ def server_delete(request, instance):
+@@ -583,3 +591,29 @@ def get_x509_credentials(request):
+ 
+ def get_x509_root_certificate(request):
+     return novaclient(request).certs.get()
++
++
++def cells_get_children(request):
++    """Gets child cells of an api server."""
++    # TODO(kspear): This needs to be moved up to novaclient, and should
++    # be removed once novaclient supports this call.
++    cells = []
++    nclient = novaclient(request)
++    resp, body = nclient.client.get('/os-cells/detail')
++    if body:
++        cells = body.get('cells', [])
++    return cells
++
++
++def cells_get_names(request):
++    """Gets the names of every cell known by the api server."""
++    # TODO(kspear): This needs to be moved up to novaclient, and should
++    # be removed once novaclient supports this call.
++    cells = []
++    nclient = novaclient(request)
++    resp, body = nclient.client.get('/os-cells/info')
++    if body:
++        cells_dict = body.get('cell', {})
++        cells = cells_dict.get('subcells', [])
++        cells = map(lambda s: s.replace('!', '-'), cells)
++    return cells
+diff --git a/horizon/dashboards/nova/instances/tables.py b/horizon/dashboards/nova/instances/tables.py
+index 380bfe7..13604df 100644
+--- a/horizon/dashboards/nova/instances/tables.py
++++ b/horizon/dashboards/nova/instances/tables.py
+@@ -17,6 +17,7 @@
+ import logging
+ 
+ from django import template
++from django.conf import settings
+ from django.core import urlresolvers
+ from django.template.defaultfilters import title
+ from django.utils.http import urlencode
+@@ -270,6 +271,12 @@ def get_power_state(instance):
+     return POWER_STATES.get(getattr(instance, "OS-EXT-STS:power_state", 0), '')
+ 
+ 
++def get_cell(instance):
++    if instance.cell_name:
++        return instance.cell_name
++    return _("Not available")
++
++
+ class InstancesTable(tables.DataTable):
+     TASK_STATUS_CHOICES = (
+         (None, True),
+@@ -289,6 +296,8 @@ class InstancesTable(tables.DataTable):
+                          link=("horizon:nova:instances:detail"),
+                          verbose_name=_("Instance Name"))
+     ip = tables.Column(get_ips, verbose_name=_("IP Address"))
++    if getattr(settings, 'OPENSTACK_CELLS_ENABLED', False):
++        cell = tables.Column(get_cell, verbose_name=_("Cell"))
+     size = tables.Column(get_size,
+                          verbose_name=_("Size"),
+                          attrs={'data-type': 'size'})
+diff --git a/horizon/dashboards/nova/instances/templates/instances/_detail_overview.html b/horizon/dashboards/nova/instances/templates/instances/_detail_overview.html
+index cebc828..bec5366 100644
+--- a/horizon/dashboards/nova/instances/templates/instances/_detail_overview.html
++++ b/horizon/dashboards/nova/instances/templates/instances/_detail_overview.html
+@@ -12,6 +12,10 @@
+     <dd>{{ instance.id }}</dd>
+     <dt>{% trans "Status" %}</dt>
+     <dd>{{ instance.status|title }}</dd>
++    {% if instance.cell_name %}
++    <dt>{% trans "Cell" %}</dt>
++    <dd>{{ instance.cell_name }}</dd>
++    {% endif %}
+   </dl>
+ </div>
+ 
+diff --git a/horizon/dashboards/nova/instances/templates/instances/_launch_cell_help.html b/horizon/dashboards/nova/instances/templates/instances/_launch_cell_help.html
+new file mode 100644
+index 0000000..77f68af
+--- /dev/null
++++ b/horizon/dashboards/nova/instances/templates/instances/_launch_cell_help.html
+@@ -0,0 +1,3 @@
++{% load i18n %}
++
++<p>{% blocktrans %}Specify the cell that your instance will run on.{% endblocktrans %}</p>
+diff --git a/horizon/dashboards/nova/instances/tests.py b/horizon/dashboards/nova/instances/tests.py
+index 57bbe60..2d7260f 100644
+--- a/horizon/dashboards/nova/instances/tests.py
++++ b/horizon/dashboards/nova/instances/tests.py
+@@ -700,7 +700,8 @@ class InstanceTests(test.TestCase):
+                                [sec_group.name],
+                                block_device_mapping,
+                                nics=nics,
+-                               instance_count=IsA(int))
++                               instance_count=IsA(int),
++                               scheduler_hints=None)
+ 
+         self.mox.ReplayAll()
+ 
+@@ -890,7 +891,8 @@ class InstanceTests(test.TestCase):
+                                [sec_group.name],
+                                None,
+                                nics=nics,
+-                               instance_count=IsA(int)) \
++                               instance_count=IsA(int),
++                               scheduler_hints=None) \
+                       .AndRaise(self.exceptions.keystone)
+ 
+         self.mox.ReplayAll()
+diff --git a/horizon/dashboards/nova/instances/workflows.py b/horizon/dashboards/nova/instances/workflows.py
+index ef350ea..d07c89a 100644
+--- a/horizon/dashboards/nova/instances/workflows.py
++++ b/horizon/dashboards/nova/instances/workflows.py
+@@ -20,6 +20,7 @@
+ 
+ import logging
+ 
++from django.conf import settings
+ from django.utils.text import normalize_newlines
+ from django.utils.translation import ugettext as _
+ 
+@@ -162,6 +163,36 @@ class VolumeOptions(workflows.Step):
+         return context
+ 
+ 
++class CellSelectionAction(workflows.Action):
++    cell = forms.ChoiceField(label=_("Cell"),
++                             help_text=_("Cell to run the instance on."),
++                             required=False)
++
++    class Meta:
++        name = _("Cell")
++        help_text_template = ("nova/instances/"
++                              "_launch_cell_help.html")
++
++    def populate_cell_choices(self, request, context):
++        try:
++            cells = api.nova.cells_get_names(request)
++            choices = [ (name, name) for name in cells ]
++        except:
++            choices = []
++            exceptions.handle(request,
++                              _('Unable to retrieve available cell list.'))
++        if choices:
++            choices.insert(0, ("", _("Default")))
++        else:
++            choices.insert(0, ("", _("No cells available.")))
++        return choices
++
++
++class CellSelection(workflows.Step):
++    action_class = CellSelectionAction
++    contributes = ("cell",)
++
++
+ class SetInstanceDetailsAction(workflows.Action):
+     SOURCE_TYPE_CHOICES = (
+         ("image_id", _("Image")),
+@@ -493,6 +524,12 @@ class LaunchInstance(workflows.Workflow):
+         else:
+             nics = None
+ 
++        cell_name = context.get('cell', '')
++        if cell_name:
++            cell_hint = { 'cell': cell_name }
++        else:
++            cell_hint = None
++
+         try:
+             api.nova.server_create(request,
+                                    context['name'],
+@@ -503,8 +540,13 @@ class LaunchInstance(workflows.Workflow):
+                                    context['security_group_ids'],
+                                    dev_mapping,
+                                    nics=nics,
+-                                   instance_count=int(context['count']))
++                                   instance_count=int(context['count']),
++                                   scheduler_hints=cell_hint)
+             return True
+         except:
+             exceptions.handle(request)
+             return False
++
++
++if getattr(settings, 'OPENSTACK_CELLS_ENABLED', False):
++    LaunchInstance.register(CellSelection)
+diff --git a/horizon/tests/testsettings.py b/horizon/tests/testsettings.py
+index 5b3b29f..b17f4d4 100644
+--- a/horizon/tests/testsettings.py
++++ b/horizon/tests/testsettings.py
+@@ -151,6 +151,8 @@ OPENSTACK_HYPERVISOR_FEATURES = {
+     'can_set_mount_point': True
+ }
+ 
++OPENSTACK_CELLS_ENABLED = False
++
+ LOGGING = {
+     'version': 1,
+     'disable_existing_loggers': False,
