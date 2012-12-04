@@ -70,6 +70,9 @@ class QuotaSet(object):
     """
     def __init__(self, apiresource):
         self.items = []
+        self.add_quotas(apiresource)
+
+    def add_quotas(self, apiresource):
         for k in apiresource._info.keys():
             if k in ['id']:
                 continue
@@ -405,7 +408,9 @@ def server_remove_floating_ip(request, server, floating_ip):
 
 
 def tenant_quota_get(request, tenant_id):
-    return QuotaSet(novaclient(request).quotas.get(tenant_id))
+    qs = QuotaSet(novaclient(request).quotas.get(tenant_id))
+    qs.add_quotas(cinderclient(request).quotas.get(tenant_id))
+    return qs
 
 
 def tenant_quota_update(request, tenant_id, **kwargs):
