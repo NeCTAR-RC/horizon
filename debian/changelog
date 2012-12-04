@@ -1,3 +1,9 @@
+horizon (2012.2+20121114-5) precise-folsom; urgency=low
+
+  * Re-enable cinder api calls
+
+ -- Kieran Spear <kispear@gmail.com>  Tue, 04 Dec 2012 16:31:47 +1100
+
 horizon (2012.2+20121114-4) precise-folsom; urgency=low
 
   * Added a patch for (cinder) volume quota support
