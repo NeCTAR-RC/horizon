@@ -9,6 +9,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openstack_dashboard.settings'
 sys.stdout = sys.stderr
 
+sys.path.append("/usr/share/openstack-dashboard/")
+
 DEBUG = False
 
 application = django.core.handlers.wsgi.WSGIHandler()
