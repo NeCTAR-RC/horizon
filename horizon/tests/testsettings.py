@@ -98,7 +98,6 @@ SITE_BRANDING = 'OpenStack'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--nocapture',
              '--nologcapture',
-             '--exclude-dir=horizon/conf/',
              '--cover-package=horizon',
              '--cover-inclusive']
 
