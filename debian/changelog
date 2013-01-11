@@ -1,9 +1,13 @@
-horizon (2013.1~g1-0ubuntu3) UNRELEASED; urgency=low
+horizon (2013.1~g2-0ubuntu1) raring; urgency=low
 
+  [ Adam Gandelman ]
   * Recompress static JS and CSS and generate new manifest.json for offline
     compression in preparation for Grizzly-2.
 
- -- Adam Gandelman <adamg@ubuntu.com>  Thu, 10 Jan 2013 21:57:29 -0800
+  [ Chuck Short ]
+  * New upstream release.
+
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 11 Jan 2013 08:26:40 -0600
 
 horizon (2013.1~g1-0ubuntu1) raring; urgency=low
 
