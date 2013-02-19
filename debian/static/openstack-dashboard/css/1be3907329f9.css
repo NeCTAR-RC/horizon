@@ -1735,9 +1735,7 @@ table .span12 {
   font-weight: normal;
   line-height: 18px;
   color: #555555;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-wrap: break-word;
 }
 .dropdown-menu li > a:hover,
 .dropdown-menu .active > a,
@@ -3783,7 +3781,7 @@ body {
   background: #fafafa;
 }
 #splash .login {
-  background: #ffffff url(/static/dashboard/img/logo.png) no-repeat center 35px;
+  background: #ffffff url(/static/dashboard/img/logo-splash.png) no-repeat center 35px;
   position: absolute;
   top: 80px;
   left: 50%;
@@ -3802,10 +3800,13 @@ body {
   -moz-background-clip: padding-box;
   background-clip: padding-box;
 }
-#splash .login input {
+#splash .login form .error {
+  width: 100%;
+}
+#splash .login form input {
   width: 350px;
 }
-#splash .login select {
+#splash .login form select {
   width: 360px;
 }
 #splash .help-block {
@@ -3894,6 +3895,16 @@ a.current_item:hover h4 {
   font-size: 16px;
   margin: -6px 0 0 14px;
   padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sidebar .switcher_bar h3:hover {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: none;
+  padding-right: 1em;
+  word-wrap: break-word;
 }
 .sidebar .switcher_bar h4 {
   color: #6fabc4;
@@ -4017,6 +4028,7 @@ a.current_item:hover h4 {
 }
 .table th.header:hover {
   background-color: #e8e8e8;
+  text-decoration: underline;
 }
 .table tbody td.anchor a {
   display: block;
@@ -4059,7 +4071,6 @@ small {
 .main_nav {
   list-style: none;
   width: 222px;
-  float: left;
   margin: 10px 0 20px 0;
 }
 .main_nav a {
@@ -4147,7 +4158,8 @@ table form {
   float: right;
   min-width: 400px;
 }
-.table_actions .table_search {
+.table_actions .table_search,
+.table_actions .table_filter {
   display: inline-block;
 }
 .table_search input {
@@ -4163,13 +4175,101 @@ table form {
 .table_actions button.filter {
   margin-left: 0;
 }
+.table_actions a.btn-create,
+.table_actions a.btn-launch {
+  padding-left: 23px;
+  position: relative;
+}
+.table_actions a.btn-create:before,
+.table_actions a.btn-launch:before {
+  display: inline-block;
+  content: "";
+  width: 18px;
+  height: 20px;
+  margin-top: 1px;
+  *margin-right: .3em;
+  line-height: 14px;
+  background-image: url("/static/bootstrap/img/glyphicons-halflings.png");
+  background-position: -403px -92px;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+.table_actions a.btn-download {
+  padding-left: 23px;
+  position: relative;
+}
+.table_actions a.btn-download:before {
+  display: inline-block;
+  content: "";
+  width: 18px;
+  height: 20px;
+  margin-top: 1px;
+  *margin-right: .3em;
+  line-height: 14px;
+  background-image: url("/static/bootstrap/img/glyphicons-halflings.png");
+  background-position: -91px -19px;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+.table_actions a.btn-upload {
+  padding-left: 23px;
+  position: relative;
+}
+.table_actions a.btn-upload:before {
+  display: inline-block;
+  content: "";
+  width: 18px;
+  height: 20px;
+  margin-top: 1px;
+  *margin-right: .3em;
+  line-height: 14px;
+  background-image: url("/static/bootstrap/img/glyphicons-halflings.png");
+  background-position: -283px -92px;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+.table_actions button.btn-delete,
+.table_actions button.btn-terminate {
+  padding-left: 23px;
+  position: relative;
+}
+.table_actions button.btn-delete:before,
+.table_actions button.btn-terminate:before {
+  display: inline-block;
+  content: "";
+  width: 18px;
+  height: 20px;
+  margin-top: 1px;
+  *margin-right: .3em;
+  line-height: 14px;
+  background-image: url("/static/bootstrap/img/glyphicons-halflings-white.png");
+  background-position: -451px 5px;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
 .table_header .table_actions {
   min-width: 0;
 }
 .table_header .table_actions a,
-.table_header .table_actions button {
+.table_header .table_actions > button,
+.table_header .table_actions .table_search button {
   display: inline-block;
   float: none;
+}
+.table_header .table_filter {
+  vertical-align: bottom;
+  margin-right: 20px;
+}
+.table_header .table_filter i {
+  vertical-align: middle;
 }
 .table_actions form {
   float: right;
@@ -4396,17 +4496,13 @@ td.select {
 }
 /* Actions dropdown */
 td.actions_column {
-  width: 150px;
+  white-space: nowrap;
   padding: 10px;
   position: relative;
-  min-width: 140px;
-  min-height: 20px;
+  width: 200px;
 }
-#floating_ips td.actions_column {
-  width: 180px;
-}
-#instances td.actions_column {
-  width: 175px;
+td.actions_column .btn-group {
+  display: inline-block;
 }
 td.actions_column .row_actions a,
 td.actions_column .row_actions input,
@@ -4698,11 +4794,16 @@ div .flavor_table {
   float: left;
   margin-right: 50px;
 }
-.error .help-inline {
+.error .help-inline,
+.dynamic-error {
   background: #efdfdf;
   border: 1px solid #ead5d8;
   padding: 10px;
   display: block;
+}
+.dynamic-error {
+  color: #b94a48;
+  margin-bottom: 0.5em;
 }
 label.log-length {
   line-height: 28px;
@@ -4866,7 +4967,7 @@ label.log-length {
 .project_membership .no_results {
   border: 1px solid #DDD;
   padding: 10px;
-  color: #08C;
+  opacity: 0.5;
 }
 .project_membership .role_dropdown li {
   cursor: pointer;
@@ -5053,4 +5154,110 @@ label.log-length {
 .modal-body fieldset .form-field select[data-add-item-url] {
   width: 275px;
   margin-right: 2px;
+}
+/* Styling for draged network object */
+#networkListSortContainer {
+  display: none;
+}
+.networklist {
+  padding: 6px;
+  background: #eee;
+  border: 1px solid #ccc;
+  min-height: 2em;
+  width: auto !important;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.networklist li {
+  width: 226px;
+  list-style-type: none;
+  margin: 6px auto;
+  padding: 3px;
+  background: #fff;
+  border: 1px solid #aaa;
+  line-height: 18px;
+  border-radius: 3px;
+  cursor: move;
+  padding-left: 23px;
+  background: #ffffff url(/static/dashboard/img/drag.png) no-repeat 11px 50%;
+}
+.networklist li em {
+  font-size: 0.5em;
+  line-height: 1em;
+  color: #999;
+  font-style: normal;
+  margin-left: 0.8em;
+}
+.networklist li i {
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.networklist li a.btn {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 11px;
+  line-height: 12px;
+  padding: 2px 5px 3px;
+  margin-right: 1px;
+  width: 18px;
+  text-align: center;
+  right: 5px;
+  vertical-align: middle;
+  float: right;
+}
+.networklist li a.btn:before {
+  content: "+";
+}
+.networklist li.ui-sortable-helper {
+  background-color: #def;
+}
+.networklist li.ui-state-highlight {
+  border: 1px dotted #ccc;
+  background: #efefef;
+  height: 0.5em;
+}
+.networklist li:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+#selected_network {
+  margin-bottom: 1.5em;
+  counter-reset: v1 0;
+  background: #edf9ff;
+  border: 1px solid #c0d9e4;
+}
+#selected_network li {
+  position: relative;
+}
+#selected_network li a.btn:before {
+  content: "-";
+}
+#selected_network li:before {
+  content: "nic:" counter(v1);
+  counter-increment: v1;
+  display: inline-block;
+  margin-right: 5px;
+  background: #666;
+  color: #fff;
+  font-size: 90%;
+  padding: 0px 4px;
+  vertical-align: middle;
+  border-radius: 2px;
+  position: absolute;
+  left: -2em;
+}
+#selected_network.dragging li:before {
+  content: "nic:";
+  background-color: rgba(102, 102, 102, 0.5);
+  padding-right: 10px;
+}
+#selected_network.dragging li.ui-state-highlight:before {
+  content: "";
+  background: transparent;
 }
