@@ -20,6 +20,7 @@
 
 from django import http
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.datastructures import SortedDict
 from mox import IsA, IgnoreArg
@@ -29,7 +30,7 @@ from horizon import api
 from horizon import test
 
 from .tabs import InstanceDetailTabs
-from .workflows import LaunchInstance
+from .workflows import LaunchInstance, CellSelection
 
 
 INDEX_URL = reverse('horizon:nova:instances:index')
@@ -982,3 +983,86 @@ class InstanceTests(test.TestCase):
         res = self.client.post(url, form_data)
 
         self.assertContains(res, "greater than or equal to 1")
+
+    @test.create_stubs({api.nova: ('tenant_quota_usages',
+                                   'cells_get_names',
+                                   'flavor_list',
+                                   'keypair_list',
+                                   'security_group_list',
+                                   'volume_snapshot_list',
+                                   'volume_list',),
+                        api.quantum: ('network_list',),
+                        api.glance: ('image_list_detailed',)})
+    def test_launch_instance_cells_get(self):
+        # Enable cell selection tab
+        LaunchInstance.register(CellSelection)
+        cell_list = ['melb', 'melb-np', 'melb-qh2', 'monash', 'qld']
+
+        quota_usages = self.quota_usages.first()
+        image = self.images.first()
+
+        api.nova.volume_list(IsA(http.HttpRequest)) \
+                .AndReturn(self.volumes.list())
+        api.nova.volume_snapshot_list(IsA(http.HttpRequest)) \
+                                .AndReturn(self.volumes.list())
+        api.glance.image_list_detailed(IsA(http.HttpRequest),
+                                       filters={'is_public': True,
+                                                'status': 'active'}) \
+                  .AndReturn([self.images.list(), False])
+        api.glance.image_list_detailed(IsA(http.HttpRequest),
+                            filters={'property-owner_id': self.tenant.id,
+                                     'status': 'active'}) \
+                  .AndReturn([[], False])
+        api.quantum.network_list(IsA(http.HttpRequest),
+                                 tenant_id=self.tenant.id,
+                                 shared=False) \
+                .AndReturn(self.networks.list()[:1])
+        api.quantum.network_list(IsA(http.HttpRequest),
+                                 shared=True) \
+                .AndReturn(self.networks.list()[1:])
+        api.nova.tenant_quota_usages(IsA(http.HttpRequest)) \
+                .AndReturn(quota_usages)
+        api.nova.flavor_list(IsA(http.HttpRequest)) \
+                .AndReturn(self.flavors.list())
+        api.nova.flavor_list(IsA(http.HttpRequest)) \
+                .AndReturn(self.flavors.list())
+        api.nova.keypair_list(IsA(http.HttpRequest)) \
+                .AndReturn(self.keypairs.list())
+        api.nova.security_group_list(IsA(http.HttpRequest)) \
+                                .AndReturn(self.security_groups.list())
+        api.nova.cells_get_names(IsA(http.HttpRequest)) \
+                                .AndReturn(cell_list)
+
+        self.mox.ReplayAll()
+
+
+        url = reverse('horizon:nova:instances:launch')
+        params = urlencode({"source_type": "image_id",
+                            "source_id": image.id})
+        res = self.client.get("%s?%s" % (url, params))
+
+        workflow = res.context['workflow']
+        self.assertTemplateUsed(res,
+                        'nova/instances/launch.html')
+        self.assertEqual(res.context['workflow'].name, LaunchInstance.name)
+        step = workflow.get_step("setinstancedetailsaction")
+        self.assertEqual(step.action.initial['image_id'], image.id)
+        self.assertQuerysetEqual(workflow.steps,
+                            ['<SetInstanceDetails: setinstancedetailsaction>',
+                             '<SetAccessControls: setaccesscontrolsaction>',
+                             '<SetNetwork: setnetworkaction>',
+                             '<VolumeOptions: volumeoptionsaction>',
+                             '<PostCreationStep: customizeaction>',
+                             '<CellSelection: cellselectionaction>'])
+
+        self.assertTemplateUsed(res,
+                        'nova/instances/_launch_cell_step.html')
+        self.assertContains(res, '<option value="" selected="selected">')
+        for cell in ['melb', 'monash', 'qld']:
+            self.assertContains(res, '<option value="%s">%s</option>' %
+                                (cell, cell))
+        for cell in cell_list:
+            self.assertContains(res,
+                                'value="%s" name="subcell"' %
+                                cell)
+        LaunchInstance.unregister(CellSelection)

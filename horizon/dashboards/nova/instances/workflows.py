@@ -164,9 +164,13 @@ class VolumeOptions(workflows.Step):
 
 
 class CellSelectionAction(workflows.Action):
-    cell = forms.ChoiceField(label=_("Cell"),
+    cell = forms.DynamicChoiceField(label=_("Cell"),
                              help_text=_("Cell to run the instance on."),
                              required=False)
+    subcell = forms.ChoiceField(label=_("Cell"),
+                                help_text=_("Cell to run the instance on."),
+                                required=False,
+                                widget=forms.widgets.RadioSelect)
 
     class Meta:
         name = _("Cell")
@@ -176,13 +180,32 @@ class CellSelectionAction(workflows.Action):
     def populate_cell_choices(self, request, context):
         try:
             cells = api.nova.cells_get_names(request)
-            choices = [ (name, name) for name in cells ]
         except:
-            choices = []
+            cells = []
             exceptions.handle(request,
                               _('Unable to retrieve available cell list.'))
+
+        self._cells_list = cells
+
+        cells_dict = {}
+        for cell in cells:
+            parent, sep, child = cell.partition('-')
+            if parent not in cells_dict:
+                cells_dict[parent] = []
+            if child:
+                cells_dict[parent].append((cell, cell))
+        self._cells_dict = cells_dict
+        choices = [ (name, name) for name in cells_dict.keys() ]
         if choices:
-            choices.insert(0, ("", _("Default")))
+            choices.insert(0, ("", _("(Any cell)")))
+        else:
+            choices.insert(0, ("", _("No cells available.")))
+        return choices
+
+    def populate_subcell_choices(self, request, context):
+        choices = [(name, name) for name in self._cells_list]
+        if choices:
+            choices.insert(0, ("", _("(Any cell)")))
         else:
             choices.insert(0, ("", _("No cells available.")))
         return choices
@@ -190,7 +213,8 @@ class CellSelectionAction(workflows.Action):
 
 class CellSelection(workflows.Step):
     action_class = CellSelectionAction
-    contributes = ("cell",)
+    contributes = ("cell", "subcell")
+    template_name = ("nova/instances/_launch_cell_step.html")
 
 
 class SetInstanceDetailsAction(workflows.Action):
@@ -524,7 +548,7 @@ class LaunchInstance(workflows.Workflow):
         else:
             nics = None
 
-        cell_name = context.get('cell', '')
+        cell_name = context.get('subcell', context.get('cell', ''))
         if cell_name:
             cell_hint = { 'cell': cell_name }
         else:
