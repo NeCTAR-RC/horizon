@@ -3447,6 +3447,8 @@ a.thumbnail:hover {
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-transition: width 0.6s ease;
   -moz-transition: width 0.6s ease;
@@ -5260,4 +5262,348 @@ label.log-length {
 #selected_network.dragging li.ui-state-highlight:before {
   content: "";
   background: transparent;
+}
+/* Styling for network topology */
+@-webkit-keyframes progress-bar-stripes {
+  from {
+    background-position: 20px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+@-moz-keyframes progress-bar-stripes {
+  from {
+    background-position: 20px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+@-ms-keyframes progress-bar-stripes {
+  from {
+    background-position: 20px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+@-o-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 20px 0;
+  }
+}
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 20px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+#topologyCanvas {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  height: 500px;
+  padding: 25px;
+  padding-left: 50px;
+  background: #efefef;
+}
+div.networks {
+  height: 100%;
+}
+div.network {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  float: left;
+  width: 270px;
+  height: 100%;
+  position: relative;
+}
+div.network .nicname {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 100%;
+  width: 17px;
+  border-radius: 17px;
+  z-index: 200;
+  color: #fff;
+  position: absolute;
+  left: -8px;
+  top: 0px;
+  cursor: pointer;
+}
+div.network .nicname:hover {
+  background-image: -webkit-linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
+  background-image: -moz-linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
+  background-image: -ms-linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
+  background-image: -o-linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
+  background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
+  background-size: 10px 10px;
+}
+div.network .nicname h3 {
+  font-size: 12px;
+  line-height: 1;
+  position: relative;
+  font-weight: normal;
+  top: 60%;
+  color: #fff;
+  left: -1px;
+  letter-spacing: 0.2em;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+  white-space: nowrap;
+  text-shadow: 0px 0px 5px #000;
+}
+div.network .nicname h3 span.ip {
+  margin-left: 0.5em;
+  color: #000;
+  font-weight: normal;
+  font-size: 90%;
+  text-shadow: 0px 0px 0px #000;
+}
+div.network .router,
+div.network .server,
+div.network .device {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  cursor: pointer;
+  width: 90px;
+  border: 3px solid #666;
+  position: absolute;
+  top: 30px;
+  left: 90px;
+  padding: 0 3px;
+  background: #666;
+  margin-bottom: 20px;
+}
+div.network .router:before,
+div.network .server:before,
+div.network .device:before,
+div.network .router:after,
+div.network .server:after,
+div.network .device:after {
+  content: "";
+  width: 90px;
+  height: 34px;
+  text-align: center;
+  position: absolute;
+  border: 3px solid #666;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 50%;
+  top: -19px;
+  left: -3px;
+}
+div.network .router:after,
+div.network .server:after,
+div.network .device:after {
+  content: "";
+  color: #fff;
+  background: #666;
+  border-radius: 50%;
+  top: auto;
+  bottom: -19px;
+  font-size: 11px;
+  line-height: 30px;
+}
+div.network .router span.devicename,
+div.network .server span.devicename,
+div.network .device span.devicename {
+  position: absolute;
+  color: #fff;
+  bottom: -10px;
+  font-size: 12px;
+  line-height: 14px;
+  left: -4px;
+  width: 100%;
+  text-align: center;
+  z-index: 300;
+}
+div.network .router span.devicename i,
+div.network .server span.devicename i,
+div.network .device span.devicename i {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: #ffffff url(/static/dashboard/img/router.png) no-repeat center center;
+  background-size: 12px 12px;
+  margin-right: 3px;
+  vertical-align: middle;
+  border-radius: 20px;
+}
+div.network .router span.name,
+div.network .server span.name,
+div.network .device span.name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  font-size: 12px;
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  top: -10px;
+  padding: 0 3px;
+}
+div.network .router div.port,
+div.network .server div.port,
+div.network .device div.port {
+  text-align: right;
+  min-width: 90px;
+  height: 10px;
+  font: 0px/0px sans-serif;
+  position: absolute;
+  left: -91px;
+  top: 8px;
+  background-color: #37a9e3;
+  background-image: none;
+  -webkit-background-size: 20px 20px;
+  -moz-background-size: 20px 20px;
+  -o-background-size: 20px 20px;
+  background-size: 20px 20px;
+  z-index: 100;
+}
+div.network .router div.port span.ip,
+div.network .server div.port span.ip,
+div.network .device div.port span.ip {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 9px;
+  line-height: 1;
+  text-shadow: 0px -1px #ffffff;
+  position: relative;
+  top: -1em;
+  width: 90px;
+  display: inline-block;
+  padding-right: 8px;
+  padding-left: 8px;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+div.network .router div.port.right,
+div.network .server div.port.right,
+div.network .device div.port.right {
+  left: auto;
+  right: -92px;
+  width: 92px;
+  text-align: left;
+}
+div.network .router:hover,
+div.network .server:hover,
+div.network .device:hover {
+  background-color: #444;
+  border-color: #444;
+}
+div.network .router:hover div.port,
+div.network .server:hover div.port,
+div.network .device:hover div.port {
+  cursor: pointer;
+  background-color: #2688c0;
+  -webkit-animation: progress-bar-stripes 1s linear infinite;
+  -moz-animation: progress-bar-stripes 1s linear infinite;
+  -ms-animation: progress-bar-stripes 1s linear infinite;
+  -o-animation: progress-bar-stripes 1s linear infinite;
+  animation: progress-bar-stripes 1s linear infinite;
+}
+div.network .router:hover div.port:hover,
+div.network .server:hover div.port:hover,
+div.network .device:hover div.port:hover {
+  -webkit-animation: progress-bar-stripes 0.3s linear infinite;
+  -moz-animation: progress-bar-stripes 0.3s linear infinite;
+  -ms-animation: progress-bar-stripes 0.3s linear infinite;
+  -o-animation: progress-bar-stripes 0.3s linear infinite;
+  animation: progress-bar-stripes 0.3s linear infinite;
+}
+div.network .router:hover:before,
+div.network .server:hover:before,
+div.network .device:hover:before {
+  border-color: #444;
+}
+div.network .router:hover:after,
+div.network .server:hover:after,
+div.network .device:hover:after {
+  background-color: #444;
+  border-color: #444;
+}
+div.network .device {
+  border: none;
+  background: transparent;
+}
+div.network .server {
+  border-radius: 5px;
+  background: #fff;
+}
+div.network .server span.devicename {
+  bottom: 0px;
+  font-size: 12px;
+  line-height: 14px;
+  left: -4px;
+}
+div.network .server span.devicename i {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: url(/static/dashboard/img/server.png) no-repeat center center;
+  background-size: 12px 12px;
+  margin-right: 3px;
+  vertical-align: middle;
+}
+div.network .server span.name {
+  top: 5px;
+  padding: 0 3px;
+}
+div.network .server:before {
+  border: none;
+  background: transparent;
+}
+div.network .server:after {
+  content: "";
+  width: 100%;
+  line-height: 1.2;
+  position: absolute;
+  text-align: center;
+  border-radius: 0;
+  background: #666;
+  color: #fff;
+  font-size: 11px;
+  height: 1.5em;
+  bottom: 0px;
+  left: 0px;
+}
+div.network .server:hover {
+  background: #fff;
+}
+.launchButtons {
+  text-align: right;
+  margin: 10px 0px 15px 10px;
+}
+.launchButtons a.btn {
+  margin-left: 10px;
 }
