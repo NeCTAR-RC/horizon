@@ -1,6 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-# Copyright 2012 Openstack, LLC
+# Copyright (c) 2012 OpenStack, LLC.
+# All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -14,16 +15,20 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.utils.translation import ugettext_lazy as _
+from os import path
 
-import horizon
-from horizon.dashboards.settings import dashboard
+from django.conf import settings
 
-
-class EC2Panel(horizon.Panel):
-    name = _("EC2 Credentials")
-    slug = 'ec2'
-    permissions = ('openstack.services.ec2',)
+from horizon import exceptions
+from openstack_dashboard.test import helpers as test
 
 
-dashboard.Settings.register(EC2Panel)
+class ErrorPageTests(test.TestCase):
+    """ Tests for error pages """
+    urls = 'openstack_dashboard.test.error_pages_urls'
+
+    def test_500_error(self):
+        TEMPLATE_DIRS = (path.join(settings.ROOT_PATH, 'templates'),)
+        with self.settings(TEMPLATE_DIRS=TEMPLATE_DIRS):
+            response = self.client.get('/500/')
+            self.assertTrue('Server error' in response.content)

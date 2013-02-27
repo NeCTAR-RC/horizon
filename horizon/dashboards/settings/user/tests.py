@@ -1,6 +1,6 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-# Copyright 2012 Openstack, LLC
+# Copyright 2013 Red Hat, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -14,16 +14,18 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 
-import horizon
-from horizon.dashboards.settings import dashboard
-
-
-class EC2Panel(horizon.Panel):
-    name = _("EC2 Credentials")
-    slug = 'ec2'
-    permissions = ('openstack.services.ec2',)
+from horizon import test
 
 
-dashboard.Settings.register(EC2Panel)
+INDEX_URL = reverse("horizon:settings:user:index")
+
+
+class UserSettingsTest(test.TestCase):
+
+    def test_timezone_offset_is_displayed(self):
+        res = self.client.get(INDEX_URL)
+
+        self.assertContains(res, "Australia/Melbourne (UTC +11:00)")
+        self.assertContains(res, "Canada/Newfoundland (UTC -03:30)")
