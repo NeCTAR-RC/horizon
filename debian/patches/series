@@ -2,30 +2,21 @@
 # from the 'patch-queue/debian/precise-folsom' branch.
 
 # fix-dashboard-django-wsgi
-# commit a0a3d4f3eb3d9f6b35730988cba80a92db985859
 fix-dashboard-django-wsgi.patch
 # fix-dashboard-manage
-# commit 3d85e195d043a9f781ee2fe44f2d02a440c64f9c
 fix-dashboard-manage.patch
 # fix-ubuntu-tests
-# commit 511ee5c5412e01ac81951b8f4775616ff617c48f
 fix-ubuntu-tests.patch
 # Squash all patches that update the default
 #  local_settings.py.example.
-# commit 65a1484755505cf820527eb37033d6173ddef31b
 ubuntu_local_settings.patch
 # Honour LOGIN_URL when redirecting to login page
-# commit ad55a194b2bd0bfa75d96743ba370c62af55481d
 backports/login-url-1079444.patch
 # Add support for (cinder) volume quotas
-# commit f9355d2c49edb169e4bb6a69a055b15bfb33ecae
 nectar/volume_quotas.patch
 # Add cells support to horizon
-# commit 4b2fcf227a94d75c1e103fa1bd1f186109ee064f
 nectar/cells.patch
 # Stub out API calls to floating IP functions (fixes dashboard hang)
-# commit f114a0dd95b8657486a7c49a7fb9b99218557866
 nectar/disable_floatingips.patch
 # Allow permissions to be set on tables
-# commit 116182bf48dab5aab4c5f8309176fb271ed5e086
 nectar/table_permissions.patch
