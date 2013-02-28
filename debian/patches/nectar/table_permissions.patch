@@ -1,0 +1,215 @@
+From: Kieran Spear <kispear@gmail.com>
+Date: Thu, 6 Dec 2012 05:23:02 +0000
+Subject: Allow permissions to be set on tables
+
+Sometimes we want to hide certain UI elements depending on the
+permissions granted to the current user. At the moment this is
+possible for Actions and Panels. This commit extends support to
+DataTable too.
+
+We also set the permission on the volume snapshots table so that,
+like the volumes panel, it is only displayed when the 'volume'
+service is active.
+
+Fixes bug #1087128.
+(cherry-picked from commit eab5fc7712ce9c0b0e226a059f054773426ad6ae)
+
+Gbp-Pq-Topic: nectar
+Gbp-Pq-Name: table_permissions.patch
+Gbp-Pq-Branch: nectar/table_permissions_folsom
+---
+ .../volume_snapshots/tables.py                     |    1 +
+ horizon/tables/base.py                             |    7 ++
+ horizon/tables/views.py                            |   15 +++-
+ horizon/tests/table_tests.py                       |   79 +++++++++++++++++++-
+ 4 files changed, 98 insertions(+), 4 deletions(-)
+
+diff --git a/horizon/dashboards/nova/images_and_snapshots/volume_snapshots/tables.py b/horizon/dashboards/nova/images_and_snapshots/volume_snapshots/tables.py
+index b782d41..09c03bf 100644
+--- a/horizon/dashboards/nova/images_and_snapshots/volume_snapshots/tables.py
++++ b/horizon/dashboards/nova/images_and_snapshots/volume_snapshots/tables.py
+@@ -86,3 +86,4 @@ class VolumeSnapshotsTable(volume_tables.VolumesTableBase):
+         row_actions = (CreateVolumeFromSnapshot, DeleteVolumeSnapshot)
+         row_class = UpdateRow
+         status_columns = ("status",)
++        permissions = ['openstack.services.volume']
+diff --git a/horizon/tables/base.py b/horizon/tables/base.py
+index 600d797..0fe02c4 100644
+--- a/horizon/tables/base.py
++++ b/horizon/tables/base.py
+@@ -707,6 +707,11 @@ class DataTableOptions(object):
+ 
+         Boolean to control whether or not to show the table's footer.
+         Default: ``True``.
++
++    .. attribute:: permissions
++
++        A list of permission names which this table requires in order to be
++        displayed. Defaults to an empty list (``[]``).
+     """
+     def __init__(self, options):
+         self.name = getattr(options, 'name', self.__class__.__name__)
+@@ -725,6 +730,7 @@ class DataTableOptions(object):
+         self.no_data_message = getattr(options,
+                                        "no_data_message",
+                                        _("No items to display."))
++        self.permissions = getattr(options, 'permissions', [])
+ 
+         # Set self.filter if we have any FilterActions
+         filter_actions = [action for action in self.table_actions if
+@@ -884,6 +890,7 @@ class DataTable(object):
+         self._no_data_message = self._meta.no_data_message
+         self.breadcrumb = None
+         self.current_item_id = None
++        self.permissions = self._meta.permissions
+ 
+         # Create a new set
+         columns = []
+diff --git a/horizon/tables/views.py b/horizon/tables/views.py
+index df345c3..ad7dc43 100644
+--- a/horizon/tables/views.py
++++ b/horizon/tables/views.py
+@@ -18,6 +18,8 @@ from collections import defaultdict
+ 
+ from django.views import generic
+ 
++from horizon.templatetags.horizon import has_permissions
++
+ 
+ class MultiTableMixin(object):
+     """ A generic mixin which provides methods for handling DataTables. """
+@@ -73,7 +75,7 @@ class MultiTableMixin(object):
+         func = getattr(self, func_name, None)
+         if not func or not callable(func):
+             cls_name = self.__class__.__name__
+-            raise NotImplementedError("You must define a %s method"
++            raise NotImplementedError("You must define a %s method "
+                                       "in %s." % (func_name, cls_name))
+         else:
+             return func
+@@ -89,6 +91,9 @@ class MultiTableMixin(object):
+                                  'on %s.' % self.__class__.__name__)
+         if not self._tables:
+             for table in self.table_classes:
++                if not has_permissions(self.request.user,
++                                       table._meta):
++                    continue
+                 func_name = "get_%s_table" % table._meta.name
+                 table_func = getattr(self, func_name, None)
+                 if table_func is None:
+@@ -183,7 +188,10 @@ class DataTableView(MultiTableView):
+ 
+     def get_tables(self):
+         if not self._tables:
+-            self._tables = {self.table_class._meta.name: self.get_table()}
++            self._tables = {}
++            if has_permissions(self.request.user,
++                               self.table_class._meta):
++                self._tables[self.table_class._meta.name] = self.get_table()
+         return self._tables
+ 
+     def get_table(self):
+@@ -197,7 +205,8 @@ class DataTableView(MultiTableView):
+ 
+     def get_context_data(self, **kwargs):
+         context = super(DataTableView, self).get_context_data(**kwargs)
+-        context[self.context_object_name] = self.table
++        if hasattr(self, "table"):
++            context[self.context_object_name] = self.table
+         return context
+ 
+ 
+diff --git a/horizon/tests/table_tests.py b/horizon/tests/table_tests.py
+index d34f349..6ef3481 100644
+--- a/horizon/tests/table_tests.py
++++ b/horizon/tests/table_tests.py
+@@ -22,7 +22,8 @@ from django.utils.translation import ugettext_lazy as _
+ from mox import IsA
+ 
+ from horizon import tables
+-from horizon import test
++from horizon.tables import views as table_views
++from horizon.test import helpers as test
+ 
+ 
+ class FakeObject(object):
+@@ -673,3 +674,79 @@ class DataTableTests(test.TestCase):
+         self.assertEqual(handled["location"], "/my_url/")
+         self.assertEqual(list(req._messages)[0].message,
+                         u"Downed Item: N/A")
++
++
++class SingleTableView(table_views.DataTableView):
++    table_class = MyTable
++    name = _("Single Table")
++    slug = "single"
++    template_name = "horizon/common/_detail_table.html"
++
++    def get_data(self):
++        return TEST_DATA
++
++
++class TableWithPermissions(tables.DataTable):
++    id = tables.Column('id')
++
++    class Meta:
++        name = "table_with_permissions"
++        permissions = ('horizon.test',)
++
++
++class SingleTableViewWithPermissions(SingleTableView):
++    table_class = TableWithPermissions
++
++
++class MultiTableView(tables.MultiTableView):
++    table_classes = (TableWithPermissions, MyTable)
++
++    def get_table_with_permissions_data(self):
++        return TEST_DATA
++
++    def get_my_table_data(self):
++        return TEST_DATA
++
++
++class DataTableViewTests(test.TestCase):
++    def _prepare_view(self, cls, *args, **kwargs):
++        req = self.factory.get('/my_url/')
++        req.user = self.user
++        view = cls()
++        view.request = req
++        view.args = args
++        view.kwargs = kwargs
++        return view
++
++    def test_data_table_view(self):
++        view = self._prepare_view(SingleTableView)
++        context = view.get_context_data()
++        self.assertEqual(context['table'].__class__,
++                         SingleTableView.table_class)
++
++    def test_data_table_view_not_authorized(self):
++        view = self._prepare_view(SingleTableViewWithPermissions)
++        context = view.get_context_data()
++        self.assertNotIn('table', context)
++
++    def test_data_table_view_authorized(self):
++        view = self._prepare_view(SingleTableViewWithPermissions)
++        self.set_permissions(permissions=['test'])
++        context = view.get_context_data()
++        self.assertIn('table', context)
++        self.assertEqual(context['table'].__class__,
++                         SingleTableViewWithPermissions.table_class)
++
++    def test_multi_table_view_not_authorized(self):
++        view = self._prepare_view(MultiTableView)
++        context = view.get_context_data()
++        self.assertEqual(context['my_table_table'].__class__, MyTable)
++        self.assertNotIn('table_with_permissions_table', context)
++
++    def test_multi_table_view_authorized(self):
++        view = self._prepare_view(MultiTableView)
++        self.set_permissions(permissions=['test'])
++        context = view.get_context_data()
++        self.assertEqual(context['my_table_table'].__class__, MyTable)
++        self.assertEqual(context['table_with_permissions_table'].__class__,
++                         TableWithPermissions)

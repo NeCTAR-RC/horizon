@@ -1,8 +1,39 @@
+From: Kieran Spear <kispear@gmail.com>
+Date: Fri, 19 Oct 2012 02:28:16 +0000
+Subject: Add cells support to horizon
+
+Show cell name on instances table and instances detail overview.
+
+Allow cell selection from the create instance dialog.
+Queries the dashboard for the list of instances and passes
+the selection back as a 'cell' scheduler hint.
+
+To enable, set OPENSTACK_CELLS_ENABLED = True in settings.py.
+
+Gbp-Pq-Topic: nectar
+Gbp-Pq-Name: cells.patch
+Gbp-Pq-Branch: nectar/cells_nectar
+---
+ horizon/api/nova.py                                |   40 ++++++++-
+ horizon/dashboards/nova/instances/tables.py        |    9 ++
+ .../templates/instances/_detail_overview.html      |    4 +
+ .../templates/instances/_launch_cell_help.html     |    6 ++
+ .../templates/instances/_launch_cell_step.html     |   16 ++++
+ horizon/dashboards/nova/instances/tests.py         |   92 +++++++++++++++++++-
+ horizon/dashboards/nova/instances/workflows.py     |   68 ++++++++++++++-
+ horizon/static/horizon/js/horizon.instances.js     |   24 +++++
+ horizon/tests/testsettings.py                      |    2 +
+ horizon/workflows/base.py                          |    1 -
+ .../static/dashboard/less/horizon.less             |    4 +
+ 11 files changed, 258 insertions(+), 8 deletions(-)
+ create mode 100644 horizon/dashboards/nova/instances/templates/instances/_launch_cell_help.html
+ create mode 100644 horizon/dashboards/nova/instances/templates/instances/_launch_cell_step.html
+
 diff --git a/horizon/api/nova.py b/horizon/api/nova.py
-index 3bf209f..67e7b97 100644
+index 08a881d..e3ff417 100644
 --- a/horizon/api/nova.py
 +++ b/horizon/api/nova.py
-@@ -91,7 +91,7 @@ class Server(APIResourceWrapper):
+@@ -94,7 +94,7 @@ class Server(APIResourceWrapper):
               'image_name', 'VirtualInterfaces', 'flavor', 'key_name',
               'tenant_id', 'user_id', 'OS-EXT-STS:power_state',
               'OS-EXT-STS:task_state', 'OS-EXT-SRV-ATTR:instance_name',
@@ -11,7 +42,7 @@ index 3bf209f..67e7b97 100644
  
      def __init__(self, apiresource, request):
          super(Server, self).__init__(apiresource)
-@@ -111,6 +111,13 @@ class Server(APIResourceWrapper):
+@@ -114,6 +114,13 @@ class Server(APIResourceWrapper):
      def internal_name(self):
          return getattr(self, 'OS-EXT-SRV-ATTR:instance_name', "")
  
@@ -25,7 +56,7 @@ index 3bf209f..67e7b97 100644
      def reboot(self, hardness=REBOOT_HARD):
          novaclient(self.request).servers.reboot(self.id, hardness)
  
-@@ -296,13 +303,14 @@ def keypair_list(request):
+@@ -305,13 +312,14 @@ def keypair_list(request):
  
  def server_create(request, name, image, flavor, key_name, user_data,
                    security_groups, block_device_mapping, nics=None,
@@ -42,7 +73,7 @@ index 3bf209f..67e7b97 100644
  
  
  def server_delete(request, instance):
-@@ -583,3 +591,29 @@ def get_x509_credentials(request):
+@@ -600,3 +608,29 @@ def get_x509_credentials(request):
  
  def get_x509_root_certificate(request):
      return novaclient(request).certs.get()
@@ -123,18 +154,60 @@ index cebc828..bec5366 100644
  
 diff --git a/horizon/dashboards/nova/instances/templates/instances/_launch_cell_help.html b/horizon/dashboards/nova/instances/templates/instances/_launch_cell_help.html
 new file mode 100644
-index 0000000..77f68af
+index 0000000..725929b
 --- /dev/null
 +++ b/horizon/dashboards/nova/instances/templates/instances/_launch_cell_help.html
-@@ -0,0 +1,3 @@
+@@ -0,0 +1,6 @@
 +{% load i18n %}
 +
-+<p>{% blocktrans %}Specify the cell that your instance will run on.{% endblocktrans %}</p>
++<p>{% blocktrans %}Location for your Virtual Machine.{% endblocktrans %}</p>
++<p>{% blocktrans %}In most cases, you shouldn't change the default. However, should you
++require special access to data, instruments or infrastructure you may
++select a cell.{% endblocktrans %}</p>
+diff --git a/horizon/dashboards/nova/instances/templates/instances/_launch_cell_step.html b/horizon/dashboards/nova/instances/templates/instances/_launch_cell_step.html
+new file mode 100644
+index 0000000..3adc6b4
+--- /dev/null
++++ b/horizon/dashboards/nova/instances/templates/instances/_launch_cell_step.html
+@@ -0,0 +1,16 @@
++<noscript><h3>{{ step }}</h3></noscript>
++<table class="table-fixed">
++  <tbody>
++    <tr>
++      <td class="actions">
++      <div class="inline-fields">
++          {% include "horizon/common/_form_fields.html" %}
++          <a id="more-cells-button" data-text-inactive="Advanced" data-text-active="Basic" href="#" class="btn">Advanced</a>
++      </div>
++      </td>
++      <td class="help_text">
++          {{ step.get_help_text }}
++      </td>
++    </tr>
++  </tbody>
++</table>
 diff --git a/horizon/dashboards/nova/instances/tests.py b/horizon/dashboards/nova/instances/tests.py
-index 57bbe60..2d7260f 100644
+index 57bbe60..8fc3e00 100644
 --- a/horizon/dashboards/nova/instances/tests.py
 +++ b/horizon/dashboards/nova/instances/tests.py
-@@ -700,7 +700,8 @@ class InstanceTests(test.TestCase):
+@@ -20,6 +20,7 @@
+ 
+ from django import http
+ from django.core.urlresolvers import reverse
++from django.test.utils import override_settings
+ from django.utils.http import urlencode
+ from django.utils.datastructures import SortedDict
+ from mox import IsA, IgnoreArg
+@@ -29,7 +30,7 @@ from horizon import api
+ from horizon import test
+ 
+ from .tabs import InstanceDetailTabs
+-from .workflows import LaunchInstance
++from .workflows import LaunchInstance, CellSelection
+ 
+ 
+ INDEX_URL = reverse('horizon:nova:instances:index')
+@@ -700,7 +701,8 @@ class InstanceTests(test.TestCase):
                                 [sec_group.name],
                                 block_device_mapping,
                                 nics=nics,
@@ -144,7 +217,7 @@ index 57bbe60..2d7260f 100644
  
          self.mox.ReplayAll()
  
-@@ -890,7 +891,8 @@ class InstanceTests(test.TestCase):
+@@ -890,7 +892,8 @@ class InstanceTests(test.TestCase):
                                 [sec_group.name],
                                 None,
                                 nics=nics,
@@ -154,8 +227,95 @@ index 57bbe60..2d7260f 100644
                        .AndRaise(self.exceptions.keystone)
  
          self.mox.ReplayAll()
+@@ -980,3 +983,86 @@ class InstanceTests(test.TestCase):
+         res = self.client.post(url, form_data)
+ 
+         self.assertContains(res, "greater than or equal to 1")
++
++    @test.create_stubs({api.nova: ('tenant_quota_usages',
++                                   'cells_get_names',
++                                   'flavor_list',
++                                   'keypair_list',
++                                   'security_group_list',
++                                   'volume_snapshot_list',
++                                   'volume_list',),
++                        api.quantum: ('network_list',),
++                        api.glance: ('image_list_detailed',)})
++    def test_launch_instance_cells_get(self):
++        # Enable cell selection tab
++        LaunchInstance.register(CellSelection)
++        cell_list = ['melb', 'melb-np', 'melb-qh2', 'monash', 'qld']
++
++        quota_usages = self.quota_usages.first()
++        image = self.images.first()
++
++        api.nova.volume_list(IsA(http.HttpRequest)) \
++                .AndReturn(self.volumes.list())
++        api.nova.volume_snapshot_list(IsA(http.HttpRequest)) \
++                                .AndReturn(self.volumes.list())
++        api.glance.image_list_detailed(IsA(http.HttpRequest),
++                                       filters={'is_public': True,
++                                                'status': 'active'}) \
++                  .AndReturn([self.images.list(), False])
++        api.glance.image_list_detailed(IsA(http.HttpRequest),
++                            filters={'property-owner_id': self.tenant.id,
++                                     'status': 'active'}) \
++                  .AndReturn([[], False])
++        api.quantum.network_list(IsA(http.HttpRequest),
++                                 tenant_id=self.tenant.id,
++                                 shared=False) \
++                .AndReturn(self.networks.list()[:1])
++        api.quantum.network_list(IsA(http.HttpRequest),
++                                 shared=True) \
++                .AndReturn(self.networks.list()[1:])
++        api.nova.tenant_quota_usages(IsA(http.HttpRequest)) \
++                .AndReturn(quota_usages)
++        api.nova.flavor_list(IsA(http.HttpRequest)) \
++                .AndReturn(self.flavors.list())
++        api.nova.flavor_list(IsA(http.HttpRequest)) \
++                .AndReturn(self.flavors.list())
++        api.nova.keypair_list(IsA(http.HttpRequest)) \
++                .AndReturn(self.keypairs.list())
++        api.nova.security_group_list(IsA(http.HttpRequest)) \
++                                .AndReturn(self.security_groups.list())
++        api.nova.cells_get_names(IsA(http.HttpRequest)) \
++                                .AndReturn(cell_list)
++
++        self.mox.ReplayAll()
++
++
++        url = reverse('horizon:nova:instances:launch')
++        params = urlencode({"source_type": "image_id",
++                            "source_id": image.id})
++        res = self.client.get("%s?%s" % (url, params))
++
++        workflow = res.context['workflow']
++        self.assertTemplateUsed(res,
++                        'nova/instances/launch.html')
++        self.assertEqual(res.context['workflow'].name, LaunchInstance.name)
++        step = workflow.get_step("setinstancedetailsaction")
++        self.assertEqual(step.action.initial['image_id'], image.id)
++        self.assertQuerysetEqual(workflow.steps,
++                            ['<SetInstanceDetails: setinstancedetailsaction>',
++                             '<SetAccessControls: setaccesscontrolsaction>',
++                             '<SetNetwork: setnetworkaction>',
++                             '<VolumeOptions: volumeoptionsaction>',
++                             '<PostCreationStep: customizeaction>',
++                             '<CellSelection: cellselectionaction>'])
++
++        self.assertTemplateUsed(res,
++                        'nova/instances/_launch_cell_step.html')
++        self.assertContains(res, '<option value="" selected="selected">')
++        for cell in ['melb', 'monash', 'qld']:
++            self.assertContains(res, '<option value="%s">%s</option>' %
++                                (cell, cell))
++        for cell in cell_list:
++            self.assertContains(res,
++                                'value="%s" name="subcell"' %
++                                cell)
++        LaunchInstance.unregister(CellSelection)
 diff --git a/horizon/dashboards/nova/instances/workflows.py b/horizon/dashboards/nova/instances/workflows.py
-index ef350ea..d07c89a 100644
+index ef350ea..e368d86 100644
 --- a/horizon/dashboards/nova/instances/workflows.py
 +++ b/horizon/dashboards/nova/instances/workflows.py
 @@ -20,6 +20,7 @@
@@ -166,14 +326,18 @@ index ef350ea..d07c89a 100644
  from django.utils.text import normalize_newlines
  from django.utils.translation import ugettext as _
  
-@@ -162,6 +163,36 @@ class VolumeOptions(workflows.Step):
+@@ -162,6 +163,60 @@ class VolumeOptions(workflows.Step):
          return context
  
  
 +class CellSelectionAction(workflows.Action):
-+    cell = forms.ChoiceField(label=_("Cell"),
++    cell = forms.DynamicChoiceField(label=_("Cell"),
 +                             help_text=_("Cell to run the instance on."),
 +                             required=False)
++    subcell = forms.ChoiceField(label=_("Cell"),
++                                help_text=_("Cell to run the instance on."),
++                                required=False,
++                                widget=forms.widgets.RadioSelect)
 +
 +    class Meta:
 +        name = _("Cell")
@@ -183,13 +347,32 @@ index ef350ea..d07c89a 100644
 +    def populate_cell_choices(self, request, context):
 +        try:
 +            cells = api.nova.cells_get_names(request)
-+            choices = [ (name, name) for name in cells ]
 +        except:
-+            choices = []
++            cells = []
 +            exceptions.handle(request,
 +                              _('Unable to retrieve available cell list.'))
++
++        self._cells_list = cells
++
++        cells_dict = {}
++        for cell in cells:
++            parent, sep, child = cell.partition('-')
++            if parent not in cells_dict:
++                cells_dict[parent] = []
++            if child:
++                cells_dict[parent].append((cell, cell))
++        self._cells_dict = cells_dict
++        choices = [ (name, name) for name in cells_dict.keys() ]
 +        if choices:
-+            choices.insert(0, ("", _("Default")))
++            choices.insert(0, ("", _("(Any cell)")))
++        else:
++            choices.insert(0, ("", _("No cells available.")))
++        return choices
++
++    def populate_subcell_choices(self, request, context):
++        choices = [(name, name) for name in self._cells_list]
++        if choices:
++            choices.insert(0, ("", _("(Any cell)")))
 +        else:
 +            choices.insert(0, ("", _("No cells available.")))
 +        return choices
@@ -197,17 +380,18 @@ index ef350ea..d07c89a 100644
 +
 +class CellSelection(workflows.Step):
 +    action_class = CellSelectionAction
-+    contributes = ("cell",)
++    contributes = ("cell", "subcell")
++    template_name = ("nova/instances/_launch_cell_step.html")
 +
 +
  class SetInstanceDetailsAction(workflows.Action):
      SOURCE_TYPE_CHOICES = (
          ("image_id", _("Image")),
-@@ -493,6 +524,12 @@ class LaunchInstance(workflows.Workflow):
+@@ -493,6 +548,12 @@ class LaunchInstance(workflows.Workflow):
          else:
              nics = None
  
-+        cell_name = context.get('cell', '')
++        cell_name = context.get('subcell', context.get('cell', ''))
 +        if cell_name:
 +            cell_hint = { 'cell': cell_name }
 +        else:
@@ -216,7 +400,7 @@ index ef350ea..d07c89a 100644
          try:
              api.nova.server_create(request,
                                     context['name'],
-@@ -503,8 +540,13 @@ class LaunchInstance(workflows.Workflow):
+@@ -503,8 +564,13 @@ class LaunchInstance(workflows.Workflow):
                                     context['security_group_ids'],
                                     dev_mapping,
                                     nics=nics,
@@ -231,11 +415,44 @@ index ef350ea..d07c89a 100644
 +
 +if getattr(settings, 'OPENSTACK_CELLS_ENABLED', False):
 +    LaunchInstance.register(CellSelection)
+diff --git a/horizon/static/horizon/js/horizon.instances.js b/horizon/static/horizon/js/horizon.instances.js
+index c5bf569..f57bc05 100644
+--- a/horizon/static/horizon/js/horizon.instances.js
++++ b/horizon/static/horizon/js/horizon.instances.js
+@@ -92,4 +92,28 @@ horizon.addInitFunction(function () {
+   horizon.modals.addModalInitFunction(function (modal) {
+     $(modal).find("#id_volume_type").change();
+   });
++
++  horizon.modals.addModalInitFunction(function (modal) {
++    $cell_div = $('div.input select#id_cell').closest('div.form-field');
++    $subcell_div = $('div.input label[for^=id_subcell]').closest('div.form-field');
++    $subcell_div.hide();
++    $('#more-cells-button').on('click', function(evt) {
++      button = $(this);
++      evt.preventDefault();
++      evt.stopPropagation();
++      if ($subcell_div.is(':visible')) {
++        button.text(button.data('text-inactive'));
++        $subcell_div.hide();
++        $cell_div.show(200);
++      } else {
++        button.text(button.data('text-active'));
++        $cell_div.hide();
++        $subcell_div.show(200);
++      }
++    });
++    $('div.input select[id=id_cell]').on('change', function(evt) {
++      var val = $(this).val();
++      $('div.input input[value=' + val + ']').attr('checked', 'checked');
++    });
++  });
+ });
 diff --git a/horizon/tests/testsettings.py b/horizon/tests/testsettings.py
-index 5b3b29f..b17f4d4 100644
+index 4a61cb9..636293c 100644
 --- a/horizon/tests/testsettings.py
 +++ b/horizon/tests/testsettings.py
-@@ -151,6 +151,8 @@ OPENSTACK_HYPERVISOR_FEATURES = {
+@@ -150,6 +150,8 @@ OPENSTACK_HYPERVISOR_FEATURES = {
      'can_set_mount_point': True
  }
  
@@ -244,3 +461,27 @@ index 5b3b29f..b17f4d4 100644
  LOGGING = {
      'version': 1,
      'disable_existing_loggers': False,
+diff --git a/horizon/workflows/base.py b/horizon/workflows/base.py
+index 10c27d8..b6017a0 100644
+--- a/horizon/workflows/base.py
++++ b/horizon/workflows/base.py
+@@ -693,7 +693,6 @@ class Workflow(html.HTMLElement):
+             cls._cls_registry.remove(step_class)
+         except KeyError:
+             raise base.NotRegistered('%s is not registered' % cls)
+-        return cls._unregister(step_class)
+ 
+     def validate(self, context):
+         """
+diff --git a/openstack_dashboard/static/dashboard/less/horizon.less b/openstack_dashboard/static/dashboard/less/horizon.less
+index db788d2..c17374c 100644
+--- a/openstack_dashboard/static/dashboard/less/horizon.less
++++ b/openstack_dashboard/static/dashboard/less/horizon.less
+@@ -1545,3 +1545,7 @@ label.log-length {
+     width: 275px;
+     margin-right: 2px;
+ }
++
++div.input input[id^=id_subcell] {
++  display: inline;
++}

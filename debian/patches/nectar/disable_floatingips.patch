@@ -1,21 +1,33 @@
+From: Kieran Spear <kispear@gmail.com>
+Date: Fri, 19 Oct 2012 02:26:00 +0000
+Subject: Stub out API calls to floating IP functions (fixes dashboard hang)
+
+Because the top-level cell isn't running nova-network, any calls to
+floating IP APIs end up waiting forever for a reply message.
+
+Gbp-Pq-Topic: nectar
+Gbp-Pq-Name: disable_floatingips.patch
+Gbp-Pq-Branch: nectar/cells_disable_floating_ip
+---
+ horizon/api/nova.py |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/horizon/api/nova.py b/horizon/api/nova.py
-index 3bf209f..d89ab76 100644
+index e3ff417..3ab52d4 100644
 --- a/horizon/api/nova.py
 +++ b/horizon/api/nova.py
-@@ -249,12 +249,14 @@ def flavor_list(request):
+@@ -265,12 +265,12 @@ def flavor_list(request):
  
  def tenant_floating_ip_list(request):
      """Fetches a list of all floating ips."""
 -    return novaclient(request).floating_ips.list()
-+    return []
-+    #return novaclient(request).floating_ips.list()
++    return [] #novaclient(request).floating_ips.list()
  
  
  def floating_ip_pools_list(request):
      """Fetches a list of all floating ip pools."""
 -    return novaclient(request).floating_ip_pools.list()
-+    return []
-+    #return novaclient(request).floating_ip_pools.list()
++    return [] #novaclient(request).floating_ip_pools.list()
  
  
  def tenant_floating_ip_get(request, floating_ip_id):

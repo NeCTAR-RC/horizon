@@ -1,5 +1,23 @@
+From: Kieran Spear <kispear@gmail.com>
+Date: Tue, 4 Dec 2012 16:37:34 +1100
+Subject: Add support for (cinder) volume quotas
+
+Change-Id: I63b156a6cab3f89295d561d11b596b24d3dbf764
+
+Conflicts:
+
+	horizon/templates/horizon/common/_quota_summary.html
+
+Gbp-Pq-Topic: nectar
+Gbp-Pq-Name: volume_quotas.patch
+Gbp-Pq-Branch: nectar/volume_quotas
+---
+ horizon/api/nova.py                                |    7 ++++++-
+ .../templates/horizon/common/_quota_summary.html   |    8 ++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
 diff --git a/horizon/api/nova.py b/horizon/api/nova.py
-index 67e7b97..40568a0 100644
+index 3f57a43..08a881d 100644
 --- a/horizon/api/nova.py
 +++ b/horizon/api/nova.py
 @@ -70,6 +70,9 @@ class QuotaSet(object):
@@ -12,7 +30,7 @@ index 67e7b97..40568a0 100644
          for k in apiresource._info.keys():
              if k in ['id']:
                  continue
-@@ -407,7 +410,9 @@ def server_remove_floating_ip(request, server, floating_ip):
+@@ -405,7 +408,9 @@ def server_remove_floating_ip(request, server, floating_ip):
  
  
  def tenant_quota_get(request, tenant_id):
@@ -24,7 +42,7 @@ index 67e7b97..40568a0 100644
  
  def tenant_quota_update(request, tenant_id, **kwargs):
 diff --git a/horizon/templates/horizon/common/_quota_summary.html b/horizon/templates/horizon/common/_quota_summary.html
-index 94b3123..c9e2c17 100644
+index 092bdd3..c0a9ce3 100644
 --- a/horizon/templates/horizon/common/_quota_summary.html
 +++ b/horizon/templates/horizon/common/_quota_summary.html
 @@ -10,4 +10,12 @@
