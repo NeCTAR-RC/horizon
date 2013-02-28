@@ -1,3 +1,51 @@
+horizon (2012.2+20130218-1) precise-folsom; urgency=low
+
+  [ Sascha Peilicke ]
+  * Revert "Temp fix for api/keystone.py"
+
+  [ Kylin CG ]
+  * Fix bug 1055929 - Can not display usage data for Quota Summary.
+
+  [ Mark McLoughlin ]
+  * Final versioning for 2012.2.1
+  * Bump next version to 2012.2.2
+
+  [ Julie Pichon ]
+  * Pin docutils to 0.9.1, fix pep8 errors
+
+  [ Jiang Yong ]
+  * Specify floating ips table action column's width
+
+  [ Matthias Runge ]
+  * Don't inherit from base.html in 500 error page
+
+  [ Joe Gordon ]
+  * Allow setting nova quotas to unlimited
+
+  [ Matthias Runge ]
+  * Avoid cinder calls, when cinder is unavailable
+
+  [ Victoria Martínez de la Cruz ]
+  * Add a check for unlimited quotas
+
+  [ Julie Pichon ]
+  * Don't show the EC2 Credentials panel if there is no EC2 service
+
+  [ Mark McLoughlin ]
+  * Final versioning for 2012.2.3
+  * Bump version to 2012.2.4
+
+  [ Julie Pichon ]
+  * Prevent the user from creating a single IP address sized network
+  * Add UTC offset information to the timezone
+
+  [ Kieran Spear ]
+  * Remove quota summary backport (now in upstream)
+  * Refresh cells patch
+  * Remove commit comments from patch series
+
+ -- Kieran Spear <kispear@gmail.com>  Thu, 28 Feb 2013 15:54:50 +1100
+
 horizon (2012.2+20121114-5) precise-folsom; urgency=low
 
   * Re-enable cinder api calls
