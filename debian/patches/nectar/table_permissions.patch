@@ -21,8 +21,8 @@ Gbp-Pq-Branch: nectar/table_permissions_folsom
  .../volume_snapshots/tables.py                     |    1 +
  horizon/tables/base.py                             |    7 ++
  horizon/tables/views.py                            |   15 +++-
- horizon/tests/table_tests.py                       |   79 +++++++++++++++++++-
- 4 files changed, 98 insertions(+), 4 deletions(-)
+ horizon/tests/table_tests.py                       |   81 ++++++++++++++++++++
+ 4 files changed, 101 insertions(+), 3 deletions(-)
 
 diff --git a/horizon/dashboards/nova/images_and_snapshots/volume_snapshots/tables.py b/horizon/dashboards/nova/images_and_snapshots/volume_snapshots/tables.py
 index b782d41..09c03bf 100644
@@ -120,20 +120,21 @@ index df345c3..ad7dc43 100644
  
  
 diff --git a/horizon/tests/table_tests.py b/horizon/tests/table_tests.py
-index d34f349..6ef3481 100644
+index d34f349..288e9bf 100644
 --- a/horizon/tests/table_tests.py
 +++ b/horizon/tests/table_tests.py
-@@ -22,7 +22,8 @@ from django.utils.translation import ugettext_lazy as _
+@@ -21,8 +21,10 @@ from django.utils.translation import ugettext_lazy as _
+ 
  from mox import IsA
  
++
  from horizon import tables
--from horizon import test
+ from horizon import test
 +from horizon.tables import views as table_views
-+from horizon.test import helpers as test
  
  
  class FakeObject(object):
-@@ -673,3 +674,79 @@ class DataTableTests(test.TestCase):
+@@ -673,3 +675,82 @@ class DataTableTests(test.TestCase):
          self.assertEqual(handled["location"], "/my_url/")
          self.assertEqual(list(req._messages)[0].message,
                          u"Downed Item: N/A")
@@ -154,7 +155,7 @@ index d34f349..6ef3481 100644
 +
 +    class Meta:
 +        name = "table_with_permissions"
-+        permissions = ('horizon.test',)
++        permissions = ('openstack.roles.admin',)
 +
 +
 +class SingleTableViewWithPermissions(SingleTableView):
@@ -183,18 +184,20 @@ index d34f349..6ef3481 100644
 +
 +    def test_data_table_view(self):
 +        view = self._prepare_view(SingleTableView)
++        view.request.user.has_perms = lambda x: not x
 +        context = view.get_context_data()
 +        self.assertEqual(context['table'].__class__,
 +                         SingleTableView.table_class)
 +
 +    def test_data_table_view_not_authorized(self):
 +        view = self._prepare_view(SingleTableViewWithPermissions)
++        view.request.user.has_perms = lambda x: not x
 +        context = view.get_context_data()
 +        self.assertNotIn('table', context)
 +
 +    def test_data_table_view_authorized(self):
 +        view = self._prepare_view(SingleTableViewWithPermissions)
-+        self.set_permissions(permissions=['test'])
++        view.request.user.has_perms = lambda x: True
 +        context = view.get_context_data()
 +        self.assertIn('table', context)
 +        self.assertEqual(context['table'].__class__,
@@ -202,13 +205,14 @@ index d34f349..6ef3481 100644
 +
 +    def test_multi_table_view_not_authorized(self):
 +        view = self._prepare_view(MultiTableView)
++        view.request.user.has_perms = lambda x: not x
 +        context = view.get_context_data()
 +        self.assertEqual(context['my_table_table'].__class__, MyTable)
 +        self.assertNotIn('table_with_permissions_table', context)
 +
 +    def test_multi_table_view_authorized(self):
 +        view = self._prepare_view(MultiTableView)
-+        self.set_permissions(permissions=['test'])
++        view.request.user.has_perms = lambda x: True
 +        context = view.get_context_data()
 +        self.assertEqual(context['my_table_table'].__class__, MyTable)
 +        self.assertEqual(context['table_with_permissions_table'].__class__,

@@ -105,7 +105,7 @@ index 0000000..958e423
 +
 +        self.assertRedirects(resp, url)
 diff --git a/horizon/tests/base_tests.py b/horizon/tests/base_tests.py
-index 011eecd..a4558f0 100644
+index 011eecd..59863ee 100644
 --- a/horizon/tests/base_tests.py
 +++ b/horizon/tests/base_tests.py
 @@ -238,7 +238,7 @@ class HorizonTests(BaseHorizonTests):
@@ -113,7 +113,7 @@ index 011eecd..a4558f0 100644
          self.setActiveUser()
          resp = self.client.get(url)
 -        redirect_url = "?".join([urlresolvers.reverse("login"),
-+        redirect_url = "?".join(['http://testserver' + settings.LOGIN_URL,
++        redirect_url = "?".join([settings.LOGIN_URL,
                                   "next=%s" % url])
          self.assertRedirectsNoFollow(resp, redirect_url)
          # Simulate ajax call
@@ -123,7 +123,7 @@ index 011eecd..a4558f0 100644
          self.assertEquals(resp["X-Horizon-Location"],
 -                          "?".join([urlresolvers.reverse("login"),
 -                                    "next=%s" % url]))
-+                          redirect_url)
++                          'http://testserver' + redirect_url)
  
      def test_required_services(self):
          horizon.register(MyDash)

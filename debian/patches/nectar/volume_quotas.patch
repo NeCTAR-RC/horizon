@@ -4,10 +4,6 @@ Subject: Add support for (cinder) volume quotas
 
 Change-Id: I63b156a6cab3f89295d561d11b596b24d3dbf764
 
-Conflicts:
-
-	horizon/templates/horizon/common/_quota_summary.html
-
 Gbp-Pq-Topic: nectar
 Gbp-Pq-Name: volume_quotas.patch
 Gbp-Pq-Branch: nectar/volume_quotas
