@@ -1,3 +1,10 @@
+horizon (2013.1.g3-0ubuntu3) UNRELEASED; urgency=low
+
+  * d/watch: Update uversionmangle to deal with upstream versioning
+    changes, remove tarballs.openstack.org.
+
+ -- James Page <james.page@ubuntu.com>  Fri, 01 Mar 2013 14:11:51 +0000
+
 horizon (2013.1.g3-0ubuntu2) raring; urgency=low
 
   * Recompress static JS and CSS and generate new manifest.json for offline
