@@ -1,9 +1,14 @@
-horizon (2013.1.g3-0ubuntu3) UNRELEASED; urgency=low
+horizon (2013.1.g3-0ubuntu4) UNRELEASED; urgency=low
 
+  [ James Page ]
   * d/watch: Update uversionmangle to deal with upstream versioning
     changes, remove tarballs.openstack.org.
 
- -- James Page <james.page@ubuntu.com>  Fri, 01 Mar 2013 14:11:51 +0000
+  [ Adam Gandelman ]
+  * debian/patches/ubuntu_local_settings.py: Refresh, specify memcache
+    location as part of CACHES, as per upstream changes to example config.
+
+ -- Adam Gandelman <adamg@ubuntu.com>  Tue, 12 Mar 2013 12:47:45 -0700
 
 horizon (2013.1.g3-0ubuntu2) raring; urgency=low
 
