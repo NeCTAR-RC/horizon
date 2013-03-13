@@ -1,7 +1,8 @@
-diff -Naurp horizon-2013.1.orig/openstack_dashboard/local/local_settings.py.example horizon-2013.1/openstack_dashboard/local/local_settings.py.example
---- horizon-2013.1.orig/openstack_dashboard/local/local_settings.py.example	2012-11-20 22:59:38.000000000 -0600
-+++ horizon-2013.1/openstack_dashboard/local/local_settings.py.example	2012-11-21 12:35:19.701240407 -0600
-@@ -4,7 +4,7 @@ from django.utils.translation import uge
+Index: horizon/openstack_dashboard/local/local_settings.py.example
+===================================================================
+--- horizon.orig/openstack_dashboard/local/local_settings.py.example	2013-03-12 12:43:30.000000000 -0700
++++ horizon/openstack_dashboard/local/local_settings.py.example	2013-03-12 12:45:17.159499422 -0700
+@@ -4,7 +4,7 @@
  
  from openstack_dashboard import exceptions
  
@@ -10,15 +11,15 @@ diff -Naurp horizon-2013.1.orig/openstack_dashboard/local/local_settings.py.exam
  TEMPLATE_DEBUG = DEBUG
  
  # Set SSL proxy settings:
-@@ -49,13 +49,29 @@ LOCAL_PATH = os.path.dirname(os.path.abs
- # We recommend you use memcached for development; otherwise after every reload
- # of the django development server, you will have to login again. To use
- # memcached set CACHE_BACKED to something like 'memcached://127.0.0.1:11211/'
--CACHE_BACKEND = 'locmem://'
-+CACHE_BACKEND = 'memcached://127.0.0.1:11211'
+@@ -68,6 +68,7 @@
+ CACHES = {
+     'default': {
+         'BACKEND' : 'django.core.cache.backends.locmem.LocMemCache'
++        'LOCATION' : '127.0.0.1:11211',
+     }
+ }
  
- # Send email to the console by default
- EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+@@ -76,6 +77,22 @@
  # Or send them to /dev/null
  #EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
  
