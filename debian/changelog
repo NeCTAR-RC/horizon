@@ -3,6 +3,7 @@ horizon (2013.1.g3-0ubuntu4) UNRELEASED; urgency=low
   [ James Page ]
   * d/watch: Update uversionmangle to deal with upstream versioning
     changes, remove tarballs.openstack.org.
+  * d/control: Version python-compressor >= 1.2 (LP: #1130610).
 
   [ Adam Gandelman ]
   * debian/patches/ubuntu_local_settings.py: Refresh, specify memcache
