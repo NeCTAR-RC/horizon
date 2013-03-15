@@ -4280,6 +4280,22 @@ table form {
 .hidden {
   display: none;
 }
+/*
+ * Bootstrap styles table backgrounds using nth-child(2n+1), which is
+ * oblivious to hidden elements. The styles below allow us to override
+ * the bootstrap style when neccessary by setting the odd/even classes.
+ */
+.table-striped.datatable tbody tr.odd td {
+  background-color: #f9f9f9;
+}
+.table-striped.datatable tbody tr.even td {
+  background-color: inherit;
+}
+.table-striped.datatable tbody tr.odd:hover td,
+.table-striped.datatable tbody tr.even:hover td,
+.table-striped.datatable tbody tr:hover th {
+  background-color: #f5f5f5;
+}
 .table-striped tbody tr.status_unknown:nth-child(odd) td {
   background-color: #ffffb5;
 }
@@ -4986,8 +5002,18 @@ label.log-length {
   box-shadow: none;
   z-index: 99999;
 }
+.project_membership .role_dropdown li i {
+  opacity: 0;
+}
 .project_membership .role_dropdown li:hover {
   background-color: #CDCDCD;
+}
+.project_membership .role_dropdown li.selected i {
+  opacity: 1;
+}
+.project_membership .dropdown-menu.role_dropdown {
+  right: 0;
+  left: auto;
 }
 .project_membership .nav .role_options {
   float: right;
@@ -5316,6 +5342,13 @@ label.log-length {
   padding-left: 50px;
   background: #efefef;
 }
+#topologyCanvas div.nodata {
+  font-size: 150%;
+  font-weight: bold;
+  text-align: center;
+  padding-top: 200px;
+  display: none;
+}
 div.networks {
   height: 100%;
 }
@@ -5354,12 +5387,18 @@ div.network .nicname:hover {
   background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
   background-size: 10px 10px;
 }
+div.network .nicname.nourl {
+  cursor: auto;
+}
+div.network .nicname.nourl:hover {
+  background-image: none;
+}
 div.network .nicname h3 {
   font-size: 12px;
   line-height: 1;
   position: relative;
   font-weight: normal;
-  top: 60%;
+  top: 55%;
   color: #fff;
   left: -1px;
   letter-spacing: 0.2em;
@@ -5371,12 +5410,27 @@ div.network .nicname h3 {
   white-space: nowrap;
   text-shadow: 0px 0px 5px #000;
 }
-div.network .nicname h3 span.ip {
-  margin-left: 0.5em;
+div.network .nicname span.ip {
+  position: absolute;
+  bottom: -10px;
+  left: 20px;
   color: #000;
+  display: block;
   font-weight: normal;
   font-size: 90%;
-  text-shadow: 0px 0px 0px #000;
+  letter-spacing: 0.2em;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+  -webkit-transform-origin: 0% 0%;
+  -moz-transform-origin: 0% 0%;
+  -ms-transform-origin: 0% 0%;
+  -o-transform-origin: 0% 0%;
+  transform-origin: 0% 0%;
+  white-space: nowrap;
+  text-shadow: 0px 0px 2px #fff,0px 0px 2px #fff;
 }
 div.network .router,
 div.network .server,
@@ -5388,72 +5442,59 @@ div.network .device {
   box-sizing: border-box;
   cursor: pointer;
   width: 90px;
-  border: 3px solid #666;
+  border: 3px solid #444;
   position: absolute;
   top: 30px;
   left: 90px;
+  color: #fff;
   padding: 0 3px;
   background: #666;
   margin-bottom: 20px;
+  border-radius: 8px;
 }
 div.network .router:before,
 div.network .server:before,
-div.network .device:before,
-div.network .router:after,
-div.network .server:after,
-div.network .device:after {
+div.network .device:before {
   content: "";
-  width: 90px;
-  height: 34px;
-  text-align: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #444;
+  line-height: 1.2;
   position: absolute;
-  border: 3px solid #666;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
-  box-sizing: border-box;
-  background: #fff;
-  border-radius: 50%;
-  top: -19px;
-  left: -3px;
+  border-radius: 20px;
+  top: -10px;
+  left: -10px;
+  background: #ffffff url(/static/dashboard/img/router.png) no-repeat center center;
+  background-size: 16px 16px;
 }
 div.network .router:after,
 div.network .server:after,
 div.network .device:after {
   content: "";
+  width: 100%;
+  line-height: 1.2;
+  position: absolute;
+  text-align: center;
+  border-radius: 0;
+  background: #444;
   color: #fff;
-  background: #666;
-  border-radius: 50%;
-  top: auto;
-  bottom: -19px;
   font-size: 11px;
-  line-height: 30px;
+  height: 1.5em;
+  bottom: 0px;
+  left: 0px;
 }
 div.network .router span.devicename,
 div.network .server span.devicename,
 div.network .device span.devicename {
   position: absolute;
   color: #fff;
-  bottom: -10px;
+  bottom: 0px;
   font-size: 12px;
   line-height: 14px;
-  left: -4px;
   width: 100%;
   text-align: center;
   z-index: 300;
-}
-div.network .router span.devicename i,
-div.network .server span.devicename i,
-div.network .device span.devicename i {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  background: #ffffff url(/static/dashboard/img/router.png) no-repeat center center;
-  background-size: 12px 12px;
-  margin-right: 3px;
-  vertical-align: middle;
-  border-radius: 20px;
+  left: -2px;
 }
 div.network .router span.name,
 div.network .server span.name,
@@ -5466,7 +5507,7 @@ div.network .device span.name {
   position: relative;
   z-index: 10;
   text-align: center;
-  top: -10px;
+  top: 4px;
   padding: 0 3px;
 }
 div.network .router div.port,
@@ -5495,6 +5536,7 @@ div.network .device div.port span.ip {
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box;
+  color: #333;
   font-size: 9px;
   line-height: 1;
   text-shadow: 0px -1px #ffffff;
@@ -5518,8 +5560,7 @@ div.network .device div.port.right {
 div.network .router:hover,
 div.network .server:hover,
 div.network .device:hover {
-  background-color: #444;
-  border-color: #444;
+  border-color: #222;
 }
 div.network .router:hover div.port,
 div.network .server:hover div.port,
@@ -5541,64 +5582,23 @@ div.network .device:hover div.port:hover {
   -o-animation: progress-bar-stripes 0.3s linear infinite;
   animation: progress-bar-stripes 0.3s linear infinite;
 }
-div.network .router:hover:before,
-div.network .server:hover:before,
-div.network .device:hover:before {
-  border-color: #444;
-}
 div.network .router:hover:after,
 div.network .server:hover:after,
 div.network .device:hover:after {
-  background-color: #444;
-  border-color: #444;
+  background-color: #222;
+  border-color: #222;
 }
 div.network .device {
   border: none;
   background: transparent;
 }
 div.network .server {
-  border-radius: 5px;
   background: #fff;
-}
-div.network .server span.devicename {
-  bottom: 0px;
-  font-size: 12px;
-  line-height: 14px;
-  left: -4px;
-}
-div.network .server span.devicename i {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  background: url(/static/dashboard/img/server.png) no-repeat center center;
-  background-size: 12px 12px;
-  margin-right: 3px;
-  vertical-align: middle;
-}
-div.network .server span.name {
-  top: 5px;
-  padding: 0 3px;
+  color: #333;
 }
 div.network .server:before {
-  border: none;
-  background: transparent;
-}
-div.network .server:after {
-  content: "";
-  width: 100%;
-  line-height: 1.2;
-  position: absolute;
-  text-align: center;
-  border-radius: 0;
-  background: #666;
-  color: #fff;
-  font-size: 11px;
-  height: 1.5em;
-  bottom: 0px;
-  left: 0px;
-}
-div.network .server:hover {
-  background: #fff;
+  background: #ffffff url(/static/dashboard/img/server.png) no-repeat center center;
+  background-size: 14px 14px;
 }
 .launchButtons {
   text-align: right;
