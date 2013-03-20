@@ -20,7 +20,7 @@ Section: python
 Architecture: all
 Depends: python-cloudfiles,
  python-django (>= 1.4),
- python-compressor,
+ python-compressor (>= 1.2),
  python-cinderclient,
  python-glanceclient,
  python-keystoneclient,
