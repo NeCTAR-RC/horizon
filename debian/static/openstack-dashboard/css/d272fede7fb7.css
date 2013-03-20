@@ -5582,6 +5582,17 @@ div.network .device:hover div.port:hover {
   -o-animation: progress-bar-stripes 0.3s linear infinite;
   animation: progress-bar-stripes 0.3s linear infinite;
 }
+div.network .router:hover div.port.nourl,
+div.network .server:hover div.port.nourl,
+div.network .device:hover div.port.nourl {
+  cursor: auto;
+  background-image: none;
+}
+div.network .router:hover div.port.nourl:hover,
+div.network .server:hover div.port.nourl:hover,
+div.network .device:hover div.port.nourl:hover {
+  background-image: none;
+}
 div.network .router:hover:after,
 div.network .server:hover:after,
 div.network .device:hover:after {

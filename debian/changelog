@@ -1,4 +1,4 @@
-horizon (1:2013.1~rc1-0ubuntu1) UNRELEASED; urgency=low
+horizon (1:2013.1~rc1-0ubuntu1) raring; urgency=low
 
   [ James Page ]
   * New upstream release candidate for Grizzly:
@@ -12,7 +12,7 @@ horizon (1:2013.1~rc1-0ubuntu1) UNRELEASED; urgency=low
   * debian/patches/ubuntu_local_settings.py: Refresh, specify memcache
     location as part of CACHES, as per upstream changes to example config.
 
- -- Adam Gandelman <adamg@ubuntu.com>  Tue, 12 Mar 2013 12:47:45 -0700
+ -- James Page <james.page@ubuntu.com>  Wed, 20 Mar 2013 11:20:17 +0000
 
 horizon (2013.1.g3-0ubuntu2) raring; urgency=low
 
