@@ -1,3 +1,9 @@
+horizon (1:2013.1~rc2-0ubuntu1) raring; urgency=low
+
+  * New upstream release.
+
+ -- Chuck Short <zulcss@ubuntu.com>  Tue, 02 Apr 2013 08:40:42 -0500
+
 horizon (1:2013.1~rc1-0ubuntu1) raring; urgency=low
 
   [ James Page ]
