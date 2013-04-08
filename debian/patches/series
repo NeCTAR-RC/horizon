@@ -20,3 +20,5 @@ nectar/cells.patch
 nectar/disable_floatingips.patch
 # Allow permissions to be set on tables
 nectar/table_permissions.patch
+# Support hiding preproduction cells
+nectar/cell_permissions.patch

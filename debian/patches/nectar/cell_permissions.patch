@@ -1,0 +1,46 @@
+From: Kieran Spear <kispear@gmail.com>
+Date: Mon, 8 Apr 2013 11:04:01 +1000
+Subject: Support hiding preproduction cells
+
+Add settings for hiding preproduction cells from the cell selection
+tab unless a user has a certain role on the current tenant:
+
+OPENSTACK_PREPROD_CELLS = ['cell1', 'cell2']
+OPENSTACK_PREPROD_ROLE = 'PreProdUser'
+
+Gbp-Pq-Topic: nectar
+Gbp-Pq-Name: cell_permissions.patch
+---
+ horizon/dashboards/nova/instances/workflows.py |   12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/horizon/dashboards/nova/instances/workflows.py b/horizon/dashboards/nova/instances/workflows.py
+index e368d86..0af4865 100644
+--- a/horizon/dashboards/nova/instances/workflows.py
++++ b/horizon/dashboards/nova/instances/workflows.py
+@@ -185,7 +185,15 @@ class CellSelectionAction(workflows.Action):
+             exceptions.handle(request,
+                               _('Unable to retrieve available cell list.'))
+ 
+-        self._cells_list = cells
++        preprod_cells = getattr(settings, 'OPENSTACK_PREPROD_CELLS', [])
++        preprod_role = getattr(settings, 'OPENSTACK_PREPROD_ROLE', 'admin')
++        preprod_perm = 'openstack.roles.' + preprod_role.lower()
++        if not request.user.has_perm(preprod_perm):
++            for cell in cells[:]:
++                if (cell in preprod_cells or
++                        cell.split('-', 1)[0] in preprod_cells):
++                    cells.remove(cell)
++        self._cells_list = list(cells)
+ 
+         cells_dict = {}
+         for cell in cells:
+@@ -195,7 +203,7 @@ class CellSelectionAction(workflows.Action):
+             if child:
+                 cells_dict[parent].append((cell, cell))
+         self._cells_dict = cells_dict
+-        choices = [ (name, name) for name in cells_dict.keys() ]
++        choices = [(name, name) for name in cells_dict.keys()]
+         if choices:
+             choices.insert(0, ("", _("(Any cell)")))
+         else:
