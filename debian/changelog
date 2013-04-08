@@ -1,3 +1,9 @@
+horizon (2012.2+20130228-2) precise-folsom; urgency=low
+
+  * Add patch for preproduction cell permissions
+
+ -- Kieran Spear <kispear@gmail.com>  Mon, 08 Apr 2013 11:27:06 +1000
+
 horizon (2012.2+20130228-1) precise-folsom; urgency=low
 
   [ Sean Dague ]
