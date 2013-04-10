@@ -1,3 +1,10 @@
+horizon (1:2013.1-0ubuntu2) UNRELEASED; urgency=low
+
+  * Recompress static JS and CSS and generate new manifest.json for
+    offline compression. 
+
+ -- Chuck Short <zulcss@ubuntu.com>  Wed, 10 Apr 2013 12:07:27 -0500
+
 horizon (1:2013.1-0ubuntu1) raring; urgency=low
 
   * New upstream release.
