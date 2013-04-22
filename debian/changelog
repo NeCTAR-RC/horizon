@@ -1,3 +1,10 @@
+horizon (1:2013.1-0ubuntu3) raring; urgency=low
+
+  * Re-sync Ubuntu theme with upstream changes, fixing instance network
+    selection dialog and network topology screens (LP: #1157918).
+
+ -- James Page <james.page@ubuntu.com>  Mon, 22 Apr 2013 14:09:04 +0100
+
 horizon (1:2013.1-0ubuntu2) raring; urgency=low
 
   * Recompress static JS and CSS and generate new manifest.json for
