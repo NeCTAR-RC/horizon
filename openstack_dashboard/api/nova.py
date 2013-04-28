@@ -73,7 +73,7 @@ class Server(APIResourceWrapper):
              'image_name', 'VirtualInterfaces', 'flavor', 'key_name',
              'tenant_id', 'user_id', 'OS-EXT-STS:power_state',
              'OS-EXT-STS:task_state', 'OS-EXT-SRV-ATTR:instance_name',
-             'OS-EXT-SRV-ATTR:host']
+             'OS-EXT-SRV-ATTR:host', 'OS-EXT-AZ:availability_zone']
 
     def __init__(self, apiresource, request):
         super(Server, self).__init__(apiresource)
@@ -92,6 +92,10 @@ class Server(APIResourceWrapper):
     @property
     def internal_name(self):
         return getattr(self, 'OS-EXT-SRV-ATTR:instance_name', "")
+
+    @property
+    def availability_zone(self):
+        return getattr(self, 'OS-EXT-AZ:availability_zone', "")
 
     def reboot(self, hardness=REBOOT_HARD):
         novaclient(self.request).servers.reboot(self.id, hardness)
@@ -344,12 +348,12 @@ def keypair_list(request):
 
 def server_create(request, name, image, flavor, key_name, user_data,
                   security_groups, block_device_mapping, nics=None,
-                  instance_count=1):
+                  availability_zone=None, instance_count=1):
     return Server(novaclient(request).servers.create(
             name, image, flavor, userdata=user_data,
             security_groups=security_groups,
             key_name=key_name, block_device_mapping=block_device_mapping,
-            nics=nics,
+            nics=nics, availability_zone=availability_zone,
             min_count=instance_count), request)
 
 
@@ -553,3 +557,7 @@ def tenant_absolute_limits(request, reserved=False):
         else:
             limits_dict[limit.name] = limit.value
     return limits_dict
+
+
+def availability_zone_list(request, detailed=False):
+    return novaclient(request).availability_zones.list(detailed=detailed)
