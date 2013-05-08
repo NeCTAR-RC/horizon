@@ -1,3 +1,9 @@
+horizon (1:2013.1.1+20130508-1) precise-grizzly; urgency=low
+
+  * Set OSLO_PACKAGE_VERSION
+
+ -- Kieran Spear <kispear@gmail.com>  Wed, 08 May 2013 17:35:34 +1000
+
 horizon (1:2013.1-0ubuntu3~cloud0) precise-grizzly; urgency=low
 
   *  New update for the Ubuntu Cloud Archive.
