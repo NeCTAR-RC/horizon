@@ -1,27 +1,22 @@
---- a/openstack_dashboard/local/local_settings.py.example
-+++ b/openstack_dashboard/local/local_settings.py.example
+diff -Naurp horizon-2013.2.a96.gd17fd51.orig/openstack_dashboard/local/local_settings.py.example horizon-2013.2.a96.gd17fd51/openstack_dashboard/local/local_settings.py.example
+--- horizon-2013.2.a96.gd17fd51.orig/openstack_dashboard/local/local_settings.py.example	2013-05-21 09:33:32.000000000 -0500
++++ horizon-2013.2.a96.gd17fd51/openstack_dashboard/local/local_settings.py.example	2013-05-21 09:41:35.062563458 -0500
 @@ -4,7 +4,7 @@ from django.utils.translation import uge
  
  from openstack_dashboard import exceptions
  
 -DEBUG = True
-+DEBUG = False
++DEBUG = Fase
  TEMPLATE_DEBUG = DEBUG
  
- # Set SSL proxy settings:
-@@ -67,7 +67,8 @@ LOCAL_PATH = os.path.dirname(os.path.abs
- 
+ # Required for Django 1.5.
+@@ -100,9 +100,26 @@ SECRET_KEY = secret_key.generate_or_read
  CACHES = {
      'default': {
--        'BACKEND' : 'django.core.cache.backends.locmem.LocMemCache'
-+        'BACKEND' : 'django.core.cache.backends.memcached.MemcachedCache',
-+        'LOCATION' : '127.0.0.1:11211'
+         'BACKEND' : 'django.core.cache.backends.locmem.LocMemCache'
++		'LOCATION': '127.0.0.1:11211'
      }
  }
- 
-@@ -76,6 +77,22 @@ EMAIL_BACKEND = 'django.core.mail.backen
- # Or send them to /dev/null
- #EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
  
 +# Enable the Ubuntu theme if it is present.
 +try:
@@ -39,6 +34,6 @@
 +# the node-less package and enable the following option.
 +COMPRESS_OFFLINE = True
 +
- # Configure these for your outgoing email host
- # EMAIL_HOST = 'smtp.my-company.com'
- # EMAIL_PORT = 25
+ # Send email to the console by default
+ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ # Or send them to /dev/null

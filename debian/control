@@ -3,7 +3,8 @@ Section: net
 Priority: extra
 Maintainer: Chuck Short <zulcss@ubuntu.com>
 Build-Depends: debhelper (>= 8.0.0),
- pep8,
+ python-pbr,
+ python-d2to1,
  pylint,
  python-all (>= 2.6.6-3~),
  python-django-nose,
