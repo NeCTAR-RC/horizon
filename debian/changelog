@@ -4,7 +4,7 @@ horizon (1:2013.2~b1-0ubuntu1) saucy; urgency=low
   * debian/patches/ubuntu_local_settings.patch: Refreshed
   * debian/control: Add python-pbr and python-d2to1.
 
- -- Chuck Short <zulcss@ubuntu.com>  Fri, 31 May 2013 08:33:29 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 31 May 2013 08:59:58 -0500
 
 horizon (1:2013.1-0ubuntu3) raring; urgency=low
 
