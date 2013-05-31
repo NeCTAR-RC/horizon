@@ -1,10 +1,10 @@
-horizon (1:2013.2.a96.gd17fd51-0ubuntu1) UNRELEASED; urgency=low
+horizon (1:2013.2~b1-0ubuntu1) saucy; urgency=low
 
   * New upstream release. 
   * debian/patches/ubuntu_local_settings.patch: Refreshed
   * debian/control: Add python-pbr and python-d2to1.
 
- -- Chuck Short <zulcss@ubuntu.com>  Tue, 21 May 2013 09:34:41 -0500
+ -- Chuck Short <zulcss@ubuntu.com>  Fri, 31 May 2013 08:33:29 -0500
 
 horizon (1:2013.1-0ubuntu3) raring; urgency=low
 
