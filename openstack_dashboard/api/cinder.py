@@ -89,10 +89,12 @@ def volume_get(request, volume_id):
 
 
 def volume_create(request, size, name, description, volume_type,
+                  availability_zone=None,
                   snapshot_id=None, metadata=None):
     return cinderclient(request).volumes.create(size, display_name=name,
             display_description=description, volume_type=volume_type,
-            snapshot_id=snapshot_id, metadata=metadata)
+            snapshot_id=snapshot_id, metadata=metadata,
+            availability_zone=availability_zone)
 
 
 def volume_delete(request, volume_id):
@@ -144,3 +146,10 @@ def volume_type_create(request, name):
 
 def volume_type_delete(request, volume_type_id):
     return cinderclient(request).volume_types.delete(volume_type_id)
+
+
+def availability_zone_list(request):
+    # FIXME(kspear): There's currently no way in Cinder to get
+    #                a list of availability zones for a regular
+    #                user (cinder bp: availability-zone-list-api).
+    return getattr(settings, 'OPENSTACK_STORAGE_AVAILABILITY_ZONES', [])

@@ -14,6 +14,7 @@
 
 
 def load_test_data(load_onto=None):
+    from . import cinder_data
     from . import exceptions
     from . import glance_data
     from . import keystone_data
@@ -26,6 +27,7 @@ def load_test_data(load_onto=None):
                keystone_data.data,
                glance_data.data,
                nova_data.data,
+               cinder_data.data,
                quantum_data.data,
                swift_data.data)
     if load_onto:

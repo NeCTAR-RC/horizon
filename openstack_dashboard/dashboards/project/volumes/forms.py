@@ -40,6 +40,8 @@ class CreateForm(forms.SelfHandlingForm):
                                                 ("%s (%sGB)" % (x.display_name,
                                                                 x.size))),
                                         required=False)
+    availability_zone = forms.ChoiceField(label=_("Availability Zone"),
+                                          required=False)
 
     def __init__(self, request, *args, **kwargs):
         super(CreateForm, self).__init__(request, *args, **kwargs)
@@ -100,6 +102,25 @@ class CreateForm(forms.SelfHandlingForm):
                 exceptions.handle(request, _("Unable to retrieve "
                         "volume snapshots."))
 
+            az_choices = self.get_availability_zones(request)
+            if len(az_choices) >= 2:
+                az_choices.insert(0, ("", _("Any zone")))
+                self.fields['availability_zone'].choices = az_choices
+            else:
+                hidden_input = forms.widgets.HiddenInput()
+                self.fields['availability_zone'].widget = hidden_input
+
+    def get_availability_zones(self, request):
+        try:
+            zones = api.cinder.availability_zone_list(request)
+        except:
+            zones = []
+            exceptions.handle(request,
+                              _('Unable to retrieve availability zones.'))
+        zone_list = [(zone, zone) for zone in zones]
+        zone_list.sort()
+        return zone_list
+
     def handle(self, request, data):
         try:
             # FIXME(johnp): cinderclient currently returns a useless
@@ -140,13 +161,19 @@ class CreateForm(forms.SelfHandlingForm):
             if data['encryption']:
                 metadata['encryption'] = data['encryption']
 
+            availability_zone = data.get('availability_zone', None)
+            extra_kwargs = {}
+            if availability_zone:
+                extra_kwargs['availability_zone'] = availability_zone
+
             volume = cinder.volume_create(request,
                                           data['size'],
                                           data['name'],
                                           data['description'],
                                           data['type'],
                                           snapshot_id=snapshot_id,
-                                          metadata=metadata)
+                                          metadata=metadata,
+                                          **extra_kwargs)
             message = 'Creating volume "%s"' % data['name']
             messages.info(request, message)
             return volume
