@@ -73,7 +73,7 @@ class Server(APIResourceWrapper):
              'image_name', 'VirtualInterfaces', 'flavor', 'key_name',
              'tenant_id', 'user_id', 'OS-EXT-STS:power_state',
              'OS-EXT-STS:task_state', 'OS-EXT-SRV-ATTR:instance_name',
-             'OS-EXT-SRV-ATTR:host']
+             'OS-EXT-SRV-ATTR:host', 'OS-EXT-AZ:availability_zone']
 
     def __init__(self, apiresource, request):
         super(Server, self).__init__(apiresource)
@@ -92,6 +92,10 @@ class Server(APIResourceWrapper):
     @property
     def internal_name(self):
         return getattr(self, 'OS-EXT-SRV-ATTR:instance_name', "")
+
+    @property
+    def availability_zone(self):
+        return getattr(self, 'OS-EXT-AZ:availability_zone', "")
 
     def reboot(self, hardness=REBOOT_HARD):
         novaclient(self.request).servers.reboot(self.id, hardness)
