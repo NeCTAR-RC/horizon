@@ -21,6 +21,7 @@
 import json
 import logging
 
+from django.conf import settings
 from django.utils.text import normalize_newlines
 from django.utils.translation import ugettext_lazy as _
 
@@ -166,6 +167,63 @@ class VolumeOptions(workflows.Step):
         return context
 
 
+class CellSelectionAction(workflows.Action):
+    cell = forms.DynamicChoiceField(label=_("Cell"),
+                             help_text=_("Cell to run the instance on."),
+                             required=False)
+    subcell = forms.ChoiceField(label=_("Cell"),
+                                help_text=_("Cell to run the instance on."),
+                                required=False,
+                                widget=forms.widgets.RadioSelect)
+
+    class Meta:
+        name = _("Cell")
+        help_text_template = ("project/instances/"
+                              "_launch_cell_help.html")
+
+    def populate_cell_choices(self, request, context):
+        try:
+            zones = api.nova.availability_zone_list(request)
+        except:
+            zones = []
+            exceptions.handle(request,
+                              _('Unable to retrieve available cell list.'))
+
+        zone_list = [zone.zoneName
+                     for zone in zones if zone.zoneState['available']]
+        zone_list.sort()
+        self._cells_list = zone_list
+
+        cells_dict = {}
+        for cell in zone_list:
+            parent, sep, child = cell.partition('-')
+            if parent not in cells_dict:
+                cells_dict[parent] = []
+            if child:
+                cells_dict[parent].append((cell, cell))
+        self._cells_dict = cells_dict
+        choices = [(name, name) for name in cells_dict.keys()]
+        if choices:
+            choices.insert(0, ("", _("(Any cell)")))
+        else:
+            choices.insert(0, ("", _("No cells available.")))
+        return choices
+
+    def populate_subcell_choices(self, request, context):
+        choices = [(name, name) for name in self._cells_list]
+        if choices:
+            choices.insert(0, ("", _("(Any cell)")))
+        else:
+            choices.insert(0, ("", _("No cells available.")))
+        return choices
+
+
+class CellSelection(workflows.Step):
+    action_class = CellSelectionAction
+    contributes = ("cell", "subcell")
+    template_name = ("project/instances/_launch_cell_step.html")
+
+
 class SetInstanceDetailsAction(workflows.Action):
     SOURCE_TYPE_CHOICES = (
         ("image_id", _("Image")),
@@ -176,8 +234,6 @@ class SetInstanceDetailsAction(workflows.Action):
     image_id = forms.ChoiceField(label=_("Image"), required=False)
     instance_snapshot_id = forms.ChoiceField(label=_("Instance Snapshot"),
                                              required=False)
-    availability_zone = forms.ChoiceField(label=_("Availability Zone"),
-                                          required=False)
     name = forms.CharField(max_length=80, label=_("Instance Name"))
     flavor = forms.ChoiceField(label=_("Flavor"),
                                help_text=_("Size of image to launch."))
@@ -330,7 +386,7 @@ class SetInstanceDetailsAction(workflows.Action):
 
 class SetInstanceDetails(workflows.Step):
     action_class = SetInstanceDetailsAction
-    contributes = ("source_type", "source_id", "availability_zone",
+    contributes = ("source_type", "source_id",
                    "name", "count", "flavor")
 
     def prepare_action_context(self, request, context):
@@ -492,7 +548,9 @@ class LaunchInstance(workflows.Workflow):
                      SetAccessControls,
                      SetNetwork,
                      VolumeOptions,
-                     PostCreationStep)
+                     CellSelection,
+                     PostCreationStep,
+                     )
 
     def format_status_message(self, message):
         name = self.context.get('name', 'unknown instance')
@@ -525,7 +583,7 @@ class LaunchInstance(workflows.Workflow):
         else:
             nics = None
 
-        avail_zone = context.get('availability_zone', None)
+        avail_zone = context.get('subcell', context.get('cell', None))
 
         try:
             api.nova.server_create(request,

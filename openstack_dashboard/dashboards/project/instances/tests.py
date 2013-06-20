@@ -22,6 +22,7 @@ import uuid
 
 from django import http
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.datastructures import SortedDict
 
@@ -33,7 +34,7 @@ from openstack_dashboard.test import helpers as test
 from openstack_dashboard.usage import quotas
 from .tables import LaunchLink
 from .tabs import InstanceDetailTabs
-from .workflows import LaunchInstance
+from .workflows import LaunchInstance, CellSelection
 
 
 INDEX_URL = reverse('horizon:project:instances:index')
