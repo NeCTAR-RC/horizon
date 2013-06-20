@@ -724,7 +724,6 @@ class Workflow(html.HTMLElement):
             cls._cls_registry.remove(step_class)
         except KeyError:
             raise base.NotRegistered('%s is not registered' % cls)
-        return cls._unregister(step_class)
 
     def validate(self, context):
         """

@@ -22,6 +22,7 @@ import uuid
 
 from django import http
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.datastructures import SortedDict
 
@@ -33,7 +34,7 @@ from openstack_dashboard.test import helpers as test
 from openstack_dashboard.usage import quotas
 from .tables import LaunchLink
 from .tabs import InstanceDetailTabs
-from .workflows import LaunchInstance
+from .workflows import LaunchInstance, CellSelection
 
 
 INDEX_URL = reverse('horizon:project:instances:index')
@@ -839,6 +840,7 @@ class InstanceTests(test.TestCase):
                              '<SetAccessControls: setaccesscontrolsaction>',
                              '<SetNetwork: setnetworkaction>',
                              '<VolumeOptions: volumeoptionsaction>',
+                             '<CellSelection: cellselectionaction>',
                              '<PostCreationStep: customizeaction>'])
 
     @test.create_stubs({api.glance: ('image_list_detailed',),
@@ -914,7 +916,9 @@ class InstanceTests(test.TestCase):
                      'project_id': self.tenants.first().id,
                      'user_id': self.user.id,
                      'groups': sec_group.name,
-                     'availability_zone': avail_zone.zoneName,
+                     #'availability_zone': avail_zone.zoneName,
+                     'cell': avail_zone.zoneName,
+                     'subcell': avail_zone.zoneName,
                      'volume_type': 'volume_id',
                      'volume_id': volume_choice,
                      'device_name': device_name,
@@ -1113,6 +1117,8 @@ class InstanceTests(test.TestCase):
                      'source_type': 'image_id',
                      'image_id': image.id,
                      'availability_zone': avail_zone.zoneName,
+                     'cell': avail_zone.zoneName,
+                     'subcell': avail_zone.zoneName,
                      'keypair': keypair.name,
                      'name': server.name,
                      'customization_script': customization_script,
