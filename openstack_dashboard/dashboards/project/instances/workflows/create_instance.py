@@ -76,9 +76,6 @@ class SelectProjectUser(workflows.Step):
 
 
 class SetInstanceDetailsAction(workflows.Action):
-    availability_zone = forms.ChoiceField(label=_("Availability Zone"),
-                                          required=False)
-
     name = forms.CharField(label=_("Instance Name"),
                            max_length=255)
 
@@ -290,23 +287,6 @@ class SetInstanceDetailsAction(workflows.Action):
             return instance_utils.sort_flavor_list(request, flavors)
         return []
 
-    def populate_availability_zone_choices(self, request, context):
-        try:
-            zones = api.nova.availability_zone_list(request)
-        except Exception:
-            zones = []
-            exceptions.handle(request,
-                              _('Unable to retrieve availability zones.'))
-
-        zone_list = [(zone.zoneName, zone.zoneName)
-                      for zone in zones if zone.zoneState['available']]
-        zone_list.sort()
-        if not zone_list:
-            zone_list.insert(0, ("", _("No availability zones found")))
-        elif len(zone_list) > 1:
-            zone_list.insert(0, ("", _("Any Availability Zone")))
-        return zone_list
-
     def get_help_text(self):
         extra = {}
         try:
@@ -416,7 +396,7 @@ class SetInstanceDetails(workflows.Step):
     action_class = SetInstanceDetailsAction
     depends_on = ("project_id", "user_id")
     contributes = ("source_type", "source_id",
-                   "availability_zone", "name", "count", "flavor",
+                   "name", "count", "flavor",
                    "device_name",  # Can be None for an image.
                    "delete_on_terminate")
 
@@ -651,6 +631,65 @@ class SetAdvanced(workflows.Step):
     contributes = ("disk_config",)
 
 
+class CellSelectionAction(workflows.Action):
+    cell = forms.DynamicChoiceField(
+        label=_("Availability Zone"),
+        help_text=_("Availability zone to run the instance on."),
+        required=False)
+    subcell = forms.ChoiceField(
+        label=_("Availability Zone"),
+        help_text=_("Availability zone to run the instance on."),
+        required=False,
+        widget=forms.widgets.RadioSelect)
+
+    class Meta:
+        name = _("Availability Zone")
+        help_text_template = ("project/instances/"
+                              "_launch_cell_help.html")
+
+    def populate_cell_choices(self, request, context):
+        try:
+            zones = api.nova.availability_zone_list(request)
+        except Exception:
+            zones = []
+            exceptions.handle(request,
+                              _('Unable to retrieve availability zone list.'))
+
+        zone_list = [zone.zoneName
+                     for zone in zones if zone.zoneState['available']]
+        zone_list.sort()
+        self._cells_list = zone_list
+
+        cells_dict = {}
+        for cell in zone_list:
+            parent, sep, child = cell.partition('-')
+            if parent not in cells_dict:
+                cells_dict[parent] = []
+            if child:
+                cells_dict[parent].append((cell, cell))
+        self._cells_dict = cells_dict
+        choices = [(name, name) for name in cells_dict.keys()]
+        if choices:
+            choices.insert(0, ("", _("(Any availability zone)")))
+        else:
+            choices.insert(0, ("", _("No availability zones.")))
+        return choices
+
+    def populate_subcell_choices(self, request, context):
+        choices = [(name, name) for name in self._cells_list]
+        if choices:
+            choices.insert(0, ("", _("(Any availability zone)")))
+        else:
+            choices.insert(0, ("", _("No availability zones.")))
+        return choices
+
+
+class CellSelection(workflows.Step):
+    action_class = CellSelectionAction
+    contributes = ("cell", "subcell")
+    template_name = ("project/instances/_launch_cell_step.html")
+
+
 class LaunchInstance(workflows.Workflow):
     slug = "launch_instance"
     name = _("Launch Instance")
@@ -662,6 +701,7 @@ class LaunchInstance(workflows.Workflow):
                      SetInstanceDetails,
                      SetAccessControls,
                      SetNetwork,
+                     CellSelection,
                      PostCreationStep,
                      SetAdvanced)
 
@@ -711,7 +751,7 @@ class LaunchInstance(workflows.Workflow):
         else:
             nics = None
 
-        avail_zone = context.get('availability_zone', None)
+        avail_zone = context.get('subcell', context.get('cell', None))
 
         # Create port with Network Name and Port Profile
         # for the use with the plugin supporting port profiles.

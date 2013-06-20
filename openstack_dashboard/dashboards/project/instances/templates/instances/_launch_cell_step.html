@@ -1,0 +1,16 @@
+<noscript><h3>{{ step }}</h3></noscript>
+<table class="table-fixed">
+  <tbody>
+    <tr>
+      <td class="actions">
+      <div class="inline-fields">
+          {% include "horizon/common/_form_fields.html" %}
+          <a id="more-cells-button" data-text-inactive="Advanced" data-text-active="Basic" href="#" class="btn">Advanced</a>
+      </div>
+      </td>
+      <td class="help_text">
+          {{ step.get_help_text }}
+      </td>
+    </tr>
+  </tbody>
+</table>
