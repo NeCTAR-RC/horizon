@@ -1,0 +1,28 @@
+{% load i18n %}
+
+<noscript><h3>{{ step }}</h3></noscript>
+<div id="cellListIdContainer">
+  <div class="col-sm-6">
+    <div class="actions">
+      <div id="cellList">
+        {% include "horizon/common/_form_fields.html" %}
+        <button id="more-cells-button" data-text-inactive="Advanced"
+                data-text-active="Basic" href="#" class="btn btn-default">Advanced</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="help_text">
+      {{ step.get_help_text }}
+    </div>
+  </div>
+</div>
+<script>
+  if (typeof $ !== 'undefined') {
+    horizon.instances.workflow_init($(".workflow"));
+  } else {
+    addHorizonLoadEvent(function() {
+      horizon.instances.workflow_init($(".workflow"));
+    });
+  }
+</script>
