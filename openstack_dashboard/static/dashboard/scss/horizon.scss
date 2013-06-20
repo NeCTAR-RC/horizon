@@ -1720,7 +1720,6 @@ label.log-length {
       background:transparent;
     }
   }
-
 }
 
 /* Styling for draged firewall router object */
@@ -1902,3 +1901,14 @@ textarea.key_text {
   }
 }
 
+// NeCTAR additions
+
+div.input label[for^=id_subcell] {
+  white-space: nowrap;
+}
+
+div.input input[id^=id_subcell] {
+  float: left;
+  margin-right: 10px;
+  width: 20px;
+}
