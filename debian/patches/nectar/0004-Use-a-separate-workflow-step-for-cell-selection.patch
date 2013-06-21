@@ -1,0 +1,253 @@
+From c8c2bd9bde1be2f7c86c6c0b41eddae9eb71034b Mon Sep 17 00:00:00 2001
+From: Kieran Spear <kispear@gmail.com>
+Date: Thu, 20 Jun 2013 12:53:30 +1000
+Subject: [PATCH 4/4] Use a separate workflow step for cell selection
+
+Change-Id: Ifc1ce50b1c6648c190c6eaffa0f6b2059cb2b11e
+---
+ horizon/static/horizon/js/horizon.instances.js     |   24 +++++++
+ horizon/workflows/base.py                          |    1 -
+ .../templates/instances/_launch_cell_help.html     |    6 ++
+ .../templates/instances/_launch_cell_step.html     |   16 +++++
+ .../dashboards/project/instances/tests.py          |    3 +-
+ .../project/instances/workflows/create_instance.py |   68 ++++++++++++++++++--
+ .../static/dashboard/less/horizon.less             |    9 ++-
+ 7 files changed, 119 insertions(+), 8 deletions(-)
+ create mode 100644 openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_help.html
+ create mode 100644 openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_step.html
+
+diff --git a/horizon/static/horizon/js/horizon.instances.js b/horizon/static/horizon/js/horizon.instances.js
+index 20f396e..aecd5e6 100644
+--- a/horizon/static/horizon/js/horizon.instances.js
++++ b/horizon/static/horizon/js/horizon.instances.js
+@@ -106,4 +106,28 @@ horizon.addInitFunction(function () {
+   horizon.modals.addModalInitFunction(function (modal) {
+     $(modal).find("#id_volume_type").change();
+   });
++
++  horizon.modals.addModalInitFunction(function (modal) {
++    $cell_div = $('div.input select#id_cell').closest('div.form-field');
++    $subcell_div = $('div.input label[for^=id_subcell]').closest('div.form-field');
++    $subcell_div.hide();
++    $('#more-cells-button').on('click', function(evt) {
++      button = $(this);
++      evt.preventDefault();
++      evt.stopPropagation();
++      if ($subcell_div.is(':visible')) {
++        button.text(button.data('text-inactive'));
++        $subcell_div.hide();
++        $cell_div.show(200);
++      } else {
++        button.text(button.data('text-active'));
++        $cell_div.hide();
++        $subcell_div.show(200);
++      }
++    });
++    $('div.input select[id=id_cell]').on('change', function(evt) {
++      var val = $(this).val();
++      $('div.input input[value=' + val + ']').attr('checked', 'checked');
++    });
++  });
+ });
+diff --git a/horizon/workflows/base.py b/horizon/workflows/base.py
+index 6776135..3ea9d12 100644
+--- a/horizon/workflows/base.py
++++ b/horizon/workflows/base.py
+@@ -724,7 +724,6 @@ class Workflow(html.HTMLElement):
+             cls._cls_registry.remove(step_class)
+         except KeyError:
+             raise base.NotRegistered('%s is not registered' % cls)
+-        return cls._unregister(step_class)
+ 
+     def validate(self, context):
+         """
+diff --git a/openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_help.html b/openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_help.html
+new file mode 100644
+index 0000000..725929b
+--- /dev/null
++++ b/openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_help.html
+@@ -0,0 +1,6 @@
++{% load i18n %}
++
++<p>{% blocktrans %}Location for your Virtual Machine.{% endblocktrans %}</p>
++<p>{% blocktrans %}In most cases, you shouldn't change the default. However, should you
++require special access to data, instruments or infrastructure you may
++select a cell.{% endblocktrans %}</p>
+diff --git a/openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_step.html b/openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_step.html
+new file mode 100644
+index 0000000..3adc6b4
+--- /dev/null
++++ b/openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_step.html
+@@ -0,0 +1,16 @@
++<noscript><h3>{{ step }}</h3></noscript>
++<table class="table-fixed">
++  <tbody>
++    <tr>
++      <td class="actions">
++      <div class="inline-fields">
++          {% include "horizon/common/_form_fields.html" %}
++          <a id="more-cells-button" data-text-inactive="Advanced" data-text-active="Basic" href="#" class="btn">Advanced</a>
++      </div>
++      </td>
++      <td class="help_text">
++          {{ step.get_help_text }}
++      </td>
++    </tr>
++  </tbody>
++</table>
+diff --git a/openstack_dashboard/dashboards/project/instances/tests.py b/openstack_dashboard/dashboards/project/instances/tests.py
+index 01b72d2..a3c39e5 100644
+--- a/openstack_dashboard/dashboards/project/instances/tests.py
++++ b/openstack_dashboard/dashboards/project/instances/tests.py
+@@ -22,6 +22,7 @@ import uuid
+ 
+ from django import http
+ from django.core.urlresolvers import reverse
++from django.test.utils import override_settings
+ from django.utils.http import urlencode
+ from django.utils.datastructures import SortedDict
+ 
+@@ -33,7 +34,7 @@ from openstack_dashboard.test import helpers as test
+ from openstack_dashboard.usage import quotas
+ from .tables import LaunchLink
+ from .tabs import InstanceDetailTabs
+-from .workflows import LaunchInstance
++from .workflows import LaunchInstance, CellSelection
+ 
+ 
+ INDEX_URL = reverse('horizon:project:instances:index')
+diff --git a/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py b/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
+index 3c665b9..691769f 100644
+--- a/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
++++ b/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
+@@ -21,6 +21,7 @@
+ import json
+ import logging
+ 
++from django.conf import settings
+ from django.utils.text import normalize_newlines
+ from django.utils.translation import ugettext_lazy as _
+ 
+@@ -166,6 +167,63 @@ class VolumeOptions(workflows.Step):
+         return context
+ 
+ 
++class CellSelectionAction(workflows.Action):
++    cell = forms.DynamicChoiceField(label=_("Cell"),
++                             help_text=_("Cell to run the instance on."),
++                             required=False)
++    subcell = forms.ChoiceField(label=_("Cell"),
++                                help_text=_("Cell to run the instance on."),
++                                required=False,
++                                widget=forms.widgets.RadioSelect)
++
++    class Meta:
++        name = _("Cell")
++        help_text_template = ("project/instances/"
++                              "_launch_cell_help.html")
++
++    def populate_cell_choices(self, request, context):
++        try:
++            zones = api.nova.availability_zone_list(request)
++        except:
++            zones = []
++            exceptions.handle(request,
++                              _('Unable to retrieve available cell list.'))
++
++        zone_list = [zone.zoneName
++                     for zone in zones if zone.zoneState['available']]
++        zone_list.sort()
++        self._cells_list = zone_list
++
++        cells_dict = {}
++        for cell in zone_list:
++            parent, sep, child = cell.partition('-')
++            if parent not in cells_dict:
++                cells_dict[parent] = []
++            if child:
++                cells_dict[parent].append((cell, cell))
++        self._cells_dict = cells_dict
++        choices = [(name, name) for name in cells_dict.keys()]
++        if choices:
++            choices.insert(0, ("", _("(Any cell)")))
++        else:
++            choices.insert(0, ("", _("No cells available.")))
++        return choices
++
++    def populate_subcell_choices(self, request, context):
++        choices = [(name, name) for name in self._cells_list]
++        if choices:
++            choices.insert(0, ("", _("(Any cell)")))
++        else:
++            choices.insert(0, ("", _("No cells available.")))
++        return choices
++
++
++class CellSelection(workflows.Step):
++    action_class = CellSelectionAction
++    contributes = ("cell", "subcell")
++    template_name = ("project/instances/_launch_cell_step.html")
++
++
+ class SetInstanceDetailsAction(workflows.Action):
+     SOURCE_TYPE_CHOICES = (
+         ("image_id", _("Image")),
+@@ -176,8 +234,6 @@ class SetInstanceDetailsAction(workflows.Action):
+     image_id = forms.ChoiceField(label=_("Image"), required=False)
+     instance_snapshot_id = forms.ChoiceField(label=_("Instance Snapshot"),
+                                              required=False)
+-    availability_zone = forms.ChoiceField(label=_("Availability Zone"),
+-                                          required=False)
+     name = forms.CharField(max_length=80, label=_("Instance Name"))
+     flavor = forms.ChoiceField(label=_("Flavor"),
+                                help_text=_("Size of image to launch."))
+@@ -330,7 +386,7 @@ class SetInstanceDetailsAction(workflows.Action):
+ 
+ class SetInstanceDetails(workflows.Step):
+     action_class = SetInstanceDetailsAction
+-    contributes = ("source_type", "source_id", "availability_zone",
++    contributes = ("source_type", "source_id",
+                    "name", "count", "flavor")
+ 
+     def prepare_action_context(self, request, context):
+@@ -492,7 +548,9 @@ class LaunchInstance(workflows.Workflow):
+                      SetAccessControls,
+                      SetNetwork,
+                      VolumeOptions,
+-                     PostCreationStep)
++                     CellSelection,
++                     PostCreationStep,
++                     )
+ 
+     def format_status_message(self, message):
+         name = self.context.get('name', 'unknown instance')
+@@ -525,7 +583,7 @@ class LaunchInstance(workflows.Workflow):
+         else:
+             nics = None
+ 
+-        avail_zone = context.get('availability_zone', None)
++        avail_zone = context.get('subcell', context.get('cell', None))
+ 
+         try:
+             api.nova.server_create(request,
+diff --git a/openstack_dashboard/static/dashboard/less/horizon.less b/openstack_dashboard/static/dashboard/less/horizon.less
+index 775d258..c7cb388 100644
+--- a/openstack_dashboard/static/dashboard/less/horizon.less
++++ b/openstack_dashboard/static/dashboard/less/horizon.less
+@@ -2072,5 +2072,12 @@ div.network {
+   }
+ }
+ 
++div.input input[id^=id_subcell] {
++  float: left;
++  margin-right: 10px;
++  width: 20px;
++}
+ 
+-
++div.input label[for^=id_subcell] {
++  white-space: nowrap;
++}
+-- 
+1.7.9.5
+

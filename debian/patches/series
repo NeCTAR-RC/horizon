@@ -1,3 +1,4 @@
+# From original Ubuntu package
 fix-dashboard-django-wsgi.patch
 fix-dashboard-manage.patch
 
@@ -6,3 +7,10 @@ fix-dashboard-manage.patch
 
 fix-ubuntu-tests.patch
 ubuntu_local_settings.patch
+
+
+# NeCTAR
+backports/0001-Add-availability-zone-choice-to-launch-instance.patch
+nectar/0002-Add-availability-zone-selection-in-volume-creation.patch
+nectar/0003-Optionally-show-availability-zone-in-instance-list.patch
+nectar/0004-Use-a-separate-workflow-step-for-cell-selection.patch
