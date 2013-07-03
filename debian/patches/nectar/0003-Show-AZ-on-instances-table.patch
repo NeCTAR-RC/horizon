@@ -1,16 +1,15 @@
-From cf1b39ee4ebeab95badac41ffaa44284bc3dd8dd Mon Sep 17 00:00:00 2001
+From ce259dfe4383ef4dc842b4ddcc3ea3745c698abb Mon Sep 17 00:00:00 2001
 From: Kieran Spear <kispear@gmail.com>
-Date: Wed, 12 Jun 2013 19:06:12 +1000
-Subject: [PATCH 3/4] Optionally show availability zone in instance list
+Date: Wed, 3 Jul 2013 17:17:03 +1000
+Subject: [PATCH] Show AZ on instances table
 
-Change-Id: I9c3cea8bab0c2d19b3667f80e83dbb71e15622c0
 ---
  openstack_dashboard/api/nova.py                    |    6 +++++-
- .../dashboards/project/instances/tables.py         |   14 ++++++++++++++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ .../dashboards/project/instances/tables.py         |    8 ++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/openstack_dashboard/api/nova.py b/openstack_dashboard/api/nova.py
-index 5585092..17f696f 100644
+index af9a457..5ae8eda 100644
 --- a/openstack_dashboard/api/nova.py
 +++ b/openstack_dashboard/api/nova.py
 @@ -73,7 +73,7 @@ class Server(APIResourceWrapper):
@@ -34,7 +33,7 @@ index 5585092..17f696f 100644
          novaclient(self.request).servers.reboot(self.id, hardness)
  
 diff --git a/openstack_dashboard/dashboards/project/instances/tables.py b/openstack_dashboard/dashboards/project/instances/tables.py
-index 57f9ed2..4cbd8a4 100644
+index 57f9ed2..179909b 100644
 --- a/openstack_dashboard/dashboards/project/instances/tables.py
 +++ b/openstack_dashboard/dashboards/project/instances/tables.py
 @@ -18,6 +18,7 @@ import logging
@@ -58,8 +57,7 @@ index 57f9ed2..4cbd8a4 100644
  class InstancesTable(tables.DataTable):
      TASK_STATUS_CHOICES = (
          (None, True),
-
-@@ -445,6 +457,8 @@ class InstancesTable(tables.DataTable):
+@@ -445,6 +452,7 @@ class InstancesTable(tables.DataTable):
                           link=("horizon:project:instances:detail"),
                           verbose_name=_("Instance Name"))
      ip = tables.Column(get_ips, verbose_name=_("IP Address"))
@@ -67,7 +65,6 @@ index 57f9ed2..4cbd8a4 100644
      size = tables.Column(get_size,
                           verbose_name=_("Size"),
                           attrs={'data-type': 'size'})
-
 -- 
 1.7.9.5
 
