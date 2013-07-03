@@ -91,7 +91,8 @@ SERVER_DATA = """
         "tenant_id": "%(tenant_id)s",
         "metadata": {"someMetaLabel": "someMetaData",
                      "some<b>html</b>label": "<!--",
-                     "empty": ""}
+                     "empty": ""},
+        "OS-EXT-AZ:availability_zone": "az1"
     }
 }
 """

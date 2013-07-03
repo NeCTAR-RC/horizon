@@ -18,6 +18,7 @@ import logging
 
 from django import shortcuts
 from django import template
+from django.conf import settings
 from django.core import urlresolvers
 from django.template.defaultfilters import title
 from django.utils.http import urlencode
@@ -439,6 +440,12 @@ TASK_DISPLAY_CHOICES = (
 )
 
 
+def get_az(instance):
+    if instance.availability_zone:
+        return instance.availability_zone
+    return _("Not available")
+
+
 class InstancesTable(tables.DataTable):
     TASK_STATUS_CHOICES = (
         (None, True),
@@ -455,6 +462,7 @@ class InstancesTable(tables.DataTable):
                          link=("horizon:project:instances:detail"),
                          verbose_name=_("Instance Name"))
     ip = tables.Column(get_ips, verbose_name=_("IP Address"))
+    zone = tables.Column(get_az, verbose_name=_("Zone"))
     size = tables.Column(get_size,
                          verbose_name=_("Size"),
                          attrs={'data-type': 'size'})
