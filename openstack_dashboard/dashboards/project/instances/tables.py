@@ -529,6 +529,12 @@ class InstancesFilterAction(tables.FilterAction):
                 if q in instance.name.lower()]
 
 
+def get_az(instance):
+    if instance.availability_zone:
+        return instance.availability_zone
+    return _("Not available")
+
+
 class InstancesTable(tables.DataTable):
     TASK_STATUS_CHOICES = (
         (None, True),
@@ -549,6 +555,7 @@ class InstancesTable(tables.DataTable):
     ip = tables.Column(get_ips,
                        verbose_name=_("IP Address"),
                        attrs={'data-type': "ip"})
+    zone = tables.Column(get_az, verbose_name=_("Zone"))
     size = tables.Column(get_size,
                          verbose_name=_("Size"),
                          attrs={'data-type': 'size'})
