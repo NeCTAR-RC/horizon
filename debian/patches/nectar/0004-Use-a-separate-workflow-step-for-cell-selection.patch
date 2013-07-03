@@ -72,7 +72,7 @@ index 0000000..725929b
 +<p>{% blocktrans %}Location for your Virtual Machine.{% endblocktrans %}</p>
 +<p>{% blocktrans %}In most cases, you shouldn't change the default. However, should you
 +require special access to data, instruments or infrastructure you may
-+select a cell.{% endblocktrans %}</p>
++select an availability zone.{% endblocktrans %}</p>
 diff --git a/openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_step.html b/openstack_dashboard/dashboards/project/instances/templates/instances/_launch_cell_step.html
 new file mode 100644
 index 0000000..3adc6b4
@@ -133,16 +133,16 @@ index 3c665b9..691769f 100644
  
  
 +class CellSelectionAction(workflows.Action):
-+    cell = forms.DynamicChoiceField(label=_("Cell"),
-+                             help_text=_("Cell to run the instance on."),
++    cell = forms.DynamicChoiceField(label=_("Availability Zone"),
++                             help_text=_("Availability zone to run the instance on."),
 +                             required=False)
-+    subcell = forms.ChoiceField(label=_("Cell"),
-+                                help_text=_("Cell to run the instance on."),
++    subcell = forms.ChoiceField(label=_("Availability Zone"),
++                                help_text=_("Availability zone to run the instance on."),
 +                                required=False,
 +                                widget=forms.widgets.RadioSelect)
 +
 +    class Meta:
-+        name = _("Cell")
++        name = _("Availability Zone")
 +        help_text_template = ("project/instances/"
 +                              "_launch_cell_help.html")
 +
@@ -152,7 +152,7 @@ index 3c665b9..691769f 100644
 +        except:
 +            zones = []
 +            exceptions.handle(request,
-+                              _('Unable to retrieve available cell list.'))
++                              _('Unable to retrieve availability zone list.'))
 +
 +        zone_list = [zone.zoneName
 +                     for zone in zones if zone.zoneState['available']]
@@ -169,17 +169,17 @@ index 3c665b9..691769f 100644
 +        self._cells_dict = cells_dict
 +        choices = [(name, name) for name in cells_dict.keys()]
 +        if choices:
-+            choices.insert(0, ("", _("(Any cell)")))
++            choices.insert(0, ("", _("(Any availability zone)")))
 +        else:
-+            choices.insert(0, ("", _("No cells available.")))
++            choices.insert(0, ("", _("No availability zones.")))
 +        return choices
 +
 +    def populate_subcell_choices(self, request, context):
 +        choices = [(name, name) for name in self._cells_list]
 +        if choices:
-+            choices.insert(0, ("", _("(Any cell)")))
++            choices.insert(0, ("", _("(Any availability zone)")))
 +        else:
-+            choices.insert(0, ("", _("No cells available.")))
++            choices.insert(0, ("", _("No availability zones.")))
 +        return choices
 +
 +
