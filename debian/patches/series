@@ -8,6 +8,7 @@ fix-dashboard-manage.patch
 fix-ubuntu-tests.patch
 ubuntu_local_settings.patch
 
+backports/warn-when-deleting-non-empty-container.patch
 
 # NeCTAR
 backports/0001-Add-availability-zone-choice-to-launch-instance.patch
