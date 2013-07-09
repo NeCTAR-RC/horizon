@@ -17,6 +17,10 @@ horizon.projects = {
     return id_string.slice(id_string.lastIndexOf("_") + 1);
   },
 
+  get_user_field_id: function(id_string) {
+    return id_string.slice(id_string.lastIndexOf(":") + 1);
+  },
+
   /*
    * Gets the html select element associated with a given
    * role id.
@@ -224,7 +228,7 @@ horizon.projects = {
    * as a list item in the project member list.
    **/
   generate_user_element: function(user_name, user_id, role_ids, text) {
-    var str_id = "id_user_" + user_id;
+    var str_id = "id_user:" + user_id;
 
     var roles = [];
     for (var r in horizon.projects.roles) {
@@ -351,7 +355,7 @@ horizon.projects = {
     $(".available_users, .project_members").on('click', ".btn-group a[href='#add_remove']", function (evt) {
       evt.preventDefault();
       var available = $(".available_users").has($(this)).length;
-      var user_id = horizon.projects.get_field_id($(this).parent().siblings().attr('data-user-id'));
+      var user_id = horizon.projects.get_user_field_id($(this).parent().siblings().attr('data-user-id'));
       var user_el = $(this).parent().parent();
 
       if (available) {
@@ -411,7 +415,7 @@ horizon.projects = {
       // get the newly selected role and the member's name
       var new_role_id = $(this).attr("data-role-id");
       var id_str = $(this).parent().parent().siblings(".member").attr("data-user-id");
-      var user_id = horizon.projects.get_field_id(id_str);
+      var user_id = horizon.projects.get_user_field_id(id_str);
 
       // update role lists
       if ($(this).hasClass('selected')) {
