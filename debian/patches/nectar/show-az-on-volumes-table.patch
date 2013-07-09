@@ -1,0 +1,26 @@
+From 2e45599a5f130a824e3f25a3efa496b3bb4c8755 Mon Sep 17 00:00:00 2001
+From: Kieran Spear <kispear@gmail.com>
+Date: Tue, 9 Jul 2013 13:48:01 +1000
+Subject: [PATCH] Show AZ on volumes table
+
+Change-Id: I49d9eda6e19535e70349f13a40a891657a79b847
+---
+ .../dashboards/project/volumes/tables.py           |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/openstack_dashboard/dashboards/project/volumes/tables.py b/openstack_dashboard/dashboards/project/volumes/tables.py
+index b14145b..39af053 100644
+--- a/openstack_dashboard/dashboards/project/volumes/tables.py
++++ b/openstack_dashboard/dashboards/project/volumes/tables.py
+@@ -157,6 +157,8 @@ class VolumesTableBase(tables.DataTable):
+     size = tables.Column(get_size,
+                          verbose_name=_("Size"),
+                          attrs={'data-type': 'size'})
++    zone = tables.Column("availability_zone",
++                         verbose_name=_("Zone"))
+     status = tables.Column("status",
+                            filters=(title,),
+                            verbose_name=_("Status"),
+-- 
+1.7.9.5
+
