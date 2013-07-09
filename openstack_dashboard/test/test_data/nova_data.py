@@ -187,6 +187,7 @@ def data(TEST):
                                  display_name='Volume name',
                                  created_at='2012-04-01 10:30:00',
                                  volume_type=None,
+                                 availability_zone='az1',
                                  attachments=[]))
     nameless_volume = volumes.Volume(volumes.VolumeManager(None),
                          dict(id="3b189ac8-9166-ac7f-90c9-16c8bf9e01ac",
@@ -198,6 +199,7 @@ def data(TEST):
                               device="/dev/hda",
                               created_at='2010-11-21 18:34:25',
                               volume_type='vol_type_1',
+                              availability_zone='az1',
                               attachments=[{"id": "1", "server_id": '1',
                                             "device": "/dev/hda"}]))
     attached_volume = volumes.Volume(volumes.VolumeManager(None),
@@ -210,6 +212,7 @@ def data(TEST):
                               device="/dev/hdk",
                               created_at='2011-05-01 11:54:33',
                               volume_type='vol_type_2',
+                              availability_zone='az1',
                               attachments=[{"id": "2", "server_id": '1',
                                             "device": "/dev/hdk"}]))
     TEST.volumes.add(volume)
