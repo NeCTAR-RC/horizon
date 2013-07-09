@@ -9,6 +9,8 @@ fix-ubuntu-tests.patch
 ubuntu_local_settings.patch
 
 backports/warn-when-deleting-non-empty-container.patch
+backports/fix-boot-from-volume-type.patch
+backports/fix-boot-from-volume-display-name.patch
 
 # NeCTAR
 backports/0001-Add-availability-zone-choice-to-launch-instance.patch

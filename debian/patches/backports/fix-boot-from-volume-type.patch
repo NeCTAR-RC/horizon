@@ -1,0 +1,35 @@
+From ed3ff15a4ffcd730d3f0966c12c64ec8e392f47d Mon Sep 17 00:00:00 2001
+From: Akihiro MOTOKI <motoki@da.jp.nec.com>
+Date: Wed, 8 May 2013 11:37:19 +0900
+Subject: [PATCH] Ensure to use keyword parameters in format string in
+ create_instance.py
+
+Fixes bug #1177629
+
+Change-Id: If5a8b74bbcb698f2833ada275be914271dc1b995
+(cherry picked from commit 58b0e62cab3b81898719881d4f8d16e094eb4854)
+---
+ .../project/instances/workflows/create_instance.py |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py b/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
+index eb8a2ad..357f14c 100644
+--- a/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
++++ b/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
+@@ -112,9 +112,10 @@ class VolumeOptionsAction(workflows.Action):
+             vol_type = "vol"
+             visible_label = _("Volume")
+         return (("%s:%s" % (volume.id, vol_type)),
+-                ("%s - %s GB (%s)" % (volume.display_name,
+-                                     volume.size,
+-                                     visible_label)))
++                (_("%(name)s - %(size)s GB (%(label)s)") %
++                 {'name': volume.display_name,
++                  'size': volume.size,
++                  'label': visible_label}))
+ 
+     def populate_volume_id_choices(self, request, context):
+         volume_options = [("", _("Select Volume"))]
+-- 
+1.7.9.5
+
