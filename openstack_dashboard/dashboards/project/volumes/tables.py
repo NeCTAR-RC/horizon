@@ -171,6 +171,8 @@ class VolumesTableBase(tables.DataTable):
     size = tables.Column(get_size,
                          verbose_name=_("Size"),
                          attrs={'data-type': 'size'})
+    zone = tables.Column("availability_zone",
+                         verbose_name=_("Zone"))
     status = tables.Column("status",
                            filters=(title,),
                            verbose_name=_("Status"),
