@@ -24,7 +24,7 @@ from django.conf import settings
 
 
 urlpatterns = patterns('horizon.views',
-    url(r'home/$', 'user_home', name='user_home')
+    url(r'^home/$', 'user_home', name='user_home')
 )
 
 # Client-side i18n URLconf.
