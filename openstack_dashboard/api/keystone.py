@@ -97,7 +97,8 @@ def keystoneclient(request, admin=False):
     """
     user = request.user
     if admin:
-        if not user.is_superuser:
+        admin_perms = getattr(settings, 'KEYSTONE_ADMIN_ENDPOINT_PERMS', '!')
+        if not (user.is_superuser or user.has_perms(admin_perms)):
             raise exceptions.NotAuthorized
         endpoint_type = 'adminURL'
     else:
@@ -138,7 +139,7 @@ def tenant_create(request, tenant_name, description, enabled):
                                                               enabled)
 
 
-def tenant_get(request, tenant_id, admin=False):
+def tenant_get(request, tenant_id, admin=True):
     return keystoneclient(request, admin=admin).tenants.get(tenant_id)
 
 
