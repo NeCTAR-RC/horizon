@@ -1,0 +1,26 @@
+From 6a217c138d42a21e74e7519f7413540eeef86d18 Mon Sep 17 00:00:00 2001
+From: Kieran Spear <kispear@gmail.com>
+Date: Mon, 29 Jul 2013 01:37:27 +0000
+Subject: [PATCH] Setting for role-based admin endpoint access
+
+---
+ openstack_dashboard/api/keystone.py |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/openstack_dashboard/api/keystone.py b/openstack_dashboard/api/keystone.py
+index a2aff7b..053096b 100644
+--- a/openstack_dashboard/api/keystone.py
++++ b/openstack_dashboard/api/keystone.py
+@@ -97,7 +97,8 @@ def keystoneclient(request, admin=False):
+     """
+     user = request.user
+     if admin:
+-        if not user.is_superuser:
++        admin_perms = getattr(settings, 'KEYSTONE_ADMIN_ENDPOINT_PERMS', '!')
++        if not (user.is_superuser or user.has_perms(admin_perms)):
+             raise exceptions.NotAuthorized
+         endpoint_type = 'adminURL'
+     else:
+-- 
+1.7.9.5
+

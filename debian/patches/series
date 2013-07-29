@@ -19,3 +19,4 @@ nectar/0002-Add-availability-zone-selection-in-volume-creation.patch
 nectar/0003-Show-AZ-on-instances-table.patch
 nectar/0004-Use-a-separate-workflow-step-for-cell-selection.patch
 nectar/show-az-on-volumes-table.patch
+nectar/setting-for-role-based-admin-endpoint-access.patch
