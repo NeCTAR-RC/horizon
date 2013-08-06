@@ -21,6 +21,15 @@ index a2aff7b..053096b 100644
              raise exceptions.NotAuthorized
          endpoint_type = 'adminURL'
      else:
+@@ -138,7 +139,7 @@ def tenant_create(request, tenant_name, description, enabled):
+                                                               enabled)
+
+
+-def tenant_get(request, tenant_id, admin=False):
++def tenant_get(request, tenant_id, admin=True):
+     return keystoneclient(request, admin=admin).tenants.get(tenant_id)
+
+
 -- 
 1.7.9.5
 
