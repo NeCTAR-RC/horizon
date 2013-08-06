@@ -1,3 +1,50 @@
+horizon (1:2013.1.3+20130806-1) precise-grizzly; urgency=low
+
+  [ Dirk Mueller ]
+  * Remove deprecated features
+
+  [ Alessio Ababilov ]
+  * Always return a list from VolumeTableMixIn._get*
+
+  [ Brooklyn Chen ]
+  * Shows a warning message when deleting a container that contains data.
+
+  [ Akihiro MOTOKI ]
+  * Ensure to use keyword parameters in format string in create_instance.py
+
+  [ Sascha Peilicke ]
+  * Manually mock service_catalog in stub_keystoneclient
+
+  [ Ryan Petrello ]
+  * Fix a few visual issues on the network topology diagram.
+
+  [ Zhenguo Niu ]
+  * Use default cidr to avoid exception when editing quantum security rules.
+
+  [ Monty Taylor ]
+  * Sync pytz from requirements.txt
+
+  [ Kieran Spear ]
+  * Show ID for None display name in boot from volume
+
+  [ Tomas Sedovic ]
+  * Don't duplicate networks list on keypair import
+
+  [ Roman Podolyaka ]
+  * Fix floating IP management from instance panel.
+
+  [ Akihiro MOTOKI ]
+  * Sync translation message catalogs with the latest code
+
+  [ Julie Pichon ]
+  * Cap django_openstack_auth
+
+  [ Kieran Spear ]
+  * Fix add/remove security groups with underscores
+  * Remove backports now upstream
+
+ -- Kieran Spear <kispear@gmail.com>  Tue, 06 Aug 2013 14:00:21 +1000
+
 horizon (1:2013.1.3+20130621-7) precise-grizzly; urgency=low
 
   * Patch for role-based admin endpoint access
