@@ -761,6 +761,7 @@ def evacuate_host(request, host, target=None, on_shared_storage=False):
 
 
 def tenant_absolute_limits(request, reserved=False):
+    reserved = False
     limits = novaclient(request).limits.get(reserved=reserved).absolute
     limits_dict = {}
     for limit in limits:
