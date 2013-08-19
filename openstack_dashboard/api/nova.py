@@ -544,9 +544,12 @@ def instance_volumes_list(request, instance_id):
 
 
 def tenant_absolute_limits(request, reserved=False):
+    reserved = False
     limits = novaclient(request).limits.get(reserved=reserved).absolute
     limits_dict = {}
     for limit in limits:
+        if limit.name.endswith('Used') and limit.value < 0:
+            limit.value = 0
         # -1 is used to represent unlimited quotas
         if limit.value == -1:
             limits_dict[limit.name] = float("inf")
