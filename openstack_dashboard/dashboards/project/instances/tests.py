@@ -765,7 +765,7 @@ class InstanceTests(test.TestCase):
                       args=[server.id])
         res = self.client.get(url)
 
-        self.assertRedirectsNoFollow(res, INDEX_URL)
+        self.assertRedirects(res, reverse("login") + "?next=" + url)
 
     @test.create_stubs({api.nova: ('server_console_output',)})
     def test_instance_log(self):
