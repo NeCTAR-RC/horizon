@@ -806,7 +806,7 @@ class InstanceTests(helpers.TestCase):
                       args=[server.id])
         res = self.client.get(url)
 
-        self.assertRedirectsNoFollow(res, INDEX_URL)
+        self.assertRedirects(res, reverse("login") + "?next=" + url)
 
     def test_instance_details_flavor_not_found(self):
         server = self.servers.first()
