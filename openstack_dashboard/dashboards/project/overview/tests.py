@@ -106,7 +106,6 @@ class UsageViewTests(test.TestCase):
         exc = self.exceptions.nova_unauthorized
         now = timezone.now()
         self.mox.StubOutWithMock(api.nova, 'usage_get')
-        self.mox.StubOutWithMock(api.nova, 'tenant_absolute_limits')
         api.nova.usage_get(IsA(http.HttpRequest), self.tenant.id,
                            datetime.datetime(now.year,
                                              now.month,
@@ -115,16 +114,11 @@ class UsageViewTests(test.TestCase):
                                              now.month,
                                              now.day, 23, 59, 59, 0)) \
                            .AndRaise(exc)
-        api.nova.tenant_absolute_limits(IsA(http.HttpRequest))\
-                           .AndReturn(self.limits['absolute'])
-        self._stub_neutron_api_calls()
         self.mox.ReplayAll()
 
         url = reverse('horizon:project:overview:index')
         res = self.client.get(url)
-        self.assertTemplateUsed(res, 'project/overview/usage.html')
-        self.assertMessageCount(res, error=1)
-        self.assertContains(res, 'Unauthorized:')
+        self.assertRedirects(res, reverse("login") + "?next=" + url)
 
     def test_usage_csv(self):
         now = timezone.now()
