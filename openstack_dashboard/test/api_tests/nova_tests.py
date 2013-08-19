@@ -208,10 +208,10 @@ class ComputeApiTests(test.APITestCase):
 
         novaclient = self.stub_novaclient()
         novaclient.limits = self.mox.CreateMockAnything()
-        novaclient.limits.get(reserved=True).AndReturn(limits)
+        novaclient.limits.get(reserved=False).AndReturn(limits)
         self.mox.ReplayAll()
 
-        ret_val = api.nova.tenant_absolute_limits(self.request, reserved=True)
+        ret_val = api.nova.tenant_absolute_limits(self.request, reserved=False)
         expected_results = {"maxTotalCores": float("inf"),
                             "maxTotalInstances": 10}
         for key in expected_results.keys():
