@@ -285,9 +285,8 @@ def handle(request, message=None, redirect=None, ignore=False,
             messages.error(request, message or fallback)
         # Escalation means logging the user out and raising NotAuthorized
         # so the middleware will redirect them appropriately.
-        if escalate:
-            logout(request)
-            raise NotAuthorized
+        logout(request)
+        raise NotAuthorized
         # Otherwise continue and present our "unauthorized" error message.
         return NotAuthorized
 
