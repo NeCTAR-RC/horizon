@@ -200,7 +200,7 @@ class VolumeViewTests(test.TestCase):
                              metadata={},
                              snapshot_id=snapshot.id,
                              image_id=None,
-                             availability_zone='nova').AndReturn(volume)
+                             availability_zone=None).AndReturn(volume)
         self.mox.ReplayAll()
 
         # get snapshot from url
@@ -267,7 +267,7 @@ class VolumeViewTests(test.TestCase):
                              metadata={},
                              snapshot_id=snapshot.id,
                              image_id=None,
-                             availability_zone='nova').AndReturn(volume)
+                             availability_zone=None).AndReturn(volume)
 
         self.mox.ReplayAll()
 
