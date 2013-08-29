@@ -40,7 +40,8 @@ class CreateForm(forms.SelfHandlingForm):
     snapshot_source = forms.ChoiceField(
         label=_("Use snapshot as a source"),
         widget=fields.SelectWidget(
-            attrs={'class': 'snapshot-selector'},
+            attrs={'class': 'snapshot-selector switchable',
+                   'data-slug': 'source'},
             data_attrs=('size', 'display_name'),
             transform=lambda x: "%s (%sGB)" % (x.display_name, x.size)),
         required=False)
@@ -52,7 +53,14 @@ class CreateForm(forms.SelfHandlingForm):
             transform=lambda x: "%s (%s)" % (x.name, filesizeformat(x.bytes))),
         required=False)
     availability_zone = forms.ChoiceField(label=_("Availability Zone"),
-                                          required=True)
+                                          required=True,
+                                          widget=forms.Select(attrs={
+                                              'class': 'switched',
+                                              'data-slug': 'range',
+                                              'data-switch-on': 'source',
+                                              'data-source-': _('Availability '
+                                                                'Zone')
+                                          }))
 
     def __init__(self, request, *args, **kwargs):
         super(CreateForm, self).__init__(request, *args, **kwargs)
@@ -225,6 +233,8 @@ class CreateForm(forms.SelfHandlingForm):
             metadata = {}
 
             az = data['availability_zone'] or None
+            if snapshot_id is not None:
+                az = None
 
             volume = cinder.volume_create(request,
                                           data['size'],
