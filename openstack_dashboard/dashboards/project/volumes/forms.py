@@ -34,14 +34,23 @@ class CreateForm(forms.SelfHandlingForm):
     encryption = forms.ChoiceField(label=_("Encryption"), required=False)
     snapshot_source = forms.ChoiceField(label=_("Use snapshot as a source"),
                                         widget=SelectWidget(
-                                          attrs={'class': 'snapshot-selector'},
+                                          attrs={'class': 'snapshot-selector '
+                                                          'switchable',
+                                                 'data-slug': 'source'},
                                           data_attrs=('size', 'display_name'),
                                           transform=lambda x:
                                                 ("%s (%sGB)" % (x.display_name,
                                                                 x.size))),
                                         required=False)
     availability_zone = forms.ChoiceField(label=_("Availability Zone"),
-                                          required=False)
+                                          required=False,
+                                          widget=forms.Select(attrs={
+                                              'class': 'switched',
+                                              'data-slug': 'range',
+                                              'data-switch-on': 'source',
+                                              'data-source-': _('Availability '
+                                                                'Zone')
+                                          }))
 
     def __init__(self, request, *args, **kwargs):
         super(CreateForm, self).__init__(request, *args, **kwargs)
@@ -163,7 +172,7 @@ class CreateForm(forms.SelfHandlingForm):
 
             availability_zone = data.get('availability_zone', None)
             extra_kwargs = {}
-            if availability_zone:
+            if availability_zone and snapshot_id is None:
                 extra_kwargs['availability_zone'] = availability_zone
 
             volume = cinder.volume_create(request,
