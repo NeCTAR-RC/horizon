@@ -44,14 +44,17 @@ class SwiftApiTests(test.APITestCase):
 
     def test_swift_create_duplicate_container(self):
         container = self.containers.first()
+        headers = api.swift._permission_to_header(is_public=False)
         swift_api = self.stub_swiftclient(expected_calls=2)
         # Check for existence, then create
         exc = self.exceptions.swift
         swift_api.head_container(container.name).AndRaise(exc)
-        swift_api.put_container(container.name).AndReturn(container)
+        swift_api.put_container(container.name, headers=headers) \
+            .AndReturn(container)
         self.mox.ReplayAll()
         # Verification handled by mox, no assertions needed.
-        api.swift.swift_create_container(self.request, container.name)
+        api.swift.swift_create_container(self.request,
+                                         container.name)
 
     def test_swift_create_container(self):
         container = self.containers.first()
@@ -60,7 +63,20 @@ class SwiftApiTests(test.APITestCase):
         self.mox.ReplayAll()
         # Verification handled by mox, no assertions needed.
         with self.assertRaises(exceptions.AlreadyExists):
-            api.swift.swift_create_container(self.request, container.name)
+            api.swift.swift_create_container(self.request,
+                                             container.name)
+
+    def test_swift_update_container(self):
+        container = self.containers.first()
+        swift_api = self.stub_swiftclient()
+        headers = api.swift._permission_to_header(is_public=True)
+        swift_api.post_container(container.name, headers=headers)\
+            .AndReturn(container)
+        self.mox.ReplayAll()
+        # Verification handled by mox, no assertions needed.
+        api.swift.swift_update_container(self.request,
+                                         container.name,
+                                         is_public=True)
 
     def test_swift_get_objects(self):
         container = self.containers.first()
