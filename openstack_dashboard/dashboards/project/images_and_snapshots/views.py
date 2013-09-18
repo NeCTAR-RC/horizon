@@ -79,10 +79,17 @@ class IndexView(tables.MultiTableView):
         if is_service_enabled(self.request, 'volume'):
             try:
                 snapshots = api.cinder.volume_snapshot_list(self.request)
-            except:
+                volumes = api.cinder.volume_list(self.request)
+                volumes = dict((v.id, v) for v in volumes)
+            except Exception:
                 snapshots = []
+                volumes = {}
                 exceptions.handle(self.request, _("Unable to retrieve "
                                                   "volume snapshots."))
+
+            for snapshot in snapshots:
+                volume = volumes.get(snapshot.volume_id)
+                setattr(snapshot, '_volume', volume or None)
         else:
             snapshots = []
         return snapshots

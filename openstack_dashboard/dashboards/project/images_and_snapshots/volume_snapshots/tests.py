@@ -64,9 +64,11 @@ class VolumeSnapshotsViewTests(test.TestCase):
     @test.create_stubs({api.glance: ('image_list_detailed',
                                      'snapshot_list_detailed'),
                         api.cinder: ('volume_snapshot_list',
+                                     'volume_list',
                                      'volume_snapshot_delete')})
     def test_delete_volume_snapshot(self):
         vol_snapshots = self.volume_snapshots.list()
+        volumes = self.volumes.list()
         snapshot = self.volume_snapshots.first()
 
         api.glance.image_list_detailed(IsA(http.HttpRequest),
@@ -75,6 +77,9 @@ class VolumeSnapshotsViewTests(test.TestCase):
                                           marker=None).AndReturn(([], False))
         api.cinder.volume_snapshot_list(IsA(http.HttpRequest)). \
             AndReturn(vol_snapshots)
+        api.cinder.volume_list(IsA(http.HttpRequest)) \
+            .AndReturn(volumes)
+
         api.cinder.volume_snapshot_delete(IsA(http.HttpRequest), snapshot.id)
         api.glance.image_list_detailed(IsA(http.HttpRequest),
                                        marker=None).AndReturn(([], False))
@@ -82,6 +87,8 @@ class VolumeSnapshotsViewTests(test.TestCase):
                                           marker=None).AndReturn(([], False))
         api.cinder.volume_snapshot_list(IsA(http.HttpRequest)). \
             AndReturn([])
+        api.cinder.volume_list(IsA(http.HttpRequest)) \
+            .AndReturn(volumes)
         self.mox.ReplayAll()
 
         formData = {'action':
