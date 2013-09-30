@@ -1,0 +1,90 @@
+From 9dbe50dba6ec55eaaf69f9d77c1b6d58bf8959d3 Mon Sep 17 00:00:00 2001
+From: Kieran Spear <kispear@gmail.com>
+Date: Thu, 29 Aug 2013 18:57:39 +1000
+Subject: [PATCH] Show volume AZ on snapshots table
+
+- Fix N+1 call for snapshot -> volume relation
+- Also show volume/snapshot id when display_name is None
+
+Change-Id: I8010a37f13e4f78277f7849d42e3c575790d42bb
+---
+ .../project/images_and_snapshots/views.py          |    6 ++++
+ .../volume_snapshots/tables.py                     |   30 +++++++++++++++-----
+ 2 files changed, 29 insertions(+), 7 deletions(-)
+
+diff --git a/openstack_dashboard/dashboards/project/images_and_snapshots/views.py b/openstack_dashboard/dashboards/project/images_and_snapshots/views.py
+index 6b7eabc..fd68067 100644
+--- a/openstack_dashboard/dashboards/project/images_and_snapshots/views.py
++++ b/openstack_dashboard/dashboards/project/images_and_snapshots/views.py
+@@ -79,10 +79,16 @@ class IndexView(tables.MultiTableView):
+         if is_service_enabled(self.request, 'volume'):
+             try:
+                 snapshots = api.cinder.volume_snapshot_list(self.request)
++                volumes = api.cinder.volume_list(self.request)
++                volumes = {v.id: v for v in volumes}
+             except:
+                 snapshots = []
++                volumes = []
+                 exceptions.handle(self.request, _("Unable to retrieve "
+                                                   "volume snapshots."))
++            for snapshot in snapshots:
++                volume = volumes.get(snapshot.volume_id)
++                setattr(snapshot, '_volume', volume or None)
+         else:
+             snapshots = []
+         return snapshots
+diff --git a/openstack_dashboard/dashboards/project/images_and_snapshots/volume_snapshots/tables.py b/openstack_dashboard/dashboards/project/images_and_snapshots/volume_snapshots/tables.py
+index 2311e5c..244032b 100644
+--- a/openstack_dashboard/dashboards/project/images_and_snapshots/volume_snapshots/tables.py
++++ b/openstack_dashboard/dashboards/project/images_and_snapshots/volume_snapshots/tables.py
+@@ -65,24 +65,40 @@ class UpdateRow(tables.Row):
+
+ class SnapshotVolumeNameColumn(tables.Column):
+     def get_raw_data(self, snapshot):
+-        request = self.table.request
+-        volume_name = api.cinder.volume_get(request,
+-                                            snapshot.volume_id).display_name
++        volume = snapshot._volume
++        if volume:
++            volume_name = volume.display_name or volume.id
++        else:
++            volume_name = _("Unknown")
+         return safestring.mark_safe(volume_name)
+
+     def get_link_url(self, snapshot):
+-        volume_id = api.cinder.volume_get(self.table.request,
+-                                          snapshot.volume_id).id
+-        return reverse(self.link, args=(volume_id,))
++        volume = snapshot._volume
++        if volume:
++            volume_id = volume.id
++            return reverse(self.link, args=(volume_id,))
++
++
++def get_snapshot_volume_az(snapshot):
++    volume = snapshot._volume
++    if volume:
++        return volume.availability_zone
++    return _("Unknown")
++
++
++def get_snapshot_display_name(snapshot):
++    return snapshot.display_name or snapshot.id
+
+
+ class VolumeSnapshotsTable(volume_tables.VolumesTableBase):
+-    name = tables.Column("display_name",
++    name = tables.Column(get_snapshot_display_name,
+                          verbose_name=_("Name"),
+                          link="horizon:project:images_and_snapshots:detail")
+     volume_name = SnapshotVolumeNameColumn("display_name",
+                               verbose_name=_("Volume Name"),
+                               link="horizon:project:volumes:detail")
++    volume_zone = tables.Column(get_snapshot_volume_az,
++                                verbose_name=_("Volume Zone"))
+
+     class Meta:
+         name = "volume_snapshots"
+--
+1.7.9.5
+

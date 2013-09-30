@@ -1,0 +1,70 @@
+From ce259dfe4383ef4dc842b4ddcc3ea3745c698abb Mon Sep 17 00:00:00 2001
+From: Kieran Spear <kispear@gmail.com>
+Date: Wed, 3 Jul 2013 17:17:03 +1000
+Subject: [PATCH] Show AZ on instances table
+
+---
+ openstack_dashboard/api/nova.py                    |    6 +++++-
+ .../dashboards/project/instances/tables.py         |    8 ++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/openstack_dashboard/api/nova.py b/openstack_dashboard/api/nova.py
+index af9a457..5ae8eda 100644
+--- a/openstack_dashboard/api/nova.py
++++ b/openstack_dashboard/api/nova.py
+@@ -73,7 +73,7 @@ class Server(APIResourceWrapper):
+              'image_name', 'VirtualInterfaces', 'flavor', 'key_name',
+              'tenant_id', 'user_id', 'OS-EXT-STS:power_state',
+              'OS-EXT-STS:task_state', 'OS-EXT-SRV-ATTR:instance_name',
+-             'OS-EXT-SRV-ATTR:host']
++             'OS-EXT-SRV-ATTR:host', 'OS-EXT-AZ:availability_zone']
+ 
+     def __init__(self, apiresource, request):
+         super(Server, self).__init__(apiresource)
+@@ -93,6 +93,10 @@ class Server(APIResourceWrapper):
+     def internal_name(self):
+         return getattr(self, 'OS-EXT-SRV-ATTR:instance_name', "")
+ 
++    @property
++    def availability_zone(self):
++        return getattr(self, 'OS-EXT-AZ:availability_zone', "")
++
+     def reboot(self, hardness=REBOOT_HARD):
+         novaclient(self.request).servers.reboot(self.id, hardness)
+ 
+diff --git a/openstack_dashboard/dashboards/project/instances/tables.py b/openstack_dashboard/dashboards/project/instances/tables.py
+index 57f9ed2..179909b 100644
+--- a/openstack_dashboard/dashboards/project/instances/tables.py
++++ b/openstack_dashboard/dashboards/project/instances/tables.py
+@@ -18,6 +18,7 @@ import logging
+ 
+ from django import shortcuts
+ from django import template
++from django.conf import settings
+ from django.core import urlresolvers
+ from django.template.defaultfilters import title
+ from django.utils.http import urlencode
+@@ -429,6 +430,12 @@ TASK_DISPLAY_CHOICES = (
+ )
+ 
+ 
++def get_az(instance):
++    if instance.availability_zone:
++        return instance.availability_zone
++    return _("Not available")
++
++
+ class InstancesTable(tables.DataTable):
+     TASK_STATUS_CHOICES = (
+         (None, True),
+@@ -445,6 +452,7 @@ class InstancesTable(tables.DataTable):
+                          link=("horizon:project:instances:detail"),
+                          verbose_name=_("Instance Name"))
+     ip = tables.Column(get_ips, verbose_name=_("IP Address"))
++    zone = tables.Column(get_az, verbose_name=_("Zone"))
+     size = tables.Column(get_size,
+                          verbose_name=_("Size"),
+                          attrs={'data-type': 'size'})
+-- 
+1.7.9.5
+

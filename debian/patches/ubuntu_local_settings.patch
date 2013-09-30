@@ -1,0 +1,44 @@
+--- a/openstack_dashboard/local/local_settings.py.example
++++ b/openstack_dashboard/local/local_settings.py.example
+@@ -4,7 +4,7 @@ from django.utils.translation import uge
+ 
+ from openstack_dashboard import exceptions
+ 
+-DEBUG = True
++DEBUG = False
+ TEMPLATE_DEBUG = DEBUG
+ 
+ # Set SSL proxy settings:
+@@ -67,7 +67,8 @@ LOCAL_PATH = os.path.dirname(os.path.abs
+ 
+ CACHES = {
+     'default': {
+-        'BACKEND' : 'django.core.cache.backends.locmem.LocMemCache'
++        'BACKEND' : 'django.core.cache.backends.memcached.MemcachedCache',
++        'LOCATION' : '127.0.0.1:11211'
+     }
+ }
+ 
+@@ -76,6 +77,22 @@ EMAIL_BACKEND = 'django.core.mail.backen
+ # Or send them to /dev/null
+ #EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+ 
++# Enable the Ubuntu theme if it is present.
++try:
++    from ubuntu_theme import *
++except ImportError:
++    pass
++
++# Default Ubuntu apache configuration uses /horizon as the application root.
++# Configure auth redirects here accordingly.
++LOGIN_URL='/horizon/auth/login/'
++LOGIN_REDIRECT_URL='/horizon'
++
++# The Ubuntu package includes pre-compressed JS and compiled CSS to allow
++# offline compression by default.  To enable online compression, install
++# the node-less package and enable the following option.
++COMPRESS_OFFLINE = True
++
+ # Configure these for your outgoing email host
+ # EMAIL_HOST = 'smtp.my-company.com'
+ # EMAIL_PORT = 25

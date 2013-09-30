@@ -1,0 +1,340 @@
+From 4fe390d37509043be4834ea341b76704cedcd39c Mon Sep 17 00:00:00 2001
+From: Kieran Spear <kispear@gmail.com>
+Date: Tue, 4 Jun 2013 15:52:56 +1000
+Subject: [PATCH 2/4] Add availability zone selection in volume creation
+
+Allows the availability zone to be selected when creating a volume.
+The AZ dropdown will be hidden unless there is more than one AZ
+available so there's no change to UX by default.
+
+TODO: Cinder doesn't support listing AZs yet, so the list is
+      currently taken from django.conf.settings.
+
+Change-Id: I66a01c31a3e2b37bf4847b655e87666481bc2acf
+
+Conflicts:
+
+	openstack_dashboard/api/cinder.py
+	openstack_dashboard/dashboards/project/volumes/forms.py
+	openstack_dashboard/dashboards/project/volumes/tests.py
+	openstack_dashboard/test/test_data/cinder_data.py
+
+(cherry-picked from commit 0c557464cfd6748d9bf8739a2e6a33c0ef15501a)
+---
+ openstack_dashboard/api/cinder.py                  |   11 +-
+ .../dashboards/project/volumes/forms.py            |   29 ++++-
+ .../dashboards/project/volumes/tests.py            |  113 +++++++++++++++++++-
+ openstack_dashboard/test/test_data/cinder_data.py  |   25 +++++
+ 4 files changed, 171 insertions(+), 7 deletions(-)
+ create mode 100644 openstack_dashboard/test/test_data/cinder_data.py
+
+diff --git a/openstack_dashboard/api/cinder.py b/openstack_dashboard/api/cinder.py
+index 7f3ebdb..5421926 100644
+--- a/openstack_dashboard/api/cinder.py
++++ b/openstack_dashboard/api/cinder.py
+@@ -89,10 +89,12 @@ def volume_get(request, volume_id):
+ 
+ 
+ def volume_create(request, size, name, description, volume_type,
++                  availability_zone=None,
+                   snapshot_id=None, metadata=None):
+     return cinderclient(request).volumes.create(size, display_name=name,
+             display_description=description, volume_type=volume_type,
+-            snapshot_id=snapshot_id, metadata=metadata)
++            snapshot_id=snapshot_id, metadata=metadata,
++            availability_zone=availability_zone)
+ 
+ 
+ def volume_delete(request, volume_id):
+@@ -144,3 +146,10 @@ def volume_type_create(request, name):
+ 
+ def volume_type_delete(request, volume_type_id):
+     return cinderclient(request).volume_types.delete(volume_type_id)
++
++
++def availability_zone_list(request):
++    # FIXME(kspear): There's currently no way in Cinder to get
++    #                a list of availability zones for a regular
++    #                user (cinder bp: availability-zone-list-api).
++    return getattr(settings, 'OPENSTACK_STORAGE_AVAILABILITY_ZONES', [])
+diff --git a/openstack_dashboard/dashboards/project/volumes/forms.py b/openstack_dashboard/dashboards/project/volumes/forms.py
+index 98a5d43..cd808e7 100644
+--- a/openstack_dashboard/dashboards/project/volumes/forms.py
++++ b/openstack_dashboard/dashboards/project/volumes/forms.py
+@@ -40,6 +40,8 @@ class CreateForm(forms.SelfHandlingForm):
+                                                 ("%s (%sGB)" % (x.display_name,
+                                                                 x.size))),
+                                         required=False)
++    availability_zone = forms.ChoiceField(label=_("Availability Zone"),
++                                          required=False)
+ 
+     def __init__(self, request, *args, **kwargs):
+         super(CreateForm, self).__init__(request, *args, **kwargs)
+@@ -100,6 +102,25 @@ class CreateForm(forms.SelfHandlingForm):
+                 exceptions.handle(request, _("Unable to retrieve "
+                         "volume snapshots."))
+ 
++            az_choices = self.get_availability_zones(request)
++            if len(az_choices) >= 2:
++                az_choices.insert(0, ("", _("Any zone")))
++                self.fields['availability_zone'].choices = az_choices
++            else:
++                hidden_input = forms.widgets.HiddenInput()
++                self.fields['availability_zone'].widget = hidden_input
++
++    def get_availability_zones(self, request):
++        try:
++            zones = api.cinder.availability_zone_list(request)
++        except:
++            zones = []
++            exceptions.handle(request,
++                              _('Unable to retrieve availability zones.'))
++        zone_list = [(zone, zone) for zone in zones]
++        zone_list.sort()
++        return zone_list
++
+     def handle(self, request, data):
+         try:
+             # FIXME(johnp): cinderclient currently returns a useless
+@@ -140,13 +161,19 @@ class CreateForm(forms.SelfHandlingForm):
+             if data['encryption']:
+                 metadata['encryption'] = data['encryption']
+ 
++            availability_zone = data.get('availability_zone', None)
++            extra_kwargs = {}
++            if availability_zone:
++                extra_kwargs['availability_zone'] = availability_zone
++
+             volume = cinder.volume_create(request,
+                                           data['size'],
+                                           data['name'],
+                                           data['description'],
+                                           data['type'],
+                                           snapshot_id=snapshot_id,
+-                                          metadata=metadata)
++                                          metadata=metadata,
++                                          **extra_kwargs)
+             message = 'Creating volume "%s"' % data['name']
+             messages.info(request, message)
+             return volume
+diff --git a/openstack_dashboard/dashboards/project/volumes/tests.py b/openstack_dashboard/dashboards/project/volumes/tests.py
+index 6b06896..a5f1c8a 100644
+--- a/openstack_dashboard/dashboards/project/volumes/tests.py
++++ b/openstack_dashboard/dashboards/project/volumes/tests.py
+@@ -34,7 +34,8 @@ from openstack_dashboard.usage import quotas
+ class VolumeViewTests(test.TestCase):
+     @test.create_stubs({cinder: ('volume_create',
+                                  'volume_snapshot_list',
+-                                 'volume_type_list',),
++                                 'volume_type_list',
++                                 'availability_zone_list'),
+                         quotas: ('tenant_quota_usages',)})
+     def test_create_volume(self):
+         volume = self.volumes.first()
+@@ -52,6 +53,8 @@ class VolumeViewTests(test.TestCase):
+         quotas.tenant_quota_usages(IsA(http.HttpRequest)).AndReturn(usage)
+         cinder.volume_snapshot_list(IsA(http.HttpRequest)).\
+                                     AndReturn(self.volume_snapshots.list())
++        cinder.availability_zone_list(IsA(http.HttpRequest)) \
++                  .AndReturn(self.cinder_availability_zones.list())
+         cinder.volume_create(IsA(http.HttpRequest),
+                              formData['size'],
+                              formData['name'],
+@@ -72,7 +75,8 @@ class VolumeViewTests(test.TestCase):
+                                  'volume_snapshot_list',
+                                  'volume_snapshot_get',
+                                  'volume_get',
+-                                 'volume_type_list',),
++                                 'volume_type_list',
++                                 'availability_zone_list'),
+                         quotas: ('tenant_quota_usages',)})
+     def test_create_volume_from_snapshot(self):
+         volume = self.volumes.first()
+@@ -109,6 +113,8 @@ class VolumeViewTests(test.TestCase):
+                                  AndReturn(self.volume_snapshots.list())
+         cinder.volume_snapshot_get(IsA(http.HttpRequest),
+                                    str(snapshot.id)).AndReturn(snapshot)
++        cinder.availability_zone_list(IsA(http.HttpRequest)) \
++                  .AndReturn(self.cinder_availability_zones.list())
+         cinder.volume_create(IsA(http.HttpRequest),
+                              formData['size'],
+                              formData['name'],
+@@ -138,7 +144,8 @@ class VolumeViewTests(test.TestCase):
+ 
+     @test.create_stubs({cinder: ('volume_snapshot_get',
+                                  'volume_type_list',
+-                                 'volume_get',),
++                                 'volume_get',
++                                 'availability_zone_list'),
+                         quotas: ('tenant_quota_usages',)})
+     def test_create_volume_from_snapshot_invalid_size(self):
+         usage = {'gigabytes': {'available': 250}, 'volumes': {'available': 6}}
+@@ -168,7 +175,9 @@ class VolumeViewTests(test.TestCase):
+                              "The volume size cannot be less than the "
+                              "snapshot size (40GB)")
+ 
+-    @test.create_stubs({cinder: ('volume_snapshot_list', 'volume_type_list',),
++    @test.create_stubs({cinder: ('volume_snapshot_list',
++                                 'volume_type_list',
++                                 'availability_zone_list'),
+                         quotas: ('tenant_quota_usages',)})
+     def test_create_volume_gb_used_over_alloted_quota(self):
+         usage = {'gigabytes': {'available': 100, 'used': 20}}
+@@ -183,6 +192,8 @@ class VolumeViewTests(test.TestCase):
+         cinder.volume_snapshot_list(IsA(http.HttpRequest)).\
+                                     AndReturn(self.volume_snapshots.list())
+         quotas.tenant_quota_usages(IsA(http.HttpRequest)).AndReturn(usage)
++        cinder.availability_zone_list(IsA(http.HttpRequest)) \
++                  .AndReturn(self.cinder_availability_zones.list())
+ 
+         self.mox.ReplayAll()
+ 
+@@ -221,7 +232,8 @@ class VolumeViewTests(test.TestCase):
+ 
+     @test.create_stubs({cinder: ('volume_create',
+                                  'volume_snapshot_list',
+-                                 'volume_type_list',),
++                                 'volume_type_list',
++                                 'availability_zone_list'),
+                         quotas: ('tenant_quota_usages',)})
+     def test_create_volume_encrypted(self):
+         volume = self.volumes.first()
+@@ -244,6 +256,8 @@ class VolumeViewTests(test.TestCase):
+         quotas.tenant_quota_usages(IsA(http.HttpRequest)).AndReturn(usage)
+         cinder.volume_snapshot_list(IsA(http.HttpRequest)).\
+                                     AndReturn(self.volume_snapshots.list())
++        cinder.availability_zone_list(IsA(http.HttpRequest)) \
++                  .AndReturn(self.cinder_availability_zones.list())
+         cinder.volume_create(IsA(http.HttpRequest),
+                              formData['size'],
+                              formData['name'],
+@@ -302,6 +316,95 @@ class VolumeViewTests(test.TestCase):
+ 
+         settings.OPENSTACK_HYPERVISOR_FEATURES['can_encrypt_volumes'] = PREV
+ 
++    @test.create_stubs({cinder: ('volume_create',
++                                 'volume_snapshot_list',
++                                 'volume_type_list',
++                                 'availability_zone_list'),
++                        api.glance: ('image_list_detailed',),
++                        quotas: ('tenant_quota_usages',)})
++    def test_create_volume_select_availability_zone(self):
++        volume = self.volumes.first()
++        volume_type = self.volume_types.first()
++        az = self.cinder_availability_zones.first()
++        usage = {'gigabytes': {'available': 250}, 'volumes': {'available': 6}}
++        formData = {'name': u'A Volume I Am Making',
++                    'description': u'This is a volume I am making for a test.',
++                    'method': u'CreateForm',
++                    'type': volume_type.name,
++                    'size': 50,
++                    'snapshot_source': '',
++                    'availability_zone': az}
++
++        cinder.volume_type_list(IsA(http.HttpRequest)).\
++                                AndReturn(self.volume_types.list())
++        quotas.tenant_quota_usages(IsA(http.HttpRequest)).AndReturn(usage)
++        cinder.volume_snapshot_list(IsA(http.HttpRequest)).\
++                                    AndReturn(self.volume_snapshots.list())
++        api.glance.image_list_detailed(IsA(http.HttpRequest),
++                                       filters={'is_public': True,
++                                                'status': 'active'}) \
++                  .AndReturn([self.images.list(), False])
++        api.glance.image_list_detailed(IsA(http.HttpRequest),
++                            filters={'property-owner_id': self.tenant.id,
++                                     'status': 'active'}) \
++                  .AndReturn([[], False])
++        cinder.availability_zone_list(IsA(http.HttpRequest)) \
++                  .AndReturn(self.cinder_availability_zones.list())
++        cinder.volume_create(IsA(http.HttpRequest),
++                             formData['size'],
++                             formData['name'],
++                             formData['description'],
++                             formData['type'],
++                             metadata={},
++                             snapshot_id=None,
++                             image_id=None,
++                             availability_zone=az).AndReturn(volume)
++
++        self.mox.ReplayAll()
++
++        url = reverse('horizon:project:volumes:create')
++        res = self.client.post(url, formData)
++
++        redirect_url = reverse('horizon:project:volumes:index')
++        self.assertRedirectsNoFollow(res, redirect_url)
++
++    @test.create_stubs({cinder: ('volume_create',
++                                 'volume_snapshot_list',
++                                 'volume_type_list',
++                                 'availability_zone_list'),
++                        api.glance: ('image_list_detailed',),
++                        quotas: ('tenant_quota_usages',)})
++    def test_create_volume_single_az_means_dropdown_is_hidden(self):
++        volume = self.volumes.first()
++        volume_type = self.volume_types.first()
++        usage = {'gigabytes': {'available': 250}, 'volumes': {'available': 6}}
++        az_list = self.cinder_availability_zones.list()[1:1]
++
++        cinder.volume_type_list(IsA(http.HttpRequest)).\
++                                AndReturn(self.volume_types.list())
++        quotas.tenant_quota_usages(IsA(http.HttpRequest)).AndReturn(usage)
++        cinder.volume_snapshot_list(IsA(http.HttpRequest)).\
++                                    AndReturn(self.volume_snapshots.list())
++        api.glance.image_list_detailed(IsA(http.HttpRequest),
++                                       filters={'is_public': True,
++                                                'status': 'active'}) \
++                  .AndReturn([self.images.list(), False])
++        api.glance.image_list_detailed(IsA(http.HttpRequest),
++                            filters={'property-owner_id': self.tenant.id,
++                                     'status': 'active'}) \
++                  .AndReturn([[], False])
++        cinder.availability_zone_list(IsA(http.HttpRequest)) \
++                  .AndReturn(az_list)
++        self.mox.ReplayAll()
++
++        url = reverse('horizon:project:volumes:create')
++        res = self.client.get(url)
++
++        # Assert the AZ field is hidden.
++        form = res.context['form']
++        self.assertTrue(isinstance(form.fields['availability_zone'].widget,
++                                   widgets.HiddenInput))
++
+     @test.create_stubs({cinder: ('volume_list',
+                                  'volume_delete',),
+                         api.nova: ('server_list',)})
+diff --git a/openstack_dashboard/test/test_data/cinder_data.py b/openstack_dashboard/test/test_data/cinder_data.py
+new file mode 100644
+index 0000000..4b3a904
+--- /dev/null
++++ b/openstack_dashboard/test/test_data/cinder_data.py
+@@ -0,0 +1,25 @@
++# Copyright 2012 Nebula, Inc.
++#
++#    Licensed under the Apache License, Version 2.0 (the "License"); you may
++#    not use this file except in compliance with the License. You may obtain
++#    a copy of the License at
++#
++#         http://www.apache.org/licenses/LICENSE-2.0
++#
++#    Unless required by applicable law or agreed to in writing, software
++#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
++#    License for the specific language governing permissions and limitations
++#    under the License.
++
++from .utils import TestDataContainer
++
++
++def data(TEST):
++    TEST.cinder_availability_zones = TestDataContainer()
++
++    # Availability Zones
++    TEST.cinder_availability_zones.add(
++        'az1',
++        'az2'
++    )
+-- 
+1.7.9.5
+

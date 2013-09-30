@@ -1,0 +1,368 @@
+From 2a7e6d9adc7baad46278ab4110ed738937ff47a3 Mon Sep 17 00:00:00 2001
+From: Justin Shepherd <jshepher@rackspace.com>
+Date: Sat, 27 Apr 2013 19:49:13 -0500
+Subject: [PATCH 1/4] Add availability zone choice to launch instance
+
+Fixes: bug #1186075
+Implements: blueprint select-zone-when-creating-instance
+
+* Updated project.instances.tests to include availability zone
+  information where required
+
+Change-Id: I14272a94b90587575776142da82413db88f5a99c
+
+Conflicts:
+
+	openstack_dashboard/api/nova.py
+	openstack_dashboard/dashboards/project/instances/tests.py
+	openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
+
+(cherry picked from commit b0299613404c2344806a1b9b5f1074ae83dff52c)
+---
+ openstack_dashboard/api/nova.py                    |    8 +++-
+ .../dashboards/project/instances/tests.py          |   41 +++++++++++++++++---
+ .../project/instances/workflows/create_instance.py |   25 +++++++++++-
+ openstack_dashboard/test/test_data/nova_data.py    |   12 +++++-
+ 4 files changed, 77 insertions(+), 9 deletions(-)
+
+diff --git a/openstack_dashboard/api/nova.py b/openstack_dashboard/api/nova.py
+index af9a457..5585092 100644
+--- a/openstack_dashboard/api/nova.py
++++ b/openstack_dashboard/api/nova.py
+@@ -344,12 +344,12 @@ def keypair_list(request):
+ 
+ def server_create(request, name, image, flavor, key_name, user_data,
+                   security_groups, block_device_mapping, nics=None,
+-                  instance_count=1):
++                  availability_zone=None, instance_count=1):
+     return Server(novaclient(request).servers.create(
+             name, image, flavor, userdata=user_data,
+             security_groups=security_groups,
+             key_name=key_name, block_device_mapping=block_device_mapping,
+-            nics=nics,
++            nics=nics, availability_zone=availability_zone,
+             min_count=instance_count), request)
+ 
+ 
+@@ -553,3 +553,7 @@ def tenant_absolute_limits(request, reserved=False):
+         else:
+             limits_dict[limit.name] = limit.value
+     return limits_dict
++
++
++def availability_zone_list(request, detailed=False):
++    return novaclient(request).availability_zones.list(detailed=detailed)
+diff --git a/openstack_dashboard/dashboards/project/instances/tests.py b/openstack_dashboard/dashboards/project/instances/tests.py
+index 07c4621..01b72d2 100644
+--- a/openstack_dashboard/dashboards/project/instances/tests.py
++++ b/openstack_dashboard/dashboards/project/instances/tests.py
+@@ -778,7 +778,8 @@ class InstanceTests(test.TestCase):
+ 
+     @test.create_stubs({api.nova: ('flavor_list',
+                                    'keypair_list',
+-                                   'security_group_list',),
++                                   'security_group_list',
++                                   'availability_zone_list',),
+                         cinder: ('volume_snapshot_list',
+                                  'volume_list',),
+                         quotas: ('tenant_quota_usages',),
+@@ -817,6 +818,8 @@ class InstanceTests(test.TestCase):
+                 .AndReturn(self.keypairs.list())
+         api.nova.security_group_list(IsA(http.HttpRequest)) \
+                                 .AndReturn(self.security_groups.list())
++        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
++                                .AndReturn(self.availability_zones.list())
+ 
+         self.mox.ReplayAll()
+ 
+@@ -844,6 +847,7 @@ class InstanceTests(test.TestCase):
+                         api.nova: ('flavor_list',
+                                    'keypair_list',
+                                    'security_group_list',
++                                   'availability_zone_list',
+                                    'server_create',),
+                         cinder: ('volume_list',
+                                  'volume_snapshot_list',)})
+@@ -854,6 +858,7 @@ class InstanceTests(test.TestCase):
+         server = self.servers.first()
+         volume = self.volumes.first()
+         sec_group = self.security_groups.first()
++        avail_zone = self.availability_zones.first()
+         customization_script = 'user data'
+         device_name = u'vda'
+         volume_choice = "%s:vol" % volume.id
+@@ -866,6 +871,8 @@ class InstanceTests(test.TestCase):
+                 .AndReturn(self.keypairs.list())
+         api.nova.security_group_list(IsA(http.HttpRequest)) \
+                 .AndReturn(self.security_groups.list())
++        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
++                .AndReturn(self.availability_zones.list())
+         api.glance.image_list_detailed(IsA(http.HttpRequest),
+                                        filters={'is_public': True,
+                                                 'status': 'active'}) \
+@@ -893,6 +900,7 @@ class InstanceTests(test.TestCase):
+                                [sec_group.name],
+                                block_device_mapping,
+                                nics=nics,
++                               availability_zone=avail_zone.zoneName,
+                                instance_count=IsA(int))
+ 
+         self.mox.ReplayAll()
+@@ -906,6 +914,7 @@ class InstanceTests(test.TestCase):
+                      'project_id': self.tenants.first().id,
+                      'user_id': self.user.id,
+                      'groups': sec_group.name,
++                     'availability_zone': avail_zone.zoneName,
+                      'volume_type': 'volume_id',
+                      'volume_id': volume_choice,
+                      'device_name': device_name,
+@@ -922,7 +931,8 @@ class InstanceTests(test.TestCase):
+                         quotas: ('tenant_quota_usages',),
+                         api.nova: ('flavor_list',
+                                    'keypair_list',
+-                                   'security_group_list',),
++                                   'security_group_list',
++                                   'availability_zone_list',),
+                         cinder: ('volume_list',
+                                  'volume_snapshot_list',)})
+     def test_launch_instance_post_no_images_available(self):
+@@ -931,6 +941,7 @@ class InstanceTests(test.TestCase):
+         server = self.servers.first()
+         volume = self.volumes.first()
+         sec_group = self.security_groups.first()
++        avail_zone = self.availability_zones.first()
+         customization_script = 'user data'
+         device_name = u'vda'
+         volume_choice = "%s:vol" % volume.id
+@@ -959,6 +970,8 @@ class InstanceTests(test.TestCase):
+                 .AndReturn(self.keypairs.list())
+         api.nova.security_group_list(IsA(http.HttpRequest)) \
+                 .AndReturn(self.security_groups.list())
++        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
++                .AndReturn(self.availability_zones.list())
+         cinder.volume_list(IsA(http.HttpRequest)) \
+                 .AndReturn(self.volumes.list())
+         cinder.volume_snapshot_list(IsA(http.HttpRequest)).AndReturn([])
+@@ -977,6 +990,7 @@ class InstanceTests(test.TestCase):
+                      'volume_type': 'volume_id',
+                      'volume_id': volume_choice,
+                      'device_name': device_name,
++                     'availability_zone': avail_zone.zoneName,
+                      'count': 1}
+         url = reverse('horizon:project:instances:launch')
+         res = self.client.post(url, form_data)
+@@ -994,7 +1008,8 @@ class InstanceTests(test.TestCase):
+                                  'volume_snapshot_list',),
+                         api.nova: ('flavor_list',
+                                    'keypair_list',
+-                                   'security_group_list',)})
++                                   'security_group_list',
++                                   'availability_zone_list',)})
+     def test_launch_flavorlist_error(self):
+         cinder.volume_list(IsA(http.HttpRequest)) \
+                 .AndReturn(self.volumes.list())
+@@ -1025,6 +1040,8 @@ class InstanceTests(test.TestCase):
+                 .AndReturn(self.keypairs.list())
+         api.nova.security_group_list(IsA(http.HttpRequest)) \
+                 .AndReturn(self.security_groups.list())
++        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
++                .AndReturn(self.availability_zones.list())
+ 
+         self.mox.ReplayAll()
+ 
+@@ -1039,6 +1056,7 @@ class InstanceTests(test.TestCase):
+                         api.nova: ('flavor_list',
+                                    'keypair_list',
+                                    'security_group_list',
++                                   'availability_zone_list',
+                                    'server_create',),
+                         cinder: ('volume_list',
+                                  'volume_snapshot_list',)})
+@@ -1048,6 +1066,7 @@ class InstanceTests(test.TestCase):
+         keypair = self.keypairs.first()
+         server = self.servers.first()
+         sec_group = self.security_groups.first()
++        avail_zone = self.availability_zones.first()
+         customization_script = 'userData'
+         nics = [{"net-id": self.networks.first().id, "v4-fixed-ip": ''}]
+ 
+@@ -1057,6 +1076,8 @@ class InstanceTests(test.TestCase):
+         api.nova.keypair_list(IgnoreArg()).AndReturn(self.keypairs.list())
+         api.nova.security_group_list(IsA(http.HttpRequest)) \
+                                 .AndReturn(self.security_groups.list())
++        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
++                                .AndReturn(self.availability_zones.list())
+         api.glance.image_list_detailed(IsA(http.HttpRequest),
+                                        filters={'is_public': True,
+                                                 'status': 'active'}) \
+@@ -1082,6 +1103,7 @@ class InstanceTests(test.TestCase):
+                                [sec_group.name],
+                                None,
+                                nics=nics,
++                               availability_zone=avail_zone.zoneName,
+                                instance_count=IsA(int)) \
+                       .AndRaise(self.exceptions.keystone)
+ 
+@@ -1090,6 +1112,7 @@ class InstanceTests(test.TestCase):
+         form_data = {'flavor': flavor.id,
+                      'source_type': 'image_id',
+                      'image_id': image.id,
++                     'availability_zone': avail_zone.zoneName,
+                      'keypair': keypair.name,
+                      'name': server.name,
+                      'customization_script': customization_script,
+@@ -1109,7 +1132,8 @@ class InstanceTests(test.TestCase):
+                         quotas: ('tenant_quota_usages',),
+                         api.nova: ('flavor_list',
+                                    'keypair_list',
+-                                   'security_group_list',),
++                                   'security_group_list',
++                                   'availability_zone_list',),
+                         cinder: ('volume_list',
+                                  'volume_snapshot_list',)})
+     def test_launch_form_instance_count_error(self):
+@@ -1119,6 +1143,7 @@ class InstanceTests(test.TestCase):
+         server = self.servers.first()
+         volume = self.volumes.first()
+         sec_group = self.security_groups.first()
++        avail_zone = self.availability_zones.first()
+         customization_script = 'user data'
+         device_name = u'vda'
+         volume_choice = "%s:vol" % volume.id
+@@ -1129,6 +1154,8 @@ class InstanceTests(test.TestCase):
+                 .AndReturn(self.keypairs.list())
+         api.nova.security_group_list(IsA(http.HttpRequest)) \
+                 .AndReturn(self.security_groups.list())
++        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
++                .AndReturn(self.availability_zones.list())
+         api.glance.image_list_detailed(IsA(http.HttpRequest),
+                                        filters={'is_public': True,
+                                                 'status': 'active'}) \
+@@ -1158,6 +1185,7 @@ class InstanceTests(test.TestCase):
+         form_data = {'flavor': flavor.id,
+                      'source_type': 'image_id',
+                      'image_id': image.id,
++                     'availability_zone': avail_zone.zoneName,
+                      'keypair': keypair.name,
+                      'name': server.name,
+                      'customization_script': customization_script,
+@@ -1222,7 +1250,8 @@ class InstanceTests(test.TestCase):
+ 
+     @test.create_stubs({api.nova: ('flavor_list',
+                                    'keypair_list',
+-                                   'security_group_list',),
++                                   'security_group_list',
++                                   'availability_zone_list',),
+                         cinder: ('volume_snapshot_list',
+                                  'volume_list',),
+                         quotas: ('tenant_quota_usages',),
+@@ -1262,6 +1291,8 @@ class InstanceTests(test.TestCase):
+                 .AndReturn([keypair])
+         api.nova.security_group_list(IsA(http.HttpRequest)) \
+                                 .AndReturn(self.security_groups.list())
++        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
++                                .AndReturn(self.availability_zones.list())
+ 
+         self.mox.ReplayAll()
+ 
+diff --git a/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py b/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
+index eb8a2ad..3c665b9 100644
+--- a/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
++++ b/openstack_dashboard/dashboards/project/instances/workflows/create_instance.py
+@@ -176,6 +176,8 @@ class SetInstanceDetailsAction(workflows.Action):
+     image_id = forms.ChoiceField(label=_("Image"), required=False)
+     instance_snapshot_id = forms.ChoiceField(label=_("Instance Snapshot"),
+                                              required=False)
++    availability_zone = forms.ChoiceField(label=_("Availability Zone"),
++                                          required=False)
+     name = forms.CharField(max_length=80, label=_("Instance Name"))
+     flavor = forms.ChoiceField(label=_("Flavor"),
+                                help_text=_("Size of image to launch."))
+@@ -295,6 +297,23 @@ class SetInstanceDetailsAction(workflows.Action):
+                               _('Unable to retrieve instance flavors.'))
+         return sorted(flavor_list)
+ 
++    def populate_availability_zone_choices(self, request, context):
++        try:
++            zones = api.nova.availability_zone_list(request)
++        except:
++            zones = []
++            exceptions.handle(request,
++                              _('Unable to retrieve availability zones.'))
++
++        zone_list = [(zone.zoneName, zone.zoneName)
++                      for zone in zones if zone.zoneState['available']]
++        zone_list.sort()
++        if zone_list:
++            zone_list.insert(0, ("", _("Any Availability Zone")))
++        else:
++            zone_list.insert(0, ("", _("No availability zones found.")))
++        return zone_list
++
+     def get_help_text(self):
+         extra = {}
+         try:
+@@ -311,7 +330,8 @@ class SetInstanceDetailsAction(workflows.Action):
+ 
+ class SetInstanceDetails(workflows.Step):
+     action_class = SetInstanceDetailsAction
+-    contributes = ("source_type", "source_id", "name", "count", "flavor")
++    contributes = ("source_type", "source_id", "availability_zone",
++                   "name", "count", "flavor")
+ 
+     def prepare_action_context(self, request, context):
+         if 'source_type' in context and 'source_id' in context:
+@@ -505,6 +525,8 @@ class LaunchInstance(workflows.Workflow):
+         else:
+             nics = None
+ 
++        avail_zone = context.get('availability_zone', None)
++
+         try:
+             api.nova.server_create(request,
+                                    context['name'],
+@@ -515,6 +537,7 @@ class LaunchInstance(workflows.Workflow):
+                                    context['security_group_ids'],
+                                    dev_mapping,
+                                    nics=nics,
++                                   availability_zone=avail_zone,
+                                    instance_count=int(context['count']))
+             return True
+         except:
+diff --git a/openstack_dashboard/test/test_data/nova_data.py b/openstack_dashboard/test/test_data/nova_data.py
+index fee40cf..4a1a9d2 100644
+--- a/openstack_dashboard/test/test_data/nova_data.py
++++ b/openstack_dashboard/test/test_data/nova_data.py
+@@ -21,7 +21,8 @@ from novaclient.v1_1 import (flavors, keypairs, servers, volumes,
+                              floating_ips, usage, certs,
+                              volume_snapshots as vol_snaps,
+                              security_group_rules as rules,
+-                             security_groups as sec_groups)
++                             security_groups as sec_groups,
++                             availability_zones)
+ 
+ from openstack_dashboard.api.base import Quota, QuotaSet as QuotaSetWrapper
+ from openstack_dashboard.api.nova import FloatingIp as NetFloatingIp
+@@ -153,6 +154,7 @@ def data(TEST):
+     TEST.certs = TestDataContainer()
+     TEST.volume_snapshots = TestDataContainer()
+     TEST.volume_types = TestDataContainer()
++    TEST.availability_zones = TestDataContainer()
+ 
+     # Data return by novaclient.
+     # It is used if API layer does data conversion.
+@@ -444,3 +446,11 @@ def data(TEST):
+                  'data': 'certificate_data'}
+     certificate = certs.Certificate(certs.CertificateManager(None), cert_data)
+     TEST.certs.add(certificate)
++
++    # Availability Zones
++    TEST.availability_zones.add(
++        availability_zones.AvailabilityZone(
++            availability_zones.AvailabilityZoneManager(None),
++            {'zoneName': 'nova', 'zoneState': {'available': True}}
++        )
++    )
+-- 
+1.7.9.5
+

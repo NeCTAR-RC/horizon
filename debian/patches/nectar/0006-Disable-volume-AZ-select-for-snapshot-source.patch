@@ -1,0 +1,52 @@
+From 4608416eaa15c950a30cbb616ab04880eb271a24 Mon Sep 17 00:00:00 2001
+From: Kieran Spear <kispear@gmail.com>
+Date: Thu, 29 Aug 2013 20:02:42 +1000
+Subject: [PATCH] Disable volume AZ select for snapshot source
+
+Change-Id: Ia53f1def7669a0368935e542646e4505d1091891
+---
+ .../dashboards/project/volumes/forms.py            |   15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/openstack_dashboard/dashboards/project/volumes/forms.py b/openstack_dashboard/dashboards/project/volumes/forms.py
+index cd808e7..38aeb3d 100644
+--- a/openstack_dashboard/dashboards/project/volumes/forms.py
++++ b/openstack_dashboard/dashboards/project/volumes/forms.py
+@@ -34,14 +34,23 @@ class CreateForm(forms.SelfHandlingForm):
+     encryption = forms.ChoiceField(label=_("Encryption"), required=False)
+     snapshot_source = forms.ChoiceField(label=_("Use snapshot as a source"),
+                                         widget=SelectWidget(
+-                                          attrs={'class': 'snapshot-selector'},
++                                          attrs={'class': 'snapshot-selector '
++                                                          'switchable',
++                                                 'data-slug': 'source'},
+                                           data_attrs=('size', 'display_name'),
+                                           transform=lambda x:
+                                                 ("%s (%sGB)" % (x.display_name,
+                                                                 x.size))),
+                                         required=False)
+     availability_zone = forms.ChoiceField(label=_("Availability Zone"),
+-                                          required=False)
++                                          required=False,
++                                          widget=forms.Select(attrs={
++                                              'class': 'switched',
++                                              'data-slug': 'range',
++                                              'data-switch-on': 'source',
++                                              'data-source-': _('Availability '
++                                                                'Zone')
++                                          }))
+ 
+     def __init__(self, request, *args, **kwargs):
+         super(CreateForm, self).__init__(request, *args, **kwargs)
+@@ -163,7 +172,7 @@ class CreateForm(forms.SelfHandlingForm):
+ 
+             availability_zone = data.get('availability_zone', None)
+             extra_kwargs = {}
+-            if availability_zone:
++            if availability_zone and snapshot_id is None:
+                 extra_kwargs['availability_zone'] = availability_zone
+ 
+             volume = cinder.volume_create(request,
+-- 
+1.7.9.5
+
