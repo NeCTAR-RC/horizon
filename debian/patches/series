@@ -7,18 +7,3 @@ fix-dashboard-manage.patch
 
 fix-ubuntu-tests.patch
 ubuntu_local_settings.patch
-
-backports/fix-home-in-url-pattern.patch
-
-# NeCTAR
-backports/0001-Add-availability-zone-choice-to-launch-instance.patch
-nectar/0002-Add-availability-zone-selection-in-volume-creation.patch
-nectar/0003-Show-AZ-on-instances-table.patch
-nectar/0004-Use-a-separate-workflow-step-for-cell-selection.patch
-nectar/0005-Show-volume-AZ-on-snapshots-table.patch
-nectar/0006-Disable-volume-AZ-select-for-snapshot-source.patch
-nectar/show-az-on-volumes-table.patch
-nectar/setting-for-role-based-admin-endpoint-access.patch
-nectar/fix-underscore-in-sg.patch
-nectar/no-reserved-quota.patch
-nectar/logout-on-unauthorized.patch
