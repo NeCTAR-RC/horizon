@@ -2,13 +2,11 @@
 
 set -e
 
-# /etc/apache2/conf.d/dashboard.conf -> /etc/apache2/conf.d/openstack-dashboard.conf
-dpkg-maintscript-helper mv_conffile \
-  /etc/apache2/conf.d/dashboard.conf /etc/apache2/conf.d/openstack-dashboard.conf \
-  2012.1~rc1-0ubuntu1 -- "$@"
-
-if [ -x "`which invoke-rc.d 2>/dev/null`" -a -x "/etc/init.d/apache2" ] ; then
-	invoke-rc.d --quiet apache2 reload
+if [ "${1}" = "purge" ] ; then
+	rm -rf /var/lib/openstack-dashboard
+	rm -rf /var/lib/horizon
 fi
 
 #DEBHELPER#
+
+exit 0

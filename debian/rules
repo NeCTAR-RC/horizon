@@ -1,50 +1,43 @@
 #!/usr/bin/make -f
 
-# Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-export OSLO_PACKAGE_VERSION=$(shell dpkg-parsechangelog | sed -n -e 's/^Version: //p')
+include /usr/share/openstack-pkg-tools/pkgos.make
+
+export OSLO_PACKAGE_VERSION=$(VERSION)
 
 %:
-	dh $@  --with python2
+	dh $@ --with python2
 
 override_dh_auto_install:
-	# install horizon and dashboard
 	python setup.py install --root=$(CURDIR)/debian/tmp --no-compile -O0 --install-layout=deb
-	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard
+
+	install -d -m 755  $(CURDIR)/debian/tmp/usr/share/openstack-dashboard
 	install -d -m 755 $(CURDIR)/debian/tmp/etc/openstack-dashboard
-	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/quantum
-	install -d -m 755 $(CURDIR)/debian/tmp/etc/apache2/conf.d
-	
+
 	cp -a $(CURDIR)/openstack_dashboard/ $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
-	cp -a $(CURDIR)/openstack_dashboard/settings.py $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
-	
-	touch $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/quantum/__init__.py
-	touch $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/quantum/client.py
-	cp -a $(CURDIR)/debian/openstack-dashboard.conf $(CURDIR)/debian/tmp/etc/apache2/conf.d
+
+	# Sets memcached by default in local_settings.py
 	cp $(CURDIR)/openstack_dashboard/local/local_settings.py.example \
 		$(CURDIR)/debian/tmp/etc/openstack-dashboard/local_settings.py
+	sed -i -e 's|^[ \t#]*CACHE_BACKEND[ \t#]*=.*|CACHE_BACKEND = "memcached://127.0.0.1:11211/"|' \
+		$(CURDIR)/debian/tmp/etc/openstack-dashboard/local_settings.py
+	sed -i -e 's|^[ \t#]*COMPRESS_OFFLINE[ \t#]*=.*|COMPRESS_OFFLINE = False|' \
+		$(CURDIR)/debian/tmp/etc/openstack-dashboard/local_settings.py
+
 	cp $(CURDIR)/manage.py \
-		 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/manage.py
+		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
 	ln -fs /etc/openstack-dashboard/local_settings.py \
 		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py
-	cp $(CURDIR)/debian/theme/img/juju.png \
-		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/img/juju.png
-
-ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
-override_dh_auto_test:
-	echo "Running tests..."
-	PYTHONPATH=. bash run_tests.sh -N || true
-endif
 
 override_dh_auto_clean:
-	dh_clean
-	rm -rf $(CURDIR)/build
+	dh_auto_clean
+	python setup.py clean
+	rm -rf $(CURDIR)/static
+	rm -rf $(CURDIR)/horizon/build
 	rm -rf $(CURDIR)/horizon.egg-info
-	rm -rf $(CURDIR)/debian/openstack-dashboard
-	rm -rf $(CURDIR)/debian/python-django-horizon
-	rm -rf $(CURDIR)/debian/tmp
-	find . -name "*.pyc" -exec rm {} \;
-
-get-orig-source:
-	uscan --verbose --force-download --rename --destdir=../build-area
+	rm -rf $(CURDIR)/openstack_dashboard/openstack_dashboard.egg-info
+	rm -rf doc/source/sourcecode
+	rm -rf $(CURDIR)/doc/build
+	rm -f horizon/openstack_dashboard/test/.secret_key_store
+	find $(CURDIR)/openstack_dashboard -iname '*.pyc' -delete
