@@ -12,7 +12,18 @@ Build-Depends: debhelper (>= 8.0.0),
  python-nose,
  python-setuptools,
  python-sphinx,
- python-coverage
+ python-coverage,
+ python-lockfile,
+ python-selenium,
+ python-compressor (>= 1.2),
+ python-cinderclient,
+ python-glanceclient,
+ python-keystoneclient,
+ python-novaclient,
+ python-openstack-auth,
+ python-swiftclient,
+ python-tz,
+ python-quantumclient
 Standards-Version: 3.9.3
 Homepage: http://launchpad.net/horizon
 
