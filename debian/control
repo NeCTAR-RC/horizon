@@ -12,12 +12,11 @@ Build-Depends: debhelper (>= 9),
                python-all (>= 2.6.6-3~),
                python-setuptools
 Build-Depends-Indep: node-less,
-                     nodejs-legacy,
+                     nodejs,
                      openstack-pkg-tools,
                      pep8 (>= 1.3.3),
                      pylint,
                      python-cinderclient,
-                     python-cloudfiles,
                      python-compressor,
                      python-coverage,
                      python-django-nose,
@@ -44,7 +43,6 @@ Section: python
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.6~)
 Depends: python-cinderclient,
-         python-cloudfiles,
          python-compressor,
          python-django,
          python-django-nose,
