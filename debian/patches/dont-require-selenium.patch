@@ -1,0 +1,17 @@
+diff --git a/horizon/test/helpers.py b/horizon/test/helpers.py
+index ccdc46e..b2cc7e8 100644
+--- a/horizon/test/helpers.py
++++ b/horizon/test/helpers.py
+@@ -32,8 +32,10 @@ from django.core.handlers import wsgi
+ from django.test.client import RequestFactory
+ from django.utils import unittest
+ 
+-from selenium.webdriver.firefox.webdriver import WebDriver
+-from selenium.webdriver.support import ui as selenium_ui
++if os.environ.get('WITH_SELENIUM', False):
++    from selenium.webdriver.firefox.webdriver import WebDriver
++    from selenium.webdriver.support import ui as selenium_ui
++
+ 
+ import mox
+ 
