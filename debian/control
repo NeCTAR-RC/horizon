@@ -11,7 +11,8 @@ Build-Depends: debhelper (>= 8.0.0),
  python-netaddr,
  python-nose,
  python-setuptools,
- python-sphinx
+ python-sphinx,
+ python-coverage
 Standards-Version: 3.9.3
 Homepage: http://launchpad.net/horizon
 
