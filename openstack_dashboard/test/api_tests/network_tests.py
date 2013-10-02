@@ -89,7 +89,7 @@ class NetworkApiNovaFloatingIpTests(test.APITestCase):
         api.network.tenant_floating_ip_release(self.request, fip.id)
 
     def test_floating_ip_associate(self):
-        server = api.nova.Server(self.servers.first(), self.request)
+        server = api.nova.Server(self.raw_servers.first(), self.request)
         floating_ip = self.floating_ips.first()
 
         novaclient = self.stub_novaclient()
@@ -106,7 +106,7 @@ class NetworkApiNovaFloatingIpTests(test.APITestCase):
                                           server.id)
 
     def test_floating_ip_disassociate(self):
-        server = api.nova.Server(self.servers.first(), self.request)
+        server = api.nova.Server(self.raw_servers.first(), self.request)
         floating_ip = self.api_floating_ips.first()
 
         novaclient = self.stub_novaclient()
@@ -123,7 +123,7 @@ class NetworkApiNovaFloatingIpTests(test.APITestCase):
                                              server.id)
 
     def test_floating_ip_target_list(self):
-        servers = self.servers.list()
+        servers = self.raw_servers.list()
         novaclient = self.stub_novaclient()
         novaclient.servers = self.mox.CreateMockAnything()
         novaclient.servers.list().AndReturn(servers)
@@ -136,7 +136,7 @@ class NetworkApiNovaFloatingIpTests(test.APITestCase):
 
     def test_floating_ip_target_get_by_instance(self):
         self.mox.ReplayAll()
-        instance_id = self.servers.first().id
+        instance_id = self.raw_servers.first().id
         ret = api.network.floating_ip_target_get_by_instance(self.request,
                                                              instance_id)
         self.assertEqual(instance_id, ret)
@@ -267,7 +267,7 @@ class NetworkApiQuantumFloatingIpTests(test.APITestCase):
                         if not p['device_owner'].startswith('network:')]
 
         self.qclient.list_ports().AndReturn({'ports': ports})
-        servers = self.servers.list()
+        servers = self.raw_servers.list()
         novaclient = self.stub_novaclient()
         novaclient.servers = self.mox.CreateMockAnything()
         search_opts = {'project_id': self.request.user.tenant_id}

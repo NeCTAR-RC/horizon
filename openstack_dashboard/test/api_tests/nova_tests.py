@@ -31,8 +31,8 @@ from openstack_dashboard.test import helpers as test
 
 class ServerWrapperTests(test.TestCase):
     def test_get_base_attribute(self):
-        server = api.nova.Server(self.servers.first(), self.request)
-        self.assertEqual(server.id, self.servers.first().id)
+        server = api.nova.Server(self.raw_servers.first(), self.request)
+        self.assertEqual(server.id, self.raw_servers.first().id)
 
     def test_image_name(self):
         image = self.images.first()
@@ -41,7 +41,7 @@ class ServerWrapperTests(test.TestCase):
                                   image.id).AndReturn(image)
         self.mox.ReplayAll()
 
-        server = api.nova.Server(self.servers.first(), self.request)
+        server = api.nova.Server(self.raw_servers.first(), self.request)
         self.assertEqual(server.image_name, image.name)
 
 

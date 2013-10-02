@@ -24,6 +24,7 @@ from novaclient.v1_1 import (flavors, keypairs, servers, volumes,
                              security_groups as sec_groups,
                              availability_zones)
 
+from openstack_dashboard import api
 from openstack_dashboard.api.base import Quota, QuotaSet as QuotaSetWrapper
 from openstack_dashboard.api.nova import FloatingIp as NetFloatingIp
 from openstack_dashboard.usage.quotas import QuotaUsage
@@ -139,6 +140,7 @@ USAGE_DATA = """
 
 def data(TEST):
     TEST.servers = TestDataContainer()
+    TEST.raw_servers = TestDataContainer()
     TEST.flavors = TestDataContainer()
     TEST.keypairs = TestDataContainer()
     TEST.security_groups = TestDataContainer()
@@ -369,13 +371,18 @@ def data(TEST):
             "flavor_id": flavor_1.id,
             "image_id": TEST.images.first().id,
             "key_name": keypair.name}
-    server_1 = servers.Server(servers.ServerManager(None),
-                              json.loads(SERVER_DATA % vals)['server'])
+    raw_server_1 = servers.Server(servers.ServerManager(None),
+                                  json.loads(SERVER_DATA % vals)['server'],
+                                  loaded=True)
+    server_1 = api.nova.Server(raw_server_1, None)
     vals.update({"name": "server_2",
                  "status": "BUILD",
                  "server_id": "2"})
-    server_2 = servers.Server(servers.ServerManager(None),
-                              json.loads(SERVER_DATA % vals)['server'])
+    raw_server_2 = servers.Server(servers.ServerManager(None),
+                                  json.loads(SERVER_DATA % vals)['server'],
+                                  loaded=True)
+    server_2 = api.nova.Server(raw_server_2, None)
+    TEST.raw_servers.add(raw_server_1, raw_server_2)
     TEST.servers.add(server_1, server_2)
 
     # VNC Console Data
