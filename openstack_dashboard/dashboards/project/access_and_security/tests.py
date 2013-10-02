@@ -54,7 +54,7 @@ class AccessAndSecurityTests(test.TestCase):
 
         api.nova.server_list(
             IsA(http.HttpRequest)) \
-            .AndReturn([self.servers.list(), False])
+            .AndReturn([self.raw_servers.list(), False])
         api.nova.keypair_list(
             IsA(http.HttpRequest)) \
             .AndReturn(keypairs)
@@ -110,11 +110,10 @@ class AccessAndSecurityTests(test.TestCase):
     @test.create_stubs({api.network: ('floating_ip_target_list',
                                       'tenant_floating_ip_list',)})
     def test_association(self):
-        servers = [api.nova.Server(s, self.request)
-                   for s in self.servers.list()]
+        servers = self.servers.list()
         # Add duplicate instance name to test instance name with [ID]
         # Change id and private IP
-        server3 = api.nova.Server(self.servers.first(), self.request)
+        server3 = api.nova.Server(self.raw_servers.first(), self.request)
         server3.id = 101
         server3.addresses = deepcopy(server3.addresses)
         server3.addresses['private'][0]['addr'] = "10.0.0.5"
