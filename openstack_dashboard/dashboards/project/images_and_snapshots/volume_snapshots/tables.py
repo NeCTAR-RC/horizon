@@ -77,13 +77,26 @@ class SnapshotVolumeNameColumn(tables.Column):
             return reverse(self.link, args=(volume_id,))
 
 
+def get_snapshot_volume_az(snapshot):
+    volume = snapshot._volume
+    if volume:
+        return volume.availability_zone
+    return _("Unknown")
+
+
+def get_snapshot_display_name(snapshot):
+    return snapshot.display_name or snapshot.id
+
+
 class VolumeSnapshotsTable(volume_tables.VolumesTableBase):
-    name = tables.Column("display_name",
+    name = tables.Column(get_snapshot_display_name,
                          verbose_name=_("Name"),
                          link="horizon:project:images_and_snapshots:detail")
     volume_name = SnapshotVolumeNameColumn("display_name",
                               verbose_name=_("Volume Name"),
                               link="horizon:project:volumes:detail")
+    volume_zone = tables.Column(get_snapshot_volume_az,
+                                verbose_name=_("Volume Zone"))
 
     class Meta:
         name = "volume_snapshots"
