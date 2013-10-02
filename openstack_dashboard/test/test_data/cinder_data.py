@@ -75,6 +75,7 @@ def data(TEST):
                              'display_description': 'Volume description',
                              'created_at': '2014-01-27 10:30:00',
                              'volume_type': None,
+                             'availability_zone': 'az1',
                              'attachments': []})
     nameless_volume = volumes.Volume(volumes.VolumeManager(None),
                          dict(id="4b069dd0-6eaa-4272-8abc-5448a68f1cce",
@@ -136,6 +137,7 @@ def data(TEST):
                              'created_at': '2014-01-27 10:30:00',
                              'volume_type': None,
                              'bootable': 'true',
+                             'availability_zone': 'az1',
                              'attachments': []})
     volume_v2.bootable = 'true'
 
