@@ -6,3 +6,5 @@ fix-dashboard-manage.patch
 
 fix-ubuntu-tests.patch
 ubuntu_local_settings.patch
+
+exclude-nose-exclude.patch
