@@ -93,9 +93,6 @@ class Server(APIResourceWrapper):
     def internal_name(self):
         return getattr(self, 'OS-EXT-SRV-ATTR:instance_name', "")
 
-    def reboot(self, hardness=REBOOT_HARD):
-        novaclient(self.request).servers.reboot(self.id, hardness)
-
 
 class NovaUsage(APIResourceWrapper):
     """Simple wrapper around contrib/simple_usage.py."""
@@ -428,8 +425,7 @@ def server_resume(request, instance_id):
 
 
 def server_reboot(request, instance_id, hardness=REBOOT_HARD):
-    server = server_get(request, instance_id)
-    server.reboot(hardness)
+    novaclient(request).servers.reboot(instance_id, hardness)
 
 
 def server_update(request, instance_id, name):

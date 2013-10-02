@@ -52,7 +52,6 @@ class ComputeApiTests(test.APITestCase):
 
         novaclient = self.stub_novaclient()
         novaclient.servers = self.mox.CreateMockAnything()
-        novaclient.servers.get(server.id).AndReturn(server)
         novaclient.servers.reboot(server.id, HARDNESS)
         self.mox.ReplayAll()
 
@@ -65,7 +64,6 @@ class ComputeApiTests(test.APITestCase):
 
         novaclient = self.stub_novaclient()
         novaclient.servers = self.mox.CreateMockAnything()
-        novaclient.servers.get(server.id).AndReturn(server)
         novaclient.servers.reboot(server.id, HARDNESS)
         self.mox.ReplayAll()
 
