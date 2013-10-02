@@ -41,6 +41,7 @@ def data(TEST):
                              'display_description': 'Volume description',
                              'created_at': '2014-01-27 10:30:00',
                              'volume_type': None,
+                             'availability_zone': 'az1',
                              'attachments': []})
     nameless_volume = volumes.Volume(volumes.VolumeManager(None),
                          dict(id="4b069dd0-6eaa-4272-8abc-5448a68f1cce",
@@ -75,6 +76,7 @@ def data(TEST):
                              'size': 20,
                              'created_at': '2014-01-27 10:30:00',
                              'volume_type': None,
+                             'availability_zone': 'az1',
                              'attachments': []})
     TEST.cinder_volumes.add(api.cinder.Volume(volume_v2))
 
