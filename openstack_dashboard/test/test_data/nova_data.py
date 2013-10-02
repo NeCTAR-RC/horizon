@@ -149,6 +149,7 @@ USAGE_DATA = """
 
 def data(TEST):
     TEST.servers = utils.TestDataContainer()
+    TEST.raw_servers = utils.TestDataContainer()
     TEST.flavors = utils.TestDataContainer()
     TEST.flavor_access = utils.TestDataContainer()
     TEST.keypairs = utils.TestDataContainer()
@@ -420,7 +421,8 @@ def data(TEST):
             "image_id": TEST.images.first().id,
             "key_name": keypair.name}
     server_1 = servers.Server(servers.ServerManager(None),
-                              json.loads(SERVER_DATA % vals)['server'])
+                              json.loads(SERVER_DATA % vals)['server'],
+                              loaded=True)
     vals.update({"name": "server_2",
                  "status": "BUILD",
                  "server_id": "2"})
@@ -429,10 +431,13 @@ def data(TEST):
     vals.update({"name": u'\u4e91\u89c4\u5219',
                  "status": "ACTIVE",
                  "tenant_id": tenant3.id,
-                "server_id": "3"})
+                 "server_id": "3"})
     server_3 = servers.Server(servers.ServerManager(None),
                               json.loads(SERVER_DATA % vals)['server'])
-    TEST.servers.add(server_1, server_2, server_3)
+    raw_servers = [server_1, server_2, server_3]
+    TEST.raw_servers.add(*raw_servers)
+    for server in raw_servers:
+        TEST.servers.add(nova.Server(server, None))
 
     # VNC Console Data
     console = {u'console': {u'url': u'http://example.com:6080/vnc_auto.html',
