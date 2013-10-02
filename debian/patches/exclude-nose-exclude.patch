@@ -1,0 +1,14 @@
+diff --git a/horizon/test/settings.py b/horizon/test/settings.py
+index 944ee04..7d66777 100644
+--- a/horizon/test/settings.py
++++ b/horizon/test/settings.py
+@@ -95,8 +95,7 @@ SITE_BRANDING = 'Horizon'
+ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+ NOSE_ARGS = ['--nocapture',
+              '--nologcapture',
+-             '--exclude-dir=horizon/conf/',
+-             '--exclude-dir=horizon/test/customization',
++             '--ignore-files=cust_test[12].py',
+              '--cover-package=horizon',
+              '--cover-inclusive',
+              '--all-modules']
