@@ -142,6 +142,13 @@ class VolumeSnapshotsFilterAction(tables.FilterAction):
                 if query in snapshot.name.lower()]
 
 
+def get_snapshot_volume_az(snapshot):
+    volume = snapshot._volume
+    if volume:
+        return volume.availability_zone
+    return _("Unknown")
+
+
 class VolumeSnapshotsTable(volume_tables.VolumesTableBase):
     name = tables.Column("name",
                          verbose_name=_("Name"),
@@ -150,6 +157,8 @@ class VolumeSnapshotsTable(volume_tables.VolumesTableBase):
         "name",
         verbose_name=_("Volume Name"),
         link="horizon:project:volumes:volumes:detail")
+    volume_zone = tables.Column(get_snapshot_volume_az,
+                                verbose_name=_("Volume Zone"))
 
     class Meta(object):
         name = "volume_snapshots"
