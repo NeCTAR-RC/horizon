@@ -192,7 +192,6 @@ class InstanceTests(test.TestCase):
     def test_index_with_instance_booted_from_volume(self):
         volume_server = self.servers.first()
         volume_server.image = ""
-        volume_server.image_name = "(not found)"
         servers = self.servers.list()
         servers[0] = volume_server
 
@@ -218,7 +217,6 @@ class InstanceTests(test.TestCase):
         self.assertTemplateUsed(res, 'project/instances/index.html')
         instances = res.context['instances_table'].data
         self.assertEqual(len(instances), len(servers))
-        self.assertContains(res, "(not found)")
 
     @test.create_stubs({api.nova: ('server_list',
                                    'flavor_list',
