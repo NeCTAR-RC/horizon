@@ -9,3 +9,4 @@ fix-ubuntu-tests.patch
 ubuntu_local_settings.patch
 
 dont-require-selenium.patch
+exclude-nose-exclude.patch
