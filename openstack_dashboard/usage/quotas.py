@@ -202,7 +202,9 @@ def tenant_quota_usages(request):
     if 'volumes' not in disabled_quotas:
         volumes = cinder.volume_list(request)
         snapshots = cinder.volume_snapshot_list(request)
-        usages.tally('gigabytes', sum([int(v.size) for v in volumes]))
+        volumes_gb = sum([int(v.size) for v in volumes])
+        snapshots_gb = sum([int(s.size) for s in snapshots])
+        usages.tally('gigabytes', volumes_gb + snapshots_gb)
         usages.tally('volumes', len(volumes))
         usages.tally('snapshots', len(snapshots))
 
@@ -232,9 +234,11 @@ def tenant_limit_usages(request):
         try:
             limits.update(cinder.tenant_absolute_limits(request))
             volumes = cinder.volume_list(request)
-            total_size = sum([getattr(volume, 'size', 0) for volume
-                              in volumes])
-            limits['gigabytesUsed'] = total_size
+            snapshots = cinder.volume_snapshot_list(request)
+            volumes_gb = sum([getattr(volume, 'size', 0) for volume
+                             in volumes])
+            snapshots_gb = sum([int(s.size) for s in snapshots])
+            limits['gigabytesUsed'] = volumes_gb + snapshots_gb
             limits['volumesUsed'] = len(volumes)
         except Exception:
             msg = _("Unable to retrieve volume limit information.")

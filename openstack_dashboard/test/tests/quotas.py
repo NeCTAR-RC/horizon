@@ -47,7 +47,7 @@ class QuotaTests(test.APITestCase):
             usages.update({'volumes': {'available': 0, 'used': 3, 'quota': 1},
                            'snapshots': {'available': 0, 'used': 3,
                                          'quota': 1},
-                           'gigabytes': {'available': 920, 'used': 80,
+                           'gigabytes': {'available': 800, 'used': 200,
                                          'quota': 1000}})
         return usages
 
@@ -77,7 +77,7 @@ class QuotaTests(test.APITestCase):
         cinder.volume_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.volumes.list())
         cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
-                .AndReturn(self.snapshots.list())
+                .AndReturn(self.volume_snapshots.list())
         cinder.tenant_quota_get(IsA(http.HttpRequest), '1') \
             .AndReturn(self.cinder_quotas.first())
 
@@ -179,7 +179,7 @@ class QuotaTests(test.APITestCase):
         cinder.volume_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.volumes.list())
         cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
-                .AndReturn(self.snapshots.list())
+                .AndReturn(self.volume_snapshots.list())
         cinder.tenant_quota_get(IsA(http.HttpRequest), '1') \
             .AndReturn(self.cinder_quotas.first())
 
