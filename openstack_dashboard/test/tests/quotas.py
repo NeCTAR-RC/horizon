@@ -36,7 +36,9 @@ class QuotaTests(test.APITestCase):
                                    'tenant_quota_get',),
                         api.network: ('tenant_floating_ip_list',),
                         quotas: ('is_service_enabled',),
-                        cinder: ('volume_list', 'tenant_quota_get',)})
+                        cinder: ('volume_list',
+                                 'volume_snapshot_list',
+                                 'tenant_quota_get',)})
     def test_tenant_quota_usages(self):
         quotas.is_service_enabled(IsA(http.HttpRequest),
                                   'volume').AndReturn(True)
@@ -50,6 +52,8 @@ class QuotaTests(test.APITestCase):
                 .AndReturn(self.servers.list())
         cinder.volume_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.volumes.list())
+        cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
+                .AndReturn(self.volume_snapshots.list())
         cinder.tenant_quota_get(IsA(http.HttpRequest), '1') \
             .AndReturn(self.quotas.first())
 
@@ -63,7 +67,7 @@ class QuotaTests(test.APITestCase):
             'security_groups': {'quota': 10},
             'security_group_rules': {'quota': 20},
             'fixed_ips': {'quota': 10},
-            'gigabytes': {'available': 920, 'used': 80, 'quota': 1000},
+            'gigabytes': {'available': 800, 'used': 200, 'quota': 1000},
             'ram': {'available': 8976, 'used': 1024, 'quota': 10000},
             'floating_ips': {'available': 0, 'used': 2, 'quota': 1},
             'instances': {'available': 8, 'used': 2, 'quota': 10},
@@ -150,7 +154,9 @@ class QuotaTests(test.APITestCase):
                                    'tenant_quota_get',),
                         api.network: ('tenant_floating_ip_list',),
                         quotas: ('is_service_enabled',),
-                        cinder: ('volume_list', 'tenant_quota_get',)})
+                        cinder: ('volume_list',
+                                 'volume_snapshot_list',
+                                 'tenant_quota_get',)})
     def test_tenant_quota_usages_unlimited_quota(self):
         inf_quota = self.quotas.first()
         inf_quota['ram'] = -1
@@ -167,6 +173,8 @@ class QuotaTests(test.APITestCase):
                 .AndReturn(self.servers.list())
         cinder.volume_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.volumes.list())
+        cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
+                .AndReturn(self.volume_snapshots.list())
         cinder.tenant_quota_get(IsA(http.HttpRequest), '1') \
             .AndReturn(inf_quota)
 
@@ -180,7 +188,7 @@ class QuotaTests(test.APITestCase):
             'security_groups': {'quota': 10},
             'security_group_rules': {'quota': 20},
             'fixed_ips': {'quota': 10},
-            'gigabytes': {'available': 920, 'used': 80, 'quota': 1000},
+            'gigabytes': {'available': 800, 'used': 200, 'quota': 1000},
             'ram': {'available': float("inf"), 'used': 1024,
                     'quota': float("inf")},
             'floating_ips': {'available': 0, 'used': 2, 'quota': 1},

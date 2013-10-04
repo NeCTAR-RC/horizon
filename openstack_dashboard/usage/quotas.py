@@ -136,7 +136,10 @@ def tenant_quota_usages(request):
 
     if 'volumes' not in disabled_quotas:
         volumes = cinder.volume_list(request)
-        usages.tally('gigabytes', sum([int(v.size) for v in volumes]))
+        snapshots = cinder.volume_snapshot_list(request)
+        volumes_gb = sum([int(v.size) for v in volumes])
+        snapshots_gb = sum([int(s.size) for s in snapshots])
+        usages.tally('gigabytes', volumes_gb + snapshots_gb)
         usages.tally('volumes', len(volumes))
 
     # Sum our usage based on the flavors of the instances.
