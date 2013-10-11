@@ -24,7 +24,7 @@ Build-Depends: debhelper (>= 8.0.0),
  python-openstack-auth,
  python-swiftclient,
  python-tz,
- python-quantumclient
+ python-neutronclient
 Standards-Version: 3.9.3
 Homepage: http://launchpad.net/horizon
 
@@ -44,7 +44,7 @@ Depends: python-cloudfiles,
  python-openstack-auth,
  python-swiftclient,
  python-tz,
- python-quantumclient,
+ python-neutronclient
  ${misc:Depends},
  ${python:Depends}
 Recommends: memcached
