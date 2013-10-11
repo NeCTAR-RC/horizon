@@ -20,11 +20,11 @@ Build-Depends: debhelper (>= 8.0.0),
  python-cinderclient,
  python-glanceclient,
  python-keystoneclient,
+ python-neutronclient
  python-novaclient,
  python-openstack-auth,
  python-swiftclient,
  python-tz,
- python-quantumclient
 Standards-Version: 3.9.3
 Homepage: http://launchpad.net/horizon
 Vcs-Browser: http://bazaar.launchpad.net/~ubuntu-server-dev/horizon/havana/files
@@ -45,12 +45,12 @@ Depends: python-cloudfiles,
  python-lockfile,
  python-memcache,
  python-netaddr,
+ python-neutronclient,
  python-novaclient,
  python-openstack-auth (>= 1.1.1),
  python-swiftclient,
  python-troveclient,
  python-tz,
- python-neutronclient,
  ${misc:Depends},
  ${python:Depends}
 Recommends: memcached
