@@ -5,6 +5,7 @@ Maintainer: Chuck Short <zulcss@ubuntu.com>
 Build-Depends: debhelper (>= 8.0.0),
  python-pbr,
  python-d2to1,
+ pep8,
  pylint,
  python-all (>= 2.6.6-3~),
  python-django-nose,
@@ -12,7 +13,18 @@ Build-Depends: debhelper (>= 8.0.0),
  python-netaddr,
  python-nose,
  python-setuptools,
- python-sphinx
+ python-sphinx,
+ python-coverage,
+ python-lockfile,
+ python-compressor (>= 1.2),
+ python-cinderclient,
+ python-glanceclient,
+ python-keystoneclient,
+ python-novaclient,
+ python-openstack-auth,
+ python-swiftclient,
+ python-tz,
+ python-quantumclient
 Standards-Version: 3.9.3
 Homepage: http://launchpad.net/horizon
 
