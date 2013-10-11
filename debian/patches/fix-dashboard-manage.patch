@@ -1,9 +1,10 @@
-diff -Naurp horizon-2013.1.orig/manage.py horizon-2013.1/manage.py
---- horizon-2013.1.orig/manage.py	2012-11-20 22:59:38.000000000 -0600
-+++ horizon-2013.1/manage.py	2012-11-21 12:28:58.773240222 -0600
+diff --git a/manage.py b/manage.py
+index fe16377..bfd0254 100755
+--- a/manage.py
++++ b/manage.py
 @@ -5,6 +5,8 @@ import sys
  
- from django.core.management import execute_from_command_line
+ from django.core.management import execute_from_command_line  # noqa
  
 +sys.path.append("/usr/share/openstack-dashboard")
 +
