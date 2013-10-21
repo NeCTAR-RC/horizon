@@ -125,6 +125,10 @@ LOGGING['loggers']['openstack_dashboard'] = {
     'handlers': ['test'],
     'propagate': False,
 }
+LOGGING['loggers']['iso8601'] = {
+    'handlers': ['null'],
+    'propagate': False,
+}
 
 SECURITY_GROUP_RULES = {
     'all_tcp': {
