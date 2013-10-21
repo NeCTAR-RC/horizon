@@ -25,6 +25,7 @@ class memoized(object):
     def __init__(self, func):
         self.func = func
         self.cache = {}
+        self.__name__ = self.func.__name__
 
     def __call__(self, *args):
         try:

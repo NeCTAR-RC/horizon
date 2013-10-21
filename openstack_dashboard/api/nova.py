@@ -401,6 +401,7 @@ def flavor_get(request, flavor_id):
 
 
 @memoized
+@base.api_function
 def flavor_list(request, is_public=True):
     """Get the list of available instance sizes (flavors)."""
     return novaclient(request).flavors.list(is_public=is_public)
@@ -489,6 +490,7 @@ def server_get(request, instance_id):
     return Server(novaclient(request).servers.get(instance_id), request)
 
 
+@base.api_function
 def server_list(request, search_opts=None, all_tenants=False):
     page_size = request.session.get('horizon_pagesize',
                                     getattr(settings, 'API_RESULT_PAGE_SIZE',

@@ -19,6 +19,7 @@
 #    under the License.
 
 from collections import Sequence  # noqa
+import functools
 import logging
 
 from django.conf import settings  # noqa
@@ -31,6 +32,17 @@ __all__ = ('APIResourceWrapper', 'APIDictWrapper',
 
 
 LOG = logging.getLogger(__name__)
+
+
+def api_function(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        print '.'.join((f.__module__, f.__name__))
+        print args
+        print kwargs
+        import pdb; pdb.set_trace()
+        return f(*args, **kwargs)
+    return wrapper
 
 
 class APIVersionManager(object):

@@ -911,57 +911,23 @@ class InstanceTests(test.TestCase):
         res = self._instance_update_post(server.id, server.name, [])
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
-    @test.create_stubs({api.nova: ('flavor_list',
-                                   'keypair_list',
-                                   'tenant_absolute_limits',
-                                   'availability_zone_list',),
-                        api.network: ('security_group_list',),
-                        cinder: ('volume_snapshot_list',
-                                 'volume_list',),
-                        api.neutron: ('network_list',
-                                      'profile_list',),
-                        api.glance: ('image_list_detailed',)})
     def test_launch_instance_get(self):
-        image = self.images.first()
-
-        cinder.volume_list(IsA(http.HttpRequest)) \
-                .AndReturn(self.volumes.list())
-        cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
-                .AndReturn(self.volumes.list())
-        api.glance.image_list_detailed(IsA(http.HttpRequest),
-                                       filters={'is_public': True,
-                                                'status': 'active'}) \
-            .AndReturn([self.images.list(), False])
-        api.glance.image_list_detailed(IsA(http.HttpRequest),
-                            filters={'property-owner_id': self.tenant.id,
-                                     'status': 'active'}) \
-                .AndReturn([[], False])
-        api.neutron.network_list(IsA(http.HttpRequest),
-                                 tenant_id=self.tenant.id,
-                                 shared=False) \
-                .AndReturn(self.networks.list()[:1])
-        api.neutron.network_list(IsA(http.HttpRequest),
-                                 shared=True) \
-                .AndReturn(self.networks.list()[1:])
+        self.cinder.volume_list()
+        self.cinder.volume_snapshot_list()
+        self.cinder.image_list_detailed(status='active', is_public=True)
+        self.cinder.image_list_detailed(status='active', owner_id=self.tenant.id)
+        self.neutron.network_list(project=self.tenant.id, shared=False)
+        self.neutron.network_list(shared=True)
         # TODO(absubram): Remove if clause and create separate
         # test stubs for when profile_support is being used.
         # Additionally ensure those are always run even in default setting
         if api.neutron.is_port_profiles_supported():
-            policy_profiles = self.policy_profiles.list()
-            api.neutron.profile_list(IsA(http.HttpRequest),
-                                     'policy').AndReturn(policy_profiles)
-        api.nova.tenant_absolute_limits(IsA(http.HttpRequest))\
-                .AndReturn(self.limits['absolute'])
-        api.nova.flavor_list(IsA(http.HttpRequest)) \
-                .AndReturn(self.flavors.list())
-        api.nova.flavor_list(IsA(http.HttpRequest)) \
-                .AndReturn(self.flavors.list())
-        api.nova.keypair_list(IsA(http.HttpRequest)) \
-                .AndReturn(self.keypairs.list())
-        api.network.security_group_list(IsA(http.HttpRequest)) \
-                                .AndReturn(self.security_groups.list())
-        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
-                                .AndReturn(self.availability_zones.list())
+            self.neutron.profile_list(profile='policy')
+        self.nova.tenant_absolute_limits()
+        self.nova.flavor_list()
+        keypairs = self.nova.keypair_list()
+        self.nova.security_group_list()
+        self.nova.availability_zone_list()
 
         self.mox.ReplayAll()
 
