@@ -1,0 +1,2 @@
+/etc/openstack-dashboard/ubuntu_theme.py /usr/share/openstack-dashboard/openstack_dashboard/local/ubuntu_theme.py
+/usr/share/openstack-dashboard-ubuntu-theme/static/ubuntu /usr/share/openstack-dashboard/openstack_dashboard/static/ubuntu

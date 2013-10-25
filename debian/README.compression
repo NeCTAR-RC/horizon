@@ -1,0 +1,6 @@
+Until this can be scripted and integrated into package build, updating the
+pre-compressed static CSS and JS requires a some manual steps:
+
+   sudo apt-get install python-lesscpy python-openstack-auth python-compressor
+   quilt pop top
+   ./debian/rules refresh-static-assets
