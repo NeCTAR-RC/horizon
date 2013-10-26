@@ -199,7 +199,7 @@ class FloatingIpNeutronViewTests(FloatingIpViewTests):
         api.cinder.volume_list(IsA(http.HttpRequest)) \
             .AndReturn(self.volumes.list())
         api.cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.snapshots.list())
+            .AndReturn(self.volume_snapshots.list())
         api.cinder.tenant_quota_get(IsA(http.HttpRequest), '1') \
             .AndReturn(self.cinder_quotas.first())
         api.neutron.is_extension_supported(
