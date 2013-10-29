@@ -162,6 +162,10 @@ class CreateForm(forms.SelfHandlingForm):
             except Exception:
                 exceptions.handle(request, _('Unable to retrieve availability '
                                              'zones.'))
+        else:
+            zones = getattr(settings, 'OPENSTACK_STORAGE_AVAILABILITY_ZONES', [])
+            zone_list = [(zone, zone) for zone in zones]  # zone zone zone
+
         if not zone_list:
             zone_list.insert(0, ("", _("No availability zones found.")))
         else:
