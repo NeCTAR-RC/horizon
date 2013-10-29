@@ -52,7 +52,7 @@ class CreateForm(forms.SelfHandlingForm):
             transform=lambda x: "%s (%s)" % (x.name, filesizeformat(x.bytes))),
         required=False)
     availability_zone = forms.ChoiceField(label=_("Availability Zone"),
-                                          required=False)
+                                          required=True)
 
     def __init__(self, request, *args, **kwargs):
         super(CreateForm, self).__init__(request, *args, **kwargs)
@@ -164,8 +164,6 @@ class CreateForm(forms.SelfHandlingForm):
                                              'zones.'))
         if not zone_list:
             zone_list.insert(0, ("", _("No availability zones found.")))
-        elif len(zone_list) > 0:
-            zone_list.insert(0, ("", _("Any Availability Zone")))
 
         return zone_list
 
