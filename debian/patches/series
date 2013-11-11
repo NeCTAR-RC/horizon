@@ -1,0 +1,8 @@
+fix-dashboard-django-wsgi.patch
+fix-dashboard-manage.patch
+
+# Disabled during Grizzly dev. cycle
+#add_juju_settings_panel.patch
+
+fix-ubuntu-tests.patch
+ubuntu_settings.patch
