@@ -1,3 +1,9 @@
+horizon (1:2013.2-0ubuntu1) saucy; urgency=low
+
+  * New upstream release (LP: #1236462).
+
+ -- Chuck Short <zulcss@ubuntu.com>  Thu, 17 Oct 2013 09:43:46 -0400
+
 horizon (1:2013.2~rc3-0ubuntu1) saucy; urgency=low
 
   * New upstream release candidate (LP: #1240665).
