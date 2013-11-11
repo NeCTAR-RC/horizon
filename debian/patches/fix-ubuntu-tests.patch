@@ -11,21 +11,15 @@
    # get results of the Horizon tests
    HORIZON_RESULT=$?
  
--  echo "Running openstack_dashboard tests"
--  export NOSE_XUNIT_FILE=openstack_dashboard/nosetests.xml
--  if [ "$NOSE_WITH_HTML_OUTPUT" = '1' ]; then
--    export NOSE_HTML_OUT_FILE='dashboard_nose_results.html'
--  fi
+   echo "Running openstack_dashboard tests"
+   export NOSE_XUNIT_FILE=openstack_dashboard/nosetests.xml
+   if [ "$NOSE_WITH_HTML_OUTPUT" = '1' ]; then
+     export NOSE_HTML_OUT_FILE='dashboard_nose_results.html'
+   fi
 -  ${command_wrapper} coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testopts
-+  #echo "Running openstack_dashboard tests"
-+  #export NOSE_XUNIT_FILE=openstack_dashboard/nosetests.xml
-+  #if [ "$NOSE_WITH_HTML_OUTPUT" = '1' ]; then
-+  #  export NOSE_HTML_OUT_FILE='dashboard_nose_results.html'
-+  #fi
-+  #${command_wrapper} coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testopts
++  ${command_wrapper} python-coverage run -p $root/manage.py test openstack_dashboard --settings=openstack_dashboard.test.settings $testopts
    # get results of the openstack_dashboard tests
--  DASHBOARD_RESULT=$?
-+  #DASHBOARD_RESULT=$?
+   DASHBOARD_RESULT=$?
  
    if [ $with_coverage -eq 1 ]; then
      echo "Generating coverage reports"
