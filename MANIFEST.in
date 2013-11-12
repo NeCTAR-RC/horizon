@@ -3,6 +3,9 @@ recursive-include horizon *.html *.css *.js *.csv *.template *.tmpl *.mo *.po
 recursive-include openstack_dashboard *.html *.js *.less *.mo *.po *.example *.eot *.svg *.ttf *.woff *.png *.ico *.wsgi *.gif *.csv *.template
 recursive-include tools *.py *.sh
 
+recursive-include horizon *.py
+recursive-include openstack_dashboard *.py
+
 include AUTHORS
 include ChangeLog
 include LICENSE
@@ -10,6 +13,8 @@ include Makefile
 include manage.py
 include README.rst
 include run_tests.sh
+include setup.py
+include setup.cfg
 include tox.ini
 include doc/Makefile
 include doc/source/_templates/.placeholder
@@ -17,3 +22,4 @@ include requirements.txt
 include test-requirements.txt
 
 exclude openstack_dashboard/local/local_settings.py
+exclude .gitreview
