@@ -96,6 +96,7 @@ class SetInstanceDetailsAction(workflows.Action):
 
     source_type = forms.ChoiceField(label=_("Instance Boot Source"),
                                     required=True,
+                                    initial='image_id',
                                     choices=SOURCE_TYPE_CHOICES,
                                     help_text=_("Choose Your Boot Source "
                                                 "Type."))
