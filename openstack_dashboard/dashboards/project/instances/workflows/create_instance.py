@@ -90,6 +90,7 @@ class SetInstanceDetailsAction(workflows.Action):
                                help_text=_("Number of instances to launch."))
 
     source_type = forms.ChoiceField(label=_("Instance Boot Source"),
+                                    initial='image_id',
                                     help_text=_("Choose Your Boot Source "
                                                 "Type."))
 
