@@ -19,6 +19,7 @@ from collections import defaultdict  # noqa
 from django.conf import settings  # noqa
 from django.core.urlresolvers import reverse  # noqa
 from django.template import defaultfilters as filters
+from django.utils import datastructures
 from django.utils.http import urlencode  # noqa
 from django.utils.translation import ugettext_lazy as _  # noqa
 
@@ -133,15 +134,25 @@ class OwnerFilter(tables.FixedFilterAction):
 
     def categorize(self, table, images):
         user_tenant_id = table.request.user.tenant_id
-        tenants = defaultdict(list)
-        for im in images:
-            categories = get_image_categories(im, user_tenant_id)
-            for category in categories:
-                tenants[category].append(im)
-        return tenants
+        return categorize_images(images, user_tenant_id)
 
 
-def get_image_categories(im, user_tenant_id):
+@memoized
+def image_categories():
+    text_map = datastructures.SortedDict()
+    text_map['project'] = _('Project')
+    for project in filter_tenants():
+        text_map[project['tenant']] = project['text']
+    text_map['shared'] = _('Shared With Me')
+    text_map['public'] = _('Public')
+    return text_map
+
+
+def image_category_text(category):
+    return image_categories().get(category, '')
+
+
+def categorize_image(im, user_tenant_id):
     categories = []
     if im.is_public:
         categories.append('public')
@@ -152,6 +163,16 @@ def get_image_categories(im, user_tenant_id):
     elif not im.is_public:
         categories.append('shared')
     return categories
+
+
+def categorize_images(images, user_tenant_id):
+    tenants = defaultdict(list)
+    for im in images:
+        categories = categorize_image(im, user_tenant_id)
+        for category in categories:
+            tenants[category].append(im)
+    all_categories = image_categories().keys()
+    return dict((name, tenants[name]) for name in all_categories)
 
 
 def get_image_name(image):
@@ -182,7 +203,7 @@ class UpdateRow(tables.Row):
         # Tag the row with the image category for client-side filtering.
         image = self.datum
         my_tenant_id = self.table.request.user.tenant_id
-        image_categories = get_image_categories(image, my_tenant_id)
+        image_categories = categorize_image(image, my_tenant_id)
         for category in image_categories:
             self.classes.append('category-' + category)
 

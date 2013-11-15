@@ -40,6 +40,7 @@ from openstack_dashboard.api import cinder
 from openstack_dashboard.usage import quotas
 
 from openstack_dashboard.dashboards.project.images_and_snapshots import utils
+from openstack_dashboard.dashboards.project.images_and_snapshots.images import tables as image_common
 
 
 LOG = logging.getLogger(__name__)
@@ -268,7 +269,14 @@ class SetInstanceDetailsAction(workflows.Action):
         for image in images:
             image.bytes = image.size
             image.volume_size = functions.bytes_to_gigabytes(image.bytes)
-            choices.append((image.id, image))
+
+        categories = image_common.categorize_images(images,
+                                                    request.user.tenant_id)
+        for name, images in categories.items():
+            if images:
+                text = image_common.image_category_text(name)
+                choices.append((text, [(image.id, image) for image in images]))
+
         if choices:
             choices.insert(0, ("", _("Select Image")))
         else:
