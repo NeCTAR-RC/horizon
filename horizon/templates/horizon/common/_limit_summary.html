@@ -36,18 +36,19 @@
       {% blocktrans with used=usage.limits.totalSecurityGroupsUsed|intcomma available=usage.limits.maxSecurityGroups|intcomma%}Used <span> {{ used }} </span> of <span> {{ available  }} </span>{% endblocktrans %}
     </strong>
     </div>
-
-{% if usage.quotas.volumes %}
+  {% if usage.limits.totalVolumesUsed %}
     <div class="d3_quota_bar">
-    <div class="d3_pie_chart" data-used="{% widthratio usage.limits.volumesUsed usage.limits.maxTotalVolumes 100 %}"></div>
-    <strong>{% trans "Volumes" %} <br />
-      {% blocktrans with used=usage.limits.volumesUsed|intcomma available=usage.limits.maxTotalVolumes|intcomma%}Used <span> {{ used }} </span> of <span> {{ available  }} </span>{% endblocktrans %}
-    </strong>
+      <div class="d3_pie_chart" data-used="{% widthratio usage.limits.totalVolumesUsed usage.limits.maxTotalVolumes 100 %}"></div>
+      <strong>{% trans "Available Volumes" %} <br />
+        {% blocktrans with used=usage.limits.totalVolumesUsed|intcomma available=usage.limits.maxTotalVolumes|intcomma %}Used <span> {{ used }} </span> of <span> {{ available }} </span>{% endblocktrans %}
+      </strong>
+    </div>
 
     <div class="d3_quota_bar">
-    <div class="d3_pie_chart" data-used="{% widthratio usage.limits.gigabytesUsed usage.limits.maxTotalVolumeGigabytes 100 %}"></div>
-    <strong>{% trans "Volume Gigabytes" %} <br />
-      {% blocktrans with used=usage.limits.gigabytesUsed|intcomma available=usage.limits.maxTotalVolumeGigabytes|intcomma%}Used <span> {{ used }} </span> of <span> {{ available  }} </span>{% endblocktrans %}
-    </strong>
-{% endif %}
+      <div class="d3_pie_chart" data-used="{% widthratio usage.limits.totalGigabytesUsed usage.limits.maxTotalVolumeGigabytes 100 %}"></div>
+      <strong>{% trans "Available Volume Storage" %} <br />
+        {% blocktrans with used=usage.limits.totalGigabytesUsed|diskgbformat available=usage.limits.maxTotalVolumeGigabytes|diskgbformat %}Used <span> {{ used }} </span> of <span> {{ available  }} </span>{% endblocktrans %}
+      </strong>
+    </div>
+  {% endif %}
 </div>
