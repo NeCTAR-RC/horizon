@@ -40,6 +40,8 @@ from openstack_dashboard.api import base
 from openstack_dashboard.api import cinder
 from openstack_dashboard.usage import quotas
 
+from openstack_dashboard.dashboards.project.images.images \
+    import tables as image_common
 from openstack_dashboard.dashboards.project.images \
     import utils as image_utils
 from openstack_dashboard.dashboards.project.instances \
@@ -338,12 +340,22 @@ class SetInstanceDetailsAction(workflows.Action):
             image.bytes = image.size
             image.volume_size = max(
                 image.min_disk, functions.bytes_to_gigabytes(image.bytes))
-            choices.append((image.id, image))
             if context.get('image_id') == image.id and \
                     'volume_size' not in context:
                 context['volume_size'] = image.volume_size
+
+        categories = image_common.categorize_images(images,
+                                                    request.user.tenant_id)
+        for name, images in categories.items():
+            if images:
+                def key(image):
+                    name = getattr(image, 'name', '') or ''
+                    return name.lower()
+                images.sort(key=key)
+                text = image_common.image_category_text(name)
+                choices.append((text, [(image.id, image) for image in images]))
+
         if choices:
-            choices.sort(key=lambda c: c[1].name)
             choices.insert(0, ("", _("Select Image")))
         else:
             choices.insert(0, ("", _("No images available")))
