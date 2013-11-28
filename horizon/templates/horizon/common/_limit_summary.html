@@ -23,12 +23,14 @@
     </strong>
     </div>
 
+    {% comment %}
     <div class="d3_quota_bar">
     <div class="d3_pie_chart" data-used="{% widthratio usage.limits.totalFloatingIpsUsed usage.limits.maxTotalFloatingIps 100 %}"></div>
     <strong>{% trans "Floating IPs" %} <br />
       {% blocktrans with used=usage.limits.totalFloatingIpsUsed|intcomma available=usage.limits.maxTotalFloatingIps|intcomma %}Used <span> {{ used }} </span> of <span> {{ available }} </span>{% endblocktrans %}
     </strong>
     </div>
+    {% endcomment %}
 
     <div class="d3_quota_bar">
     <div class="d3_pie_chart" data-used="{% widthratio usage.limits.totalSecurityGroupsUsed usage.limits.maxSecurityGroups 100 %}"></div>
