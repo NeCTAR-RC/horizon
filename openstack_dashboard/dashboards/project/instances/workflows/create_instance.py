@@ -138,14 +138,14 @@ class SetInstanceDetailsAction(workflows.Action):
             ("volume_id", _("Boot from volume.")),
         ]
 
-        try:
-            if api.nova.extension_supported("BlockDeviceMappingV2Boot",
-                                            request):
-                source_type_choices.append(("volume_image_id",
-                        _("Boot from image (creates a new volume).")))
-        except Exception:
-            exceptions.handle(request, _('Unable to retrieve extensions '
-                                         'information.'))
+        # try:
+        #     if api.nova.extension_supported("BlockDeviceMappingV2Boot",
+        #                                     request):
+        #         source_type_choices.append(("volume_image_id",
+        #                 _("Boot from image (creates a new volume).")))
+        # except Exception:
+        #     exceptions.handle(request, _('Unable to retrieve extensions '
+        #                                  'information.'))
 
         source_type_choices.append(("volume_snapshot_id",
                 _("Boot from volume snapshot (creates a new volume).")))
