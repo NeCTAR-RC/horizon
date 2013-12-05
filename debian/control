@@ -29,6 +29,7 @@ Depends: python-cloudfiles,
  python-cinderclient,
  python-glanceclient,
  python-keystoneclient,
+ python-lesscpy,
  python-lockfile,
  python-memcache,
  python-netaddr,
@@ -41,7 +42,6 @@ Depends: python-cloudfiles,
  ${misc:Depends},
  ${python:Depends}
 Recommends: memcached
-Suggests: python-lesscpy
 Description: Django module providing web based interaction with OpenStack
  The Django-Nova project is a Django module that is used to provide web based
  interactions with the OpenStack Nova cloud controller.
