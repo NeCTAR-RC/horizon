@@ -3414,6 +3414,59 @@ class InstanceTests(helpers.TestCase):
             cleaned,
             precleaned)
 
+    @helpers.create_stubs({api.nova: ('availability_zone_list',)})
+    def test_preproduction_cell_filter(self, cells=[], role='admin',
+                                       assert_excludes=[]):
+        api.nova.availability_zone_list(IsA(http.HttpRequest)) \
+            .MultipleTimes().AndReturn(self.availability_zones.list())
+        self.mox.ReplayAll()
+
+        with django.test.utils.override_settings(
+                OPENSTACK_PREPROD_CELLS=cells,
+                OPENSTACK_PREPROD_ROLE=role):
+            t = workflows.create_instance.CellSelectionAction(self.request, {})
+            choices = t.populate_cell_choices(self.request, {})
+
+        choices.pop(0)  # Remove help text.
+        expected_azs = [az.zoneName for az in self.availability_zones.list()]
+        self.assertItemsEqual(set(expected_azs) - set(assert_excludes),
+                              [choice[0] for choice in choices])
+
+    def test_preproduction_cell_filter_without_required_role(self):
+        az2 = self.availability_zones.list()[1].zoneName
+        self.test_preproduction_cell_filter(cells=[az2, 'nonexistent'],
+                                            role='preproduser',
+                                            assert_excludes=[az2])
+
+    def test_preproduction_cell_filter_with_required_role(self):
+        az2 = self.availability_zones.list()[1].zoneName
+        self.request.user.roles.append({'name': 'preproduser'})
+        self.test_preproduction_cell_filter(cells=[az2],
+                                            role='preproduser')
+
+    def test_preproduction_cell_filter_with_role_dict_and_no_roles(self):
+        az1 = self.availability_zones.first().zoneName
+        az2 = self.availability_zones.list()[1].zoneName
+        cell_dict = {az1: 'preproduser', az2: 'nova2_user'}
+        self.test_preproduction_cell_filter(cells=cell_dict,
+                                            assert_excludes=[az1, az2])
+
+    def test_preproduction_cell_filter_with_role_dict_and_one_role(self):
+        az1 = self.availability_zones.first().zoneName
+        az2 = self.availability_zones.list()[1].zoneName
+        self.request.user.roles.append({'name': 'preproduser'})
+        cell_dict = {az1: 'preproduser', az2: 'nova2_user'}
+        self.test_preproduction_cell_filter(cells=cell_dict,
+                                            assert_excludes=[az2])
+
+    def test_preproduction_cell_filter_with_role_dict_and_both_roles(self):
+        az1 = self.availability_zones.first().zoneName
+        az2 = self.availability_zones.list()[1].zoneName
+        self.request.user.roles.append({'name': 'preproduser'})
+        self.request.user.roles.append({'name': 'nova2_user'})
+        cell_dict = {az1: 'preproduser', az2: 'nova2_user'}
+        self.test_preproduction_cell_filter(cells=cell_dict)
+
 
 class InstanceAjaxTests(helpers.TestCase):
     @helpers.create_stubs({api.nova: ("server_get",

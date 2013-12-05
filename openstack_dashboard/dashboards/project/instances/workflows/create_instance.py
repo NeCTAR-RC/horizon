@@ -20,6 +20,7 @@ import json
 import logging
 import operator
 
+from django.conf import settings
 from django.template.defaultfilters import filesizeformat  # noqa
 from django.utils.text import normalize_newlines  # noqa
 from django.utils.translation import ugettext_lazy as _
@@ -791,7 +792,25 @@ class CellSelectionAction(workflows.Action):
         zone_list = [zone.zoneName
                      for zone in zones if zone.zoneState['available']]
         zone_list.sort()
-        self._cells_list = zone_list
+
+        preprod_cells = getattr(settings, 'OPENSTACK_PREPROD_CELLS', [])
+        preprod_role = getattr(settings, 'OPENSTACK_PREPROD_ROLE', 'admin')
+
+        def filter_zone_list(cell, role_name):
+            preprod_perm = 'openstack.roles.' + role_name.lower()
+            if not request.user.has_perm(preprod_perm):
+                for zone in zone_list[:]:
+                    if (zone == cell or zone.split('-', 1)[0] == cell):
+                        zone_list.remove(zone)
+
+        if isinstance(preprod_cells, dict):
+            for cell, role_name in preprod_cells.items():
+                filter_zone_list(cell, role_name)
+        else:
+            for cell in preprod_cells:
+                filter_zone_list(cell, preprod_role)
+
+        self._cells_list = list(zone_list)
 
         cells_dict = {}
         for cell in zone_list:

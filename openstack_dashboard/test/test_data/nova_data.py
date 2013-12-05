@@ -588,6 +588,21 @@ def data(TEST):
             },
         },
     ))
+    TEST.availability_zones.add(availability_zones.AvailabilityZone(
+        availability_zones.AvailabilityZoneManager(None),
+        {
+            'zoneName': 'nova2',
+            'zoneState': {'available': True},
+            'hosts': {
+                "host001": {
+                    "nova-network": {
+                        "active": True,
+                        "available": True,
+                    },
+                },
+            },
+        },
+    ))
 
     # hypervisors
     hypervisor_1 = hypervisors.Hypervisor(
