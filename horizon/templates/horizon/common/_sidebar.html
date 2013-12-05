@@ -33,7 +33,7 @@
   {% endif %}
 
   {% with num_of_regions=request.user.available_services_regions|length %}
-  {% if num_of_regions > 1 %}
+  {% if num_of_regions > 10 %}
   <div id="services_region_switcher" class="dropdown switcher_bar" tabindex="1">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#services_region_switcher">
         <h4>{% trans "Managing Region" %}</h4>
