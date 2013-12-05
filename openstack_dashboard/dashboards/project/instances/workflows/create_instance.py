@@ -566,7 +566,16 @@ class CellSelectionAction(workflows.Action):
         zone_list = [zone.zoneName
                      for zone in zones if zone.zoneState['available']]
         zone_list.sort()
-        self._cells_list = zone_list
+
+        preprod_cells = getattr(settings, 'OPENSTACK_PREPROD_CELLS', [])
+        preprod_role = getattr(settings, 'OPENSTACK_PREPROD_ROLE', 'admin')
+        preprod_perm = 'openstack.roles.' + preprod_role.lower()
+        if not request.user.has_perm(preprod_perm):
+            for zone in zone_list[:]:
+                if (zone in preprod_cells or
+                        zone.split('-', 1)[0] in preprod_cells):
+                    zone_list.remove(zone)
+        self._cells_list = list(zone_list)
 
         cells_dict = {}
         for cell in zone_list:
