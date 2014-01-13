@@ -154,9 +154,6 @@ class UsageViewTests(test.TestCase):
         exc = self.exceptions.nova_unauthorized
         now = timezone.now()
         self._stub_nova_api_calls()
-        api.nova.extension_supported(
-            'SimpleTenantUsage', IsA(http.HttpRequest)) \
-            .AndReturn(True)
         api.nova.usage_get(IsA(http.HttpRequest), self.tenant.id,
                            datetime.datetime(now.year,
                                              now.month,
@@ -165,10 +162,6 @@ class UsageViewTests(test.TestCase):
                                              now.month,
                                              now.day, 23, 59, 59, 0)) \
                            .AndRaise(exc)
-        api.nova.tenant_absolute_limits(IsA(http.HttpRequest))\
-                           .AndReturn(self.limits['absolute'])
-        self._stub_neutron_api_calls()
-        self._stub_cinder_api_calls()
         self.mox.ReplayAll()
 
         url = reverse('horizon:project:overview:index')
