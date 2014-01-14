@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{% trans "Stacks" %}{% endblock %}
+{% block title %}{% trans "Stacks" %} {% trans "(Beta)" %}{% endblock %}
 
 {% block page_header %}
-  {% include "horizon/common/_page_header.html" with title=_("Stacks") %}
+  {% include "horizon/common/_page_header.html" with title=_("Stacks (Beta)") %}
 {% endblock page_header %}
 
 {% block main %}
+<div class="alert alert-success">
+</i><b>Note:</b> Heat (Stacks) is a new service and currently in a beta phase. Some more advanced Heat functions are not yet available. Refer to the <a href="https://support.rc.nectar.org.au/docs/heat">Heat support documentation</a> for more information.
+</div>
+
     {{ table.render }}
 {% endblock %}
 

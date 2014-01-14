@@ -20,7 +20,7 @@ from openstack_dashboard.dashboards.project import dashboard
 
 
 class Stacks(horizon.Panel):
-    name = _("Stacks")
+    name = _("Stacks (beta)")
     slug = "stacks"
     permissions = ('openstack.services.orchestration',)
 
