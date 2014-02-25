@@ -926,9 +926,9 @@ class InstanceTests(test.TestCase):
                                  expect_password_fields=True):
         image = self.images.first()
 
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(block_device_mapping_v2)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(block_device_mapping_v2)
         cinder.volume_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.volumes.list())
         cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
@@ -994,11 +994,11 @@ class InstanceTests(test.TestCase):
         else:
             self.assertNotContains(res, password_field_label)
 
-        boot_from_image_field_label = 'Boot from image (creates a new volume).'
-        if block_device_mapping_v2:
-            self.assertContains(res, boot_from_image_field_label)
-        else:
-            self.assertNotContains(res, boot_from_image_field_label)
+        # boot_from_image_field_label = 'Boot from image (creates a new volume).'
+        # if block_device_mapping_v2:
+        #     self.assertContains(res, boot_from_image_field_label)
+        # else:
+        #     self.assertNotContains(res, boot_from_image_field_label)
 
     def test_launch_instance_get_no_block_device_mapping_v2_supported(self):
         self.test_launch_instance_get(block_device_mapping_v2=False)
@@ -1032,9 +1032,9 @@ class InstanceTests(test.TestCase):
         nics = [{"net-id": self.networks.first().id, "v4-fixed-ip": ''}]
         quota_usages = self.quota_usages.first()
 
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(True)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(True)
         api.nova.flavor_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.flavors.list())
         api.nova.keypair_list(IsA(http.HttpRequest)) \
@@ -1140,9 +1140,9 @@ class InstanceTests(test.TestCase):
         nics = [{"net-id": self.networks.first().id, "v4-fixed-ip": ''}]
         quota_usages = self.quota_usages.first()
 
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(True)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(True)
         api.nova.flavor_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.flavors.list())
         api.nova.keypair_list(IsA(http.HttpRequest)) \
@@ -1253,9 +1253,9 @@ class InstanceTests(test.TestCase):
         nics = [{"net-id": self.networks.first().id, "v4-fixed-ip": ''}]
         quota_usages = self.quota_usages.first()
 
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(True)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(True)
         api.nova.flavor_list(IsA(http.HttpRequest)) \
                  .AndReturn(self.flavors.list())
         api.nova.keypair_list(IsA(http.HttpRequest)) \
@@ -1361,9 +1361,9 @@ class InstanceTests(test.TestCase):
         customization_script = 'user data'
         quota_usages = self.quota_usages.first()
 
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(True)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(True)
         api.nova.flavor_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.flavors.list())
         api.nova.tenant_absolute_limits(IsA(http.HttpRequest)) \
@@ -1438,9 +1438,9 @@ class InstanceTests(test.TestCase):
                                    'tenant_absolute_limits',
                                    'availability_zone_list',)})
     def test_launch_flavorlist_error(self):
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(True)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(True)
         cinder.volume_list(IsA(http.HttpRequest)) \
             .AndReturn(self.volumes.list())
         cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
@@ -1511,9 +1511,9 @@ class InstanceTests(test.TestCase):
         nics = [{"net-id": self.networks.first().id, "v4-fixed-ip": ''}]
         quota_usages = self.quota_usages.first()
 
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(True)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(True)
         cinder.volume_snapshot_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.volumes.list())
         api.nova.flavor_list(IgnoreArg()).AndReturn(self.flavors.list())
@@ -1621,9 +1621,9 @@ class InstanceTests(test.TestCase):
         volume_choice = "%s:vol" % volume.id
         quota_usages = self.quota_usages.first()
 
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(True)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(True)
         api.nova.flavor_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.flavors.list())
         api.nova.keypair_list(IsA(http.HttpRequest)) \
@@ -1802,9 +1802,9 @@ class InstanceTests(test.TestCase):
                                      'policy').AndReturn(policy_profiles)
         api.nova.tenant_absolute_limits(IsA(http.HttpRequest)) \
            .AndReturn(self.limits['absolute'])
-        api.nova.extension_supported('BlockDeviceMappingV2Boot',
-                                     IsA(http.HttpRequest)) \
-                .AndReturn(True)
+        # api.nova.extension_supported('BlockDeviceMappingV2Boot',
+        #                              IsA(http.HttpRequest)) \
+        #         .AndReturn(True)
         api.nova.flavor_list(IsA(http.HttpRequest)) \
                 .AndReturn(self.flavors.list())
         api.nova.flavor_list(IsA(http.HttpRequest)) \
