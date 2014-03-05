@@ -17,6 +17,7 @@
 from django.utils.translation import ugettext_lazy as _  # noqa
 
 import horizon
+from horizon.conf import HORIZON_CONFIG
 
 from openstack_dashboard.dashboards.project import dashboard
 
@@ -24,7 +25,7 @@ from openstack_dashboard.dashboards.project import dashboard
 class Databases(horizon.Panel):
     name = _("Database Instances")
     slug = 'databases'
-    permissions = ('openstack.services.database',)
+    permissions = HORIZON_CONFIG.panel_permissions('databases')
 
 
 dashboard.Project.register(Databases)

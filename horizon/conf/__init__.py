@@ -5,6 +5,8 @@ from django.utils.functional import LazyObject  # noqa
 
 
 class LazySettings(LazyObject):
+    PANEL_PERMISSIONS_KEY = 'panel_permissions'
+
     def _setup(self, name=None):
         from django.conf import settings  # noqa
         from horizon.conf.default import HORIZON_CONFIG as DEFAULT_CONFIG  # noqa
@@ -25,11 +27,21 @@ class LazySettings(LazyObject):
             default_pw_help = DEFAULT_CONFIG['password_validator']['help_text']
             HORIZON_CONFIG['password_validator']['help_text'] = default_pw_help
 
+        key = self.PANEL_PERMISSIONS_KEY
+        for panel in DEFAULT_CONFIG[key]:
+            if panel not in HORIZON_CONFIG[key]:
+                HORIZON_CONFIG[key][panel] = DEFAULT_CONFIG[key][panel]
+
         self._wrapped = HORIZON_CONFIG
 
     def __getitem__(self, name, fallback=None):
         if self._wrapped is empty:
             self._setup(name)
         return self._wrapped.get(name, fallback)
+
+    def panel_permissions(self, panel_slug):
+        perms = self.get(self.PANEL_PERMISSIONS_KEY, {}).get(panel_slug, '!')
+        return tuple(perms)
+
 
 HORIZON_CONFIG = LazySettings()

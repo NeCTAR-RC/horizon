@@ -17,6 +17,7 @@
 from django.utils.translation import ugettext_lazy as _  # noqa
 
 import horizon
+from horizon.conf import HORIZON_CONFIG
 
 from openstack_dashboard.dashboards.project import dashboard
 
@@ -24,8 +25,7 @@ from openstack_dashboard.dashboards.project import dashboard
 class Backups(horizon.Panel):
     name = _("Database Backups")
     slug = 'database_backups'
-    permissions = ('openstack.services.database',
-                   'openstack.services.object-store',)
+    permissions = HORIZON_CONFIG.panel_permissions('database_backups')
 
 
 dashboard.Project.register(Backups)

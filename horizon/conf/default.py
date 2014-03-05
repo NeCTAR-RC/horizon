@@ -31,5 +31,13 @@ HORIZON_CONFIG = {
     'password_autocomplete': 'on',
 
     # Enable or disable simplified floating IP address management.
-    'simple_ip_management': True
+    'simple_ip_management': True,
+
+    'panel_permissions': {
+        'databases': ('openstack.services.database',),
+        'database_backups': (
+            'openstack.services.database',
+            'openstack.services.object-store',
+        ),
+    }
 }
