@@ -193,7 +193,15 @@ class BaseUsage(object):
         raise NotImplementedError("You must define a get_usage_list method.")
 
     def summarize(self, start, end):
-        if not api.nova.extension_supported('SimpleTenantUsage', self.request):
+        try:
+            supported = api.nova.extension_supported('SimpleTenantUsage',
+                                                     self.request)
+        except Exception:
+            supported = False
+            exceptions.handle(self.request,
+                              _('Unable to retrieve usage information.'))
+
+        if not supported:
             return
 
         if start <= end and start <= self.today:
