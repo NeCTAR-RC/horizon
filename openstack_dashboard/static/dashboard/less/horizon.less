@@ -67,27 +67,47 @@ dt {
   display: block;
 }
 
+.topbar .switcher_bar a.dropdown-toggle:hover {
+  text-decoration: none;
+}
+
+.sidebar .switcher_bar:focus {
+  outline: none;
+}
+
 .topbar .switcher_bar ul {
   width: 130px;
 }
 
 .topbar .switcher_bar h3 {
-  padding: 2px 10px 1px;
+  padding: 2px 14px 1px 10px;
   font-size: 13px !important;
   line-height: 20px;
   color: #6e6e6e;
   text-decoration: none;
+
+  overflow:hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  &:hover {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: none;
+    word-wrap: break-word;
+  }
 }
 
 .topbar .switcher_bar div {
-  padding: 2px 10px 1px;
   font-size: 11px !important;
   line-height: 20px;
   color: #6e6e6e;
   text-decoration: none;
   overflow: hidden;
-  padding-right: 32px;
   text-overflow: ellipsis;
+}
+
+.topbar #user_info .switcher_bar div {
+  padding: 2px 38px 1px 10px;
 }
 
 .topbar .context-box {
