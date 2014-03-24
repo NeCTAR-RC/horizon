@@ -257,7 +257,7 @@ class OwnerFilterTests(test.TestCase):
         self.table = self.mox.CreateMock(horizon_tables.DataTable)
         self.table.request = self.request
 
-    @override_settings(IMAGES_LIST_FILTER_TENANTS=[{'name': 'Official',
+    @override_settings(IMAGES_LIST_FILTER_TENANTS=[{'text': 'Official',
                                                     'tenant': 'officialtenant',
                                                     'icon': 'icon-ok'}])
     def test_filter(self):
