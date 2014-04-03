@@ -21,6 +21,7 @@
 import json
 import logging
 
+from django.conf import settings  # noqa
 from django.template.defaultfilters import filesizeformat  # noqa
 from django.utils.text import normalize_newlines  # noqa
 from django.utils.translation import ugettext_lazy as _
