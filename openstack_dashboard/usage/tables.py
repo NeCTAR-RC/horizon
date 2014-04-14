@@ -26,6 +26,8 @@ class CSVSummary(tables.LinkAction):
     icon = "download"
 
     def get_link_url(self, usage=None):
+        if 'usage' not in self.table.kwargs:
+            return '#'
         return self.table.kwargs['usage'].csv_link()
 
 
