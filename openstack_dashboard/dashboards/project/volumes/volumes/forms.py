@@ -77,7 +77,7 @@ class CreateForm(forms.SelfHandlingForm):
         required=False)
     availability_zone = forms.ChoiceField(
         label=_("Availability Zone"),
-        required=False,
+        required=True,
         widget=forms.Select(
             attrs={'class': 'switched',
                    'data-switch-on': 'source',
@@ -223,6 +223,21 @@ class CreateForm(forms.SelfHandlingForm):
             else:
                 del self.fields['volume_source_type']
 
+    def clean(self):
+        cleaned_data = super(CreateForm, self).clean()
+
+        # Don't require AZ for volume or snapshot source.
+        source_type = cleaned_data.get("volume_source_type", None)
+        if (cleaned_data.get("snapshot_source", None) and
+                    source_type in [None, 'snapshot_source']
+            or
+                cleaned_data.get("volume_source", None) and
+                    source_type in [None, 'volume_source']):
+            cleaned_data['availability_zone'] = None
+            self.errors.pop('availability_zone', None)
+
+        return cleaned_data
+
     # Determine whether the extension for Cinder AZs is enabled
     def cinder_az_supported(self, request):
         try:
@@ -246,8 +261,8 @@ class CreateForm(forms.SelfHandlingForm):
                                              'zones.'))
         if not zone_list:
             zone_list.insert(0, ("", _("No availability zones found")))
-        elif len(zone_list) > 0:
-            zone_list.insert(0, ("", _("Any Availability Zone")))
+        else:
+            zone_list.insert(0, ("", _("Select availability zone")))
 
         return zone_list
 
