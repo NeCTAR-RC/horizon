@@ -122,6 +122,7 @@ class VolumeViewTests(test.TestCase):
                     'method': u'CreateForm',
                     'size': 50,
                     'type': '',
+                    'availability_zone': 'nova',
                     'volume_source_type': 'no_source_type',
                     'snapshot_source': self.cinder_volume_snapshots.first().id,
                     'image_source': self.images.first().id}
@@ -156,7 +157,7 @@ class VolumeViewTests(test.TestCase):
                              metadata={},
                              snapshot_id=None,
                              image_id=None,
-                             availability_zone=None,
+                             availability_zone='nova',
                              source_volid=None).AndReturn(volume)
 
         self.mox.ReplayAll()
@@ -410,6 +411,7 @@ class VolumeViewTests(test.TestCase):
                     'method': u'CreateForm',
                     'size': 40,
                     'type': '',
+                    'availability_zone': 'nova',
                     'image_source': image.id}
 
         cinder.volume_type_list(IsA(http.HttpRequest)).\
@@ -432,7 +434,7 @@ class VolumeViewTests(test.TestCase):
                              metadata={},
                              snapshot_id=None,
                              image_id=image.id,
-                             availability_zone=None,
+                             availability_zone='nova',
                              source_volid=None).AndReturn(volume)
 
         self.mox.ReplayAll()
@@ -467,6 +469,7 @@ class VolumeViewTests(test.TestCase):
                     'method': u'CreateForm',
                     'size': 30,
                     'type': '',
+                    'availability_zone': 'nova',
                     'volume_source_type': 'image_source',
                     'snapshot_source': self.cinder_volume_snapshots.first().id,
                     'image_source': image.id}
@@ -503,7 +506,7 @@ class VolumeViewTests(test.TestCase):
                              metadata={},
                              snapshot_id=None,
                              image_id=image.id,
-                             availability_zone=None,
+                             availability_zone='nova',
                              source_volid=None).AndReturn(volume)
 
         self.mox.ReplayAll()
@@ -530,6 +533,7 @@ class VolumeViewTests(test.TestCase):
         formData = {'name': u'A Volume I Am Making',
                     'description': u'This is a volume I am making for a test.',
                     'method': u'CreateForm',
+                    'availability_zone': 'nova',
                     'size': 1, 'image_source': image.id}
 
         cinder.volume_type_list(IsA(http.HttpRequest)).\
@@ -578,6 +582,7 @@ class VolumeViewTests(test.TestCase):
         formData = {'name': u'A Volume I Am Making',
                     'description': u'This is a volume I am making for a test.',
                     'method': u'CreateForm',
+                    'availability_zone': 'nova',
                     'size': 5, 'image_source': image.id}
 
         cinder.volume_type_list(IsA(http.HttpRequest)).\
@@ -630,6 +635,7 @@ class VolumeViewTests(test.TestCase):
         formData = {'name': u'This Volume Is Huge!',
                     'description': u'This is a volume that is just too big!',
                     'method': u'CreateForm',
+                    'availability_zone': 'nova',
                     'size': 5000}
 
         cinder.volume_type_list(IsA(http.HttpRequest)).\
@@ -679,6 +685,7 @@ class VolumeViewTests(test.TestCase):
         formData = {'name': u'Too Many...',
                     'description': u'We have no volumes left!',
                     'method': u'CreateForm',
+                    'availability_zone': 'nova',
                     'size': 10}
 
         cinder.volume_type_list(IsA(http.HttpRequest)).\
