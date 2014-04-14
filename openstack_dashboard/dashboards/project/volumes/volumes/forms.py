@@ -71,7 +71,7 @@ def availability_zones(request):
     if not zone_list:
         zone_list.insert(0, ("", _("No availability zones found")))
     elif len(zone_list) > 1:
-        zone_list.insert(0, ("", _("Any Availability Zone")))
+        zone_list.insert(0, ("", _("Select availability zone")))
 
     return zone_list
 
@@ -120,7 +120,7 @@ class CreateForm(forms.SelfHandlingForm):
     size = forms.IntegerField(min_value=1, initial=1, label=_("Size (GB)"))
     availability_zone = forms.ChoiceField(
         label=_("Availability Zone"),
-        required=False,
+        required=True,
         widget=forms.Select(
             attrs={'class': 'switched',
                    'data-switch-on': 'source',
@@ -293,7 +293,45 @@ class CreateForm(forms.SelfHandlingForm):
                 not cleaned_data.get('volume_source')):
             msg = _('Volume source must be specified')
             self._errors['volume_source'] = self.error_class([msg])
+
+        # Don't require AZ for volume or snapshot source.
+        if (cleaned_data.get("snapshot_source", None) and
+                    source_type in [None, 'snapshot_source']
+            or
+                cleaned_data.get("volume_source", None) and
+                    source_type in [None, 'volume_source']):
+            cleaned_data['availability_zone'] = None
+            self.errors.pop('availability_zone', None)
+
         return cleaned_data
+
+    # Determine whether the extension for Cinder AZs is enabled
+    def cinder_az_supported(self, request):
+        try:
+            return cinder.extension_supported(request, 'AvailabilityZones')
+        except Exception:
+            exceptions.handle(request, _('Unable to determine if '
+                                         'availability zones extension '
+                                         'is supported.'))
+            return False
+
+    def availability_zones(self, request):
+        zone_list = []
+        if self.cinder_az_supported(request):
+            try:
+                zones = api.cinder.availability_zone_list(request)
+                zone_list = [(zone.zoneName, zone.zoneName)
+                              for zone in zones if zone.zoneState['available']]
+                zone_list.sort()
+            except Exception:
+                exceptions.handle(request, _('Unable to retrieve availability '
+                                             'zones.'))
+        if not zone_list:
+            zone_list.insert(0, ("", _("No availability zones found")))
+        else:
+            zone_list.insert(0, ("", _("Select availability zone")))
+
+        return zone_list
 
     def get_volumes(self, request):
         volumes = []
