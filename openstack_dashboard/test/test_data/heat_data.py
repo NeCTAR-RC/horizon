@@ -343,7 +343,7 @@ def data(TEST):
             'DBUsername': '******',
             'InstanceType': 'm1.small',
             'AWS::StackId':
-        'arn:openstack:heat::2ce287:stacks/teststack/88553ec',
+            'arn:openstack:heat::2ce287:stacks/teststack/88553ec',
             'DBRootPassword': '******',
             'AWS::StackName': 'teststack',
             'DBPassword': '******',
