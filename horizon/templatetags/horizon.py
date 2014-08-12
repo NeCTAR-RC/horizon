@@ -120,7 +120,9 @@ def quota(val, units=None):
     if val == float("inf"):
         return _("No Limit")
     elif units is not None:
-        return "%s %s %s" % (val, units, force_unicode(_("Available")))
+        return "%s %s %s" % (val,
+                             force_unicode(units),
+                             force_unicode(_("Available")))
     else:
         return "%s %s" % (val, force_unicode(_("Available")))
 
@@ -130,7 +132,7 @@ def quotainf(val, units=None):
     if val == float("inf"):
         return _("No Limit")
     elif units is not None:
-        return "%s %s" % (val, units)
+        return "%s %s" % (val, force_unicode(units))
     else:
         return val
 
