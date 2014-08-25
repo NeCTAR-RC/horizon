@@ -43,7 +43,7 @@ horizon.ajax = {
         limit = horizon.conf.ajax.queue_limit,
         request;
     if (queue.length && (!limit || horizon.ajax._active.length < limit)) {
-      request = queue.pop();
+      request = queue.shift();
       horizon.ajax._active.push(request);
       return request();
     }
