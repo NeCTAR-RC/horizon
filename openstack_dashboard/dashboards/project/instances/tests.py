@@ -40,6 +40,7 @@ from openstack_dashboard.usage import quotas
 
 from openstack_dashboard.dashboards.project.instances import tables
 from openstack_dashboard.dashboards.project.instances import tabs
+from openstack_dashboard.dashboards.project.instances import utils
 from openstack_dashboard.dashboards.project.instances import workflows
 
 INDEX_URL = reverse('horizon:project:instances:index')
@@ -48,6 +49,10 @@ SEC_GROUP_ROLE_PREFIX = \
 
 
 class InstanceTests(test.TestCase):
+    def setUp(self):
+        super(InstanceTests, self).setUp()
+        self.mock_api('nova.flavor_extra_specs', {})
+
     @test.create_stubs({api.nova: ('flavor_list',
                                    'server_list',
                                    'tenant_absolute_limits',
@@ -2851,3 +2856,13 @@ class InstanceAjaxTests(test.TestCase):
         # a different availability zone.', u'']]
         self.assertEqual(messages[0][0], 'error')
         self.assertTrue(messages[0][1].startswith('Failed'))
+
+
+class InstanceUtilsTests(test.TestCase):
+    def test_group_flavors(self):
+        flavor = self.flavors.first()
+        extra_specs = {flavor.id: {'group': 'compute'}}
+        grouping = utils.group_flavors(self.request,
+                                       [flavor],
+                                       extra_specs)
+        self.assertIn(('compute', [(flavor.id, flavor.name)]), grouping)

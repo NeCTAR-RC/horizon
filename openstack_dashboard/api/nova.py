@@ -444,6 +444,16 @@ def remove_tenant_from_flavor(request, flavor, tenant):
         flavor=flavor, tenant=tenant)
 
 
+@memoized
+def flavor_extra_specs(request):
+    flavors = flavor_list(request)
+    flavor_specs = {}
+    for flavor in flavors:
+        specs = flavor_get_extras(request, flavor.id, raw=True)
+        flavor_specs[flavor.id] = specs
+    return flavor_specs
+
+
 def flavor_get_extras(request, flavor_id, raw=False):
     """Get flavor extra specs."""
     flavor = novaclient(request).flavors.get(flavor_id)

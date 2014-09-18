@@ -60,8 +60,8 @@ class SetFlavorChoiceAction(workflows.Action):
 
     def populate_flavor_choices(self, request, context):
         flavors = context.get('flavors').values()
-        if len(flavors) > 1:
-            flavors = instance_utils.sort_flavor_list(request, flavors)
+        extra_specs = instance_utils.flavor_extra_specs(request)
+        flavors = instance_utils.group_flavors(request, flavors, extra_specs)
         if flavors:
             flavors.insert(0, ("", _("Select a New Flavor")))
         else:
