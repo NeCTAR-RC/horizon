@@ -267,6 +267,12 @@ TIME_ZONE = "UTC"
 #     'reverse': False,
 # }
 
+# As above, but for sorting flavor groups. Groups are strings.
+# List the groups that should appear first in the flavor list,
+# in the order given. Remaining groups will be sorted alphabetically.
+#
+# CREATE_INSTANCE_FLAVOR_GROUP_ORDER = []
+
 # The Horizon Policy Enforcement engine uses these values to load per service
 # policy rule files. The content of these files should match the files the
 # OpenStack services are using to determine role based access control in the

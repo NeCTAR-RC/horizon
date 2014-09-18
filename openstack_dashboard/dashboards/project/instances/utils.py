@@ -10,9 +10,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import logging
 
 from django.conf import settings
+from django.core import cache
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -30,6 +32,42 @@ def flavor_list(request):
         exceptions.handle(request,
                           _('Unable to retrieve instance flavors.'))
         return []
+
+
+def flavor_extra_specs(request, flavor_id):
+    _cache = cache.cache
+    try:
+        key = 'horizon__nova__extra_specs__%s' % flavor_id
+        specs = _cache.get(key)
+        if specs is None:
+            specs = api.nova.flavor_get_extras(request, flavor_id, raw=True)
+            _cache.set(key, specs, 3600)
+    except Exception:
+        exceptions.handle(request,
+                          _('Unable to retrieve instance flavor specs.'))
+        specs = {}
+    return specs
+
+
+def group_flavors(request, flavors, extra_specs):
+    groups = collections.defaultdict(list)
+    for flavor in flavors:
+        group_name = extra_specs.get(flavor.id, {}).get('group')
+        groups[group_name].append(flavor)
+
+    choice_groups = []
+    group_order = getattr(settings, 'CREATE_INSTANCE_FLAVOR_GROUP_ORDER', [])
+    for group in group_order + filter(lambda g: g not in group_order,
+                                      sorted(groups.keys())):
+        if group not in groups:
+            continue
+        flavors = sort_flavor_list(request, groups[group])
+        if group is None:
+            # Add groupless flavors to the root.
+            choice_groups.extend(flavors)
+        else:
+            choice_groups.append((group, flavors))
+    return choice_groups
 
 
 def sort_flavor_list(request, flavors):

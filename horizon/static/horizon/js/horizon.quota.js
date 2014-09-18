@@ -222,7 +222,7 @@ horizon.Quota = {
   getSelectedFlavor: function() {
     if(this.is_flavor_quota) {
       this.selected_flavor = $.grep(this.flavors, function(flavor) {
-        return flavor.id === $("#id_flavor").children(":selected").val();
+        return flavor.id === $("#id_flavor :selected").val();
       })[0];
     } else {
       this.selected_flavor = null;
