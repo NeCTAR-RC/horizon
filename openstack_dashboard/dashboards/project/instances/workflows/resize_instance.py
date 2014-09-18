@@ -48,10 +48,12 @@ class SetFlavorChoiceAction(workflows.Action):
         old_flavor_id = context.get('old_flavor_id')
         flavors = context.get('flavors').values()
 
-        # Remove current flavor from the list of flavor choices
-        flavors = [flavor for flavor in flavors if flavor.id != old_flavor_id]
-        if len(flavors) > 1:
-            flavors = instance_utils.sort_flavor_list(request, flavors)
+        extra_specs = [(flavor.id,
+                        instance_utils.flavor_extra_specs(request, flavor.id))
+                       for flavor in flavors]
+        extra_specs = dict(extra_specs)
+        flavors = instance_utils.group_flavors(request, flavors, extra_specs,
+                                               exclude_ids=[old_flavor_id])
         if flavors:
             flavors.insert(0, ("", _("Select a New Flavor")))
         else:
