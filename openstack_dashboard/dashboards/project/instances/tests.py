@@ -42,6 +42,7 @@ from openstack_dashboard.api import cinder
 from openstack_dashboard.dashboards.project.instances import console
 from openstack_dashboard.dashboards.project.instances import tables
 from openstack_dashboard.dashboards.project.instances import tabs
+from openstack_dashboard.dashboards.project.instances import utils
 from openstack_dashboard.dashboards.project.instances import workflows
 from openstack_dashboard.test import helpers
 from openstack_dashboard.usage import quotas
@@ -56,6 +57,10 @@ SNAPSHOT_SEARCH_OPTS = dict(status=AVAILABLE)
 
 
 class InstanceTests(helpers.TestCase):
+    #def setUp(self):
+        #super(InstanceTests, self).setUp()
+        #self.mock_api('nova.flavor_get_extras', {})
+
     @helpers.create_stubs({
         api.nova: (
             'flavor_list',
@@ -4931,3 +4936,13 @@ class ConsoleManagerTests(helpers.TestCase):
         res = self.client.post(url, form_data)
 
         self.assertRedirectsNoFollow(res, INDEX_URL)
+
+
+class InstanceUtilsTests(helpers.TestCase):
+    def test_group_flavors(self):
+        flavor = self.flavors.first()
+        extra_specs = {flavor.id: {'flavor_class:name': 'compute'}}
+        grouping = utils.group_flavors(self.request,
+                                       [flavor],
+                                       extra_specs)
+        self.assertIn(('compute', [(flavor.id, flavor.name)]), grouping)

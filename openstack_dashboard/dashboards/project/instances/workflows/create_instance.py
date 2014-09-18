@@ -370,7 +370,12 @@ class SetInstanceDetailsAction(workflows.Action):
         return cleaned_data
 
     def populate_flavor_choices(self, request, context):
-        return instance_utils.flavor_field_data(request, False)
+        flavors = instance_utils.flavor_list(request)
+        extra_specs = [(flavor.id,
+                        instance_utils.flavor_extra_specs(request, flavor.id))
+                       for flavor in flavors]
+        extra_specs = dict(extra_specs)
+        return instance_utils.group_flavors(request, flavors, extra_specs)
 
     def populate_availability_zone_choices(self, request, context):
         try:
