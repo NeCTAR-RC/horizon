@@ -23,6 +23,7 @@ def data(TEST):
     TEST.containers = utils.TestDataContainer()
     TEST.objects = utils.TestDataContainer()
     TEST.folder = utils.TestDataContainer()
+    TEST.accounts = utils.TestDataContainer()
 
     # '%' can break URL if not properly url-quoted
     # ' ' (space) can break 'Content-Disposition' if not properly
@@ -97,3 +98,24 @@ def data(TEST):
                    "hash": u"object_hash"}
 
     TEST.folder.add(swift.PseudoFolder(folder_dict, container_1.name))
+
+    account = {'content-length': '0',
+               'x-account-meta-quota-bytes': '10737418240',
+               'x-account-object-count': '0',
+               'connection': 'keep-alive',
+               'x-timestamp': '1411443402.08685',
+               'x-trans-id': 'txd3e605169b27469ebafcc-005420fa1a',
+               'date': 'Tue, 23 Sep 2014 04:42:02 GMT',
+               'x-account-bytes-used': '5368709120',
+               'x-account-container-count': '0',
+               'content-type': 'text/plain; charset=utf-8',
+               'accept-ranges': 'bytes'}
+    TEST.accounts.add(account)
+
+    account = account.copy()
+    del account['x-account-meta-quota-bytes']
+    TEST.accounts.add(account)
+
+    limits = {"absolute": {"maxObjectGigabytes": 10,
+                           "totalObjectGigabytesUsed": 5}}
+    TEST.swift_limits = limits
