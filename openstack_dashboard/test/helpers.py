@@ -30,6 +30,7 @@ from django import http
 from django.test.client import RequestFactory  # noqa
 from django.utils.importlib import import_module  # noqa
 from django.utils import unittest
+import mock
 
 from ceilometerclient.v2 import client as ceilometer_client
 from cinderclient import client as cinder_client
@@ -125,6 +126,8 @@ class TestCase(horizon_helpers.TestCase):
         self.mox = mox.Mox()
         self.factory = RequestFactoryWithMessages()
         self.context = {'authorized_tenants': self.tenants.list()}
+        self.patchers = {}
+        self.mocks = {}
 
         def fake_conn_request(*args, **kwargs):
             raise Exception("An external URI request tried to escape through "
@@ -158,7 +161,17 @@ class TestCase(horizon_helpers.TestCase):
         context_processors.openstack = self._real_context_processor
         utils.get_user = self._real_get_user
         self.mox.VerifyAll()
+        for name, patcher in self.patchers.items():
+            patcher.stop()
         del os.environ["HORIZON_TEST_RUN"]
+
+    def mock_api(self, name, return_value=None):
+        patcher = mock.patch('openstack_dashboard.api.%s' % name, spec=True)
+        self.patchers[name] = patcher
+        _mock = patcher.start()
+        _mock.return_value = return_value
+        self.mocks[name] = _mock
+        return _mock
 
     def setActiveUser(self, id=None, token=None, username=None, tenant_id=None,
                         service_catalog=None, tenant_name=None, roles=None,
