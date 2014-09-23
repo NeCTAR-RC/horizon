@@ -53,4 +53,12 @@
       </strong>
     </div>
   {% endif %}
+  {% if usage.limits.totalObjectMegabytesUsed >= 0 %}
+    <div class="d3_quota_bar">
+      <div class="d3_pie_chart_usage" data-used="{% widthratio usage.limits.totalObjectMegabytesUsed usage.limits.maxObjectMegabytes 100 %}"></div>
+      <strong>{% trans "Object Storage" %} <br />
+        {% blocktrans with used=usage.limits.totalObjectMegabytesUsed|mb_float_format available=usage.limits.maxObjectMegabytes|quotainf|mb_float_format %}Used <span> {{ used }} </span> of <span> {{ available }} </span>{% endblocktrans %}
+      </strong>
+    </div>
+  {% endif %}
 </div>

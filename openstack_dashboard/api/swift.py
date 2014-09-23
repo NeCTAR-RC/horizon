@@ -37,6 +37,9 @@ FOLDER_DELIMITER = "/"
 GLOBAL_READ_ACL = ".r:*"
 LIST_CONTENTS_ACL = ".rlistings"
 
+QUOTA_LIMIT_HEADER = 'x-account-meta-quota-bytes'
+QUOTA_USAGE_HEADER = 'x-account-bytes-used'
+
 
 class Container(base.APIDictWrapper):
     pass
@@ -338,3 +341,12 @@ def swift_get_object(request, container_name, object_name, with_data=True):
                          container_name,
                          orig_name=orig_name,
                          data=data)
+
+
+def tenant_absolute_limits(request):
+    account = swift_api(request).head_account()
+    limit = account.get(QUOTA_LIMIT_HEADER, 'inf')
+    limit = float(limit) / (1024 ** 2)
+    used = float(account.get(QUOTA_USAGE_HEADER, 0)) / (1024 ** 2)
+    return {'maxObjectMegabytes': limit,
+            'totalObjectMegabytesUsed': used}

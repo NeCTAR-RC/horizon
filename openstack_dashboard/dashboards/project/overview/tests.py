@@ -21,7 +21,6 @@ import datetime
 from django.core.urlresolvers import reverse
 from django import http
 from django.utils import timezone
-
 from mox import IsA  # noqa
 
 from openstack_dashboard import api
@@ -33,6 +32,12 @@ INDEX_URL = reverse('horizon:project:overview:index')
 
 
 class UsageViewTests(test.TestCase):
+
+    def setUp(self):
+        super(UsageViewTests, self).setUp()
+        limits = {'maxObjectMegabytes': 1024,
+                  'totalObjectMegabytesUsed': 512.0}
+        self.mock_api('swift.tenant_absolute_limits', limits)
 
     def _stub_nova_api_calls(self, nova_stu_enabled=True):
         self.mox.StubOutWithMock(api.nova, 'usage_get')
@@ -134,6 +139,8 @@ class UsageViewTests(test.TestCase):
         api.base.is_service_enabled(IsA(http.HttpRequest), 'network') \
                            .MultipleTimes().AndReturn(False)
         api.base.is_service_enabled(IsA(http.HttpRequest), 'volume') \
+                           .MultipleTimes().AndReturn(False)
+        api.base.is_service_enabled(IsA(http.HttpRequest), 'object-store') \
                            .MultipleTimes().AndReturn(False)
 
         self.mox.ReplayAll()
@@ -389,6 +396,8 @@ class UsageViewTests(test.TestCase):
                            .MultipleTimes().AndReturn(False)
         api.base.is_service_enabled(IsA(http.HttpRequest), 'volume') \
                            .MultipleTimes().AndReturn(cinder_enabled)
+        api.base.is_service_enabled(IsA(http.HttpRequest), 'object-store') \
+                           .MultipleTimes().AndReturn(True)
         self.mox.ReplayAll()
 
         res = self.client.get(reverse('horizon:project:overview:index'))
@@ -402,3 +411,5 @@ class UsageViewTests(test.TestCase):
             self.assertEqual(usages.limits['maxTotalVolumeGigabytes'], 1000)
         else:
             self.assertNotIn('totalVolumesUsed', usages.limits)
+        self.assertEqual(usages.limits['maxObjectMegabytes'], 1024)
+        self.assertEqual(usages.limits['totalObjectMegabytesUsed'], 512)

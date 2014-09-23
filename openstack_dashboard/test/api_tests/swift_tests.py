@@ -212,3 +212,22 @@ class SwiftApiTests(test.APITestCase):
         self.assertTrue(api.swift.swift_object_exists(*args))
         # Again, for a "non-existent" object
         self.assertFalse(api.swift.swift_object_exists(*args))
+
+    def _tenant_absolute_limits(self, account, quotas):
+        swift_api = self.stub_swiftclient()
+        swift_api.head_account().AndReturn(account)
+        self.mox.ReplayAll()
+
+        limits = api.swift.tenant_absolute_limits(self.request)
+        self.assertEqual(limits['maxObjectMegabytes'], quotas['limit'])
+        self.assertEqual(limits['totalObjectMegabytesUsed'], quotas['used'])
+
+    def test_tenant_absolute_limits_with_quota(self):
+        self._tenant_absolute_limits(self.accounts.first(),
+                                     {'limit': 10 * 1024,
+                                      'used': 25.0})
+
+    def test_tenant_absolute_limits_no_quota(self):
+        self._tenant_absolute_limits(self.accounts.list()[1],
+                                     {'limit': float('inf'),
+                                      'used': 25.0})

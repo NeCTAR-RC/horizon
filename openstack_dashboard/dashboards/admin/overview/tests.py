@@ -36,6 +36,11 @@ INDEX_URL = reverse('horizon:project:overview:index')
 
 
 class UsageViewTests(test.BaseAdminViewTests):
+    def setUp(self):
+        super(UsageViewTests, self).setUp()
+        limits = {'maxObjectMegabytes': 1024,
+                  'totalObjectMegabytesUsed': 512.0}
+        self.mock_api('swift.tenant_absolute_limits', limits)
 
     def _stub_api_calls(self, nova_stu_enabled):
         self.mox.StubOutWithMock(api.nova, 'usage_list')

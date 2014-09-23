@@ -188,6 +188,16 @@ class BaseUsage(object):
 
         return
 
+    def get_swift_limits(self):
+        if not api.base.is_service_enabled(self.request, 'object-store'):
+            return
+        try:
+            limits = api.swift.tenant_absolute_limits(self.request)
+            self.limits.update(limits)
+        except Exception:
+            msg = _("Unable to retrieve object storage limit information.")
+            exceptions.handle(self.request, msg)
+
     def get_limits(self):
         try:
             self.limits = api.nova.tenant_absolute_limits(self.request)
@@ -196,6 +206,7 @@ class BaseUsage(object):
                               _("Unable to retrieve limit information."))
         self.get_neutron_limits()
         self.get_cinder_limits()
+        self.get_swift_limits()
 
     def get_usage_list(self, start, end):
         return []
