@@ -125,6 +125,7 @@ class ContainerView(browsers.ResourceBrowserView):
         context = super(ContainerView, self).get_context_data(**kwargs)
         context['container_name'] = self.kwargs["container_name"]
         context['subfolders'] = []
+        context['limits'] = self.get_limits()
         if self.kwargs["subfolder_path"]:
             (parent, slash, folder) = self.kwargs["subfolder_path"] \
                                           .strip('/').rpartition('/')
@@ -133,6 +134,16 @@ class ContainerView(browsers.ResourceBrowserView):
                 context['subfolders'].insert(0, (folder, path))
                 (parent, slash, folder) = parent.rpartition('/')
         return context
+
+    def get_limits(self):
+        if not api.base.is_service_enabled(self.request, 'object-store'):
+            return
+        try:
+            limits = api.swift.tenant_absolute_limits(self.request)
+            return limits
+        except Exception:
+            msg = _("Unable to retrieve object storage limit information.")
+            exceptions.handle(self.request, msg)
 
 
 class CreateView(forms.ModalFormView):

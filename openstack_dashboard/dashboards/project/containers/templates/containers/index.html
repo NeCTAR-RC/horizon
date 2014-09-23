@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n horizon sizeformat %}
 {% load url from future %}
 
 {% block title %}{% trans "Containers" %}{% endblock %}
@@ -11,6 +11,16 @@
 {% endblock page_header %}
 
 {% block main %}
+<div>
+    <strong>{% trans "Object Storage Usage" %}:
+       {% blocktrans with used=limits.totalObjectMegabytesUsed|mb_float_format available=limits.maxObjectMegabytes|quotainf|mb_float_format %}<span> {{ used }} </span> used of <span> {{ available }} </span>{% endblocktrans %}
+    </strong>
+    <br/>
+    <br/>
+    <div style="width: 100%" id="quota_object_storage" class="quota_bar"
+        data-progress-indicator-step-by="integer" data-quota-limit="{{ limits.maxObjectMegabytes }}" data-quota-used="{{ limits.totalObjectMegabytesUsed }}">
+    </div>
+</div>
     {% if subfolders %}
          <div class="page_title table_header">
             <div>
@@ -28,4 +38,14 @@
          </div>
     {% endif %}
   {{ swift_browser.render }}
+
+<script type="text/javascript" charset="utf-8">
+  if(typeof horizon.Quota !== 'undefined') {
+    horizon.Quota.init();
+  } else {
+    addHorizonLoadEvent(function() {
+        horizon.Quota.init();
+    });
+  }
+</script>
 {% endblock %}

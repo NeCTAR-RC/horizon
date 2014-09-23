@@ -42,6 +42,12 @@ CONTAINER_INDEX_URL = reverse('horizon:project:containers:index')
 
 
 class SwiftTests(test.TestCase):
+    def setUp(self):
+        super(SwiftTests, self).setUp()
+        limits = {'maxObjectMegabytes': 1024,
+                  'totalObjectMegabytesUsed': 512.0}
+        self.mock_api('swift.tenant_absolute_limits', limits)
+
     @test.create_stubs({api.swift: ('swift_get_containers',)})
     def test_index_no_container_selected(self):
         containers = self.containers.list()
