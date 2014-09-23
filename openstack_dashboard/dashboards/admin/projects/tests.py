@@ -1461,6 +1461,12 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
 
 
 class UsageViewTests(test.BaseAdminViewTests):
+    def setUp(self):
+        super(UsageViewTests, self).setUp()
+        limits = {'maxObjectMegabytes': 1024,
+                  'totalObjectMegabytesUsed': 512.0}
+        self.mock_api('swift.tenant_absolute_limits', limits)
+
     def _stub_nova_api_calls(self, nova_stu_enabled=True):
         self.mox.StubOutWithMock(api.nova, 'usage_get')
         self.mox.StubOutWithMock(api.nova, 'tenant_absolute_limits')
