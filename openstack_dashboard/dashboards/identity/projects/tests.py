@@ -1506,6 +1506,7 @@ class UpdateProjectWorkflowTests(test.BaseAdminViewTests):
 
 
 class UsageViewTests(test.BaseAdminViewTests):
+
     def _stub_nova_api_calls(self, nova_stu_enabled=True):
         self.mox.StubOutWithMock(api.nova, 'usage_get')
         self.mox.StubOutWithMock(api.nova, 'tenant_absolute_limits')

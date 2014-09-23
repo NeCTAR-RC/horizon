@@ -65,6 +65,11 @@ class UsageViewTests(test.TestCase):
         api.cinder.tenant_absolute_limits(IsA(http.HttpRequest)) \
             .AndReturn(self.cinder_limits['absolute'])
 
+    @test.create_stubs({api.swift: ('tenant_absolute_limits',)})
+    def _stub_swift_api_calls(self):
+        api.swift.tenant_absolute_limits(IsA(http.HttpRequest)) \
+            .AndReturn(self.swift_limits['absolute'])
+
     @test.create_stubs({api.neutron: ('is_extension_supported',),
                         api.network: ('floating_ip_supported',
                                       'tenant_floating_ip_list',
@@ -137,6 +142,8 @@ class UsageViewTests(test.TestCase):
         api.base.is_service_enabled(IsA(http.HttpRequest), 'network') \
             .MultipleTimes().AndReturn(False)
         api.base.is_service_enabled(IsA(http.HttpRequest), 'volume') \
+            .MultipleTimes().AndReturn(False)
+        api.base.is_service_enabled(IsA(http.HttpRequest), 'object-store') \
             .MultipleTimes().AndReturn(False)
 
         self.mox.ReplayAll()
@@ -313,11 +320,14 @@ class UsageViewTests(test.TestCase):
 
         if cinder_enabled:
             self._stub_cinder_api_calls()
+            self._stub_swift_api_calls()
 
         api.base.is_service_enabled(IsA(http.HttpRequest), 'network') \
             .MultipleTimes().AndReturn(False)
         api.base.is_service_enabled(IsA(http.HttpRequest), 'volume') \
             .MultipleTimes().AndReturn(cinder_enabled)
+        api.base.is_service_enabled(IsA(http.HttpRequest), 'object-store') \
+                .MultipleTimes().AndReturn(True)
         self.mox.ReplayAll()
 
         res = self.client.get(reverse('horizon:project:overview:index'))
@@ -329,8 +339,11 @@ class UsageViewTests(test.TestCase):
             self.assertEqual(usages.limits['maxTotalVolumes'], 10)
             self.assertEqual(usages.limits['totalGigabytesUsed'], 5)
             self.assertEqual(usages.limits['maxTotalVolumeGigabytes'], 1000)
+            self.assertEqual(usages.limits['maxObjectGigabytes'], 10)
+            self.assertEqual(usages.limits['totalObjectGigabytesUsed'], 5)
         else:
             self.assertNotIn('totalVolumesUsed', usages.limits)
+            self.assertNotIn('totalObjectGigabytesUsed', usages.limits)
 
     def _test_usage_charts(self):
         self._stub_nova_api_calls(False)

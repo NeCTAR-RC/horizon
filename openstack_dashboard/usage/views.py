@@ -78,6 +78,11 @@ class UsageView(tables.DataTableView):
                          _("Volumes")))
             types.append(("totalGigabytesUsed", "maxTotalVolumeGigabytes",
                          _("Volume Storage")))
+        # Check for object-store usage
+        if 'totalObjectGigabytesUsed' in self.usage.limits and \
+           self.usage.limits['totalObjectGigabytesUsed'] >= 0:
+            types.append(("totalObjectGigabytesUsed", "maxObjectGigabytes",
+                         _("Object Storage")))
         for t in types:
             if t[0] in self.usage.limits and t[1] in self.usage.limits:
                 text = False
