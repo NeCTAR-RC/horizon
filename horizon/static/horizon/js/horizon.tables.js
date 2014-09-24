@@ -16,8 +16,11 @@ horizon.datatables = {
         $table = $row.closest('table'),
         decay_constant = $row.attr('decay_constant');
 
+      action_menu_is_active = $row.find('.actions_column .btn-group.open').length;
+      can_see_row = horizon.datatables.can_see_row($row);
+
       // Do not update this row if the action column is expanded
-      if ($row.find('.actions_column .btn-group.open').length) {
+      if (action_menu_is_active || !can_see_row) {
         // Wait and try to update again in next interval instead
         setTimeout(horizon.datatables.update_row, interval, row);
         // Remove interval decay, since this will not hit server
@@ -139,6 +142,19 @@ horizon.datatables = {
         }
       });
     });
+  },
+
+  can_see_row: function(row) {
+    var $row = $(row);
+    var $window = $(window);
+    if ($row.length === 0) {
+      return false;
+    }
+    var page_top = $window.scrollTop();
+    var page_bottom = page_top + $window.height();
+    var row_top = $row.offset().top;
+    var row_bottom = row_top + $row.height();
+    return (page_bottom >= row_top && page_top <= row_bottom);
   },
 
   validate_button: function () {
