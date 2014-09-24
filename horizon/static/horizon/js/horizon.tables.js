@@ -3,22 +3,28 @@ horizon.datatables = {
   update: function () {
     var $rows_to_update = $('tr.status_unknown.ajax-update');
     if ($rows_to_update.length) {
-      var interval = $rows_to_update.attr('data-update-interval'),
-        $table = $rows_to_update.closest('table'),
-        decay_constant = $table.attr('decay_constant');
+      $rows_to_update.each(function(index, row) {
+        horizon.datatables.update_row(row);
+      });
+    }
+  },
+
+  update_row: function(row) {
+    var $row = $(row);
+    var $table = $row.closest('table.datatable');
+      var interval = $row.attr('data-update-interval'),
+        $table = $row.closest('table'),
+        decay_constant = $row.attr('decay_constant');
 
       // Do not update this row if the action column is expanded
-      if ($rows_to_update.find('.actions_column .btn-group.open').length) {
+      if ($row.find('.actions_column .btn-group.open').length) {
         // Wait and try to update again in next interval instead
-        setTimeout(horizon.datatables.update, interval);
+        setTimeout(horizon.datatables.update_row, interval, row);
         // Remove interval decay, since this will not hit server
-        $table.removeAttr('decay_constant');
+        $row.removeAttr('decay_constant');
         return;
       }
       // Trigger the update handlers.
-      $rows_to_update.each(function(index, row) {
-        var $row = $(this),
-          $table = $row.closest('table.datatable');
         horizon.ajax.queue({
           url: $row.attr('data-update-url'),
           error: function (jqXHR, textStatus, errorThrown) {
@@ -57,8 +63,9 @@ horizon.datatables = {
           },
           success: function (data, textStatus, jqXHR) {
             var $new_row = $(data);
+            var needs_refresh = $new_row.hasClass('status_unknown')
 
-            if ($new_row.hasClass('status_unknown')) {
+            if (needs_refresh) {
               var spinner_elm = $new_row.find("td.status_unknown:last");
               var imagePath = $new_row.find('.btn-action-required').length > 0 ?
                 "dashboard/img/action_required.png":
@@ -77,20 +84,21 @@ horizon.datatables = {
                 $new_row.find('.table-row-multi-select:checkbox').prop('checked', true);
               }
               $row.replaceWith($new_row);
+              $row = $new_row
               // Reset tablesorter's data cache.
               $table.trigger("update");
               // Reset decay constant.
-              $table.removeAttr('decay_constant');
+              $row.removeAttr('decay_constant');
               // Check that quicksearch is enabled for this table
               // Reset quicksearch's data cache.
               if ($table.attr('id') in horizon.datatables.qs) {
                 horizon.datatables.qs[$table.attr('id')].cache();
               }
             }
-          },
-          complete: function (jqXHR, textStatus) {
-            // Revalidate the button check for the updated table
-            horizon.datatables.validate_button();
+
+            if (!needs_refresh) {
+                return;
+            }
 
             // Set interval decay to this table, and increase if it already exist
             if(decay_constant === undefined) {
@@ -98,16 +106,18 @@ horizon.datatables = {
             } else {
               decay_constant++;
             }
-            $table.attr('decay_constant', decay_constant);
-            // Poll until there are no rows in an "unknown" state on the page.
+            $row.attr('decay_constant', decay_constant);
+            // Poll until this row changes from the "unknown" state.
             next_poll = interval * decay_constant;
             // Limit the interval to 30 secs
             if(next_poll > 30 * 1000) { next_poll = 30 * 1000; }
-            setTimeout(horizon.datatables.update, next_poll);
+            setTimeout(horizon.datatables.update_row, next_poll, $row);
+          },
+          complete: function (jqXHR, textStatus) {
+            // Revalidate the button check for the updated table
+            horizon.datatables.validate_button();
           }
         });
-      });
-    }
   },
 
   update_actions: function() {
