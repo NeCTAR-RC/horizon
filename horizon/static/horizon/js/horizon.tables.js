@@ -96,7 +96,7 @@ horizon.datatables = {
               $row.replaceWith($new_row);
               $row = $new_row
               // Reset tablesorter's data cache.
-              $table.trigger("update");
+              horizon.datatables.update_table($table);
               // Reset decay constant.
               $row.removeAttr('decay_constant');
             }
@@ -406,6 +406,23 @@ horizon.datatables.set_table_fixed_filter = function (parent) {
     });
   });
 };
+
+function throttle(func, wait) {
+  var timeout;
+  return function() {
+    var context = this, args = arguments;
+    if (!timeout) {
+      timeout = setTimeout(function() {
+        timeout = null;
+        func.apply(context, args)
+      }, wait);
+    }
+  }
+}
+
+horizon.datatables.update_table = throttle(function(table) {
+  $(table).trigger("update");
+}, 1000);
 
 horizon.addInitFunction(function() {
   horizon.datatables.validate_button();
