@@ -51,7 +51,7 @@ SEC_GROUP_ROLE_PREFIX = \
 class InstanceTests(test.TestCase):
     def setUp(self):
         super(InstanceTests, self).setUp()
-        self.mock_api('nova.flavor_extra_specs', {})
+        self.mock_api('nova.flavor_get_extras', {})
 
     @test.create_stubs({api.nova: ('flavor_list',
                                    'server_list',

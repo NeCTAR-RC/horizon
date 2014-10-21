@@ -287,7 +287,10 @@ class SetInstanceDetailsAction(workflows.Action):
 
     def populate_flavor_choices(self, request, context):
         flavors = instance_utils.flavor_list(request)
-        extra_specs = instance_utils.flavor_extra_specs(request)
+        extra_specs = [(flavor.id,
+                        instance_utils.flavor_extra_specs(request, flavor.id))
+                       for flavor in flavors]
+        extra_specs = dict(extra_specs)
         return instance_utils.group_flavors(request, flavors, extra_specs)
 
     def get_help_text(self):

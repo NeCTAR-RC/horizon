@@ -34,16 +34,16 @@ def flavor_list(request):
         return []
 
 
-def flavor_extra_specs(request):
+def flavor_extra_specs(request, flavor_id):
     try:
-        key = 'horizon__nova__extra_specs'
+        key = 'horizon__nova__extra_specs__%s' % flavor_id
         specs = cache.get(key)
         if specs is None:
-            specs = api.nova.flavor_extra_specs(request)
+            specs = api.nova.flavor_get_extras(request, flavor_id, raw=True)
             cache.set(key, specs, 3600)
     except Exception:
         exceptions.handle(request,
-                        _('Unable to retrieve instance flavor specs.'))
+                          _('Unable to retrieve instance flavor specs.'))
         specs = {}
     return specs
 
