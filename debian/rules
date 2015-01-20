@@ -22,7 +22,8 @@ override_dh_auto_clean:
 override_dh_auto_build:
 	# NOTE(jamespage) this is a little horrible but works around
 	# the switch to /var/lib/openstack once installed for lockfiles
-	ln -sf ../xstatic horizon/xstatic
+	bash debian/bundle-xstatic.sh $(DEB_UPSTREAM_VERSION)
+	cp -r ../xstatic horizon/
 	patch -p1 -R <debian/patches/ubuntu_settings.patch 
 	./run_tests.sh -N --compilemessages
 	patch -p1 <debian/patches/ubuntu_settings.patch 
@@ -32,7 +33,7 @@ override_dh_auto_install:
 	# install horizon and dashboard
 	python setup.py install --root=$(CURDIR)/debian/tmp --no-compile -O0 --install-layout=deb
 	# install vendorfied xstatic assets
-	cp -r xstatic $(CURDIR)/debian/tmp/usr/lib/$(PYVER)/dist-packages/horizon
+	#cp -r xstatic $(CURDIR)/debian/tmp/usr/lib/$(PYVER)/dist-packages/horizon
 	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard
 	install -d -m 755 $(CURDIR)/debian/tmp/etc/openstack-dashboard
 	install -d -m 755 $(CURDIR)/debian/tmp/etc/apache2/conf-available
