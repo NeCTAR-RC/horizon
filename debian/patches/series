@@ -1,6 +1,6 @@
-prevent_login_page_DOS.patch
+#prevent_login_page_DOS.patch
 fix-dashboard-django-wsgi.patch
 fix-dashboard-manage.patch
 ubuntu_settings.patch
 embedded-xstatic.patch
-add-juju-environment-download.patch
+#add-juju-environment-download.patch
