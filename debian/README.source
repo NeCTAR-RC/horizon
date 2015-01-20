@@ -1,0 +1,19 @@
+horizon for Ubuntu
+------------------
+
+During the Juno/14.10 development cycle, use of xstatic packages was introduced
+so that CSS, JS and other static assets did not have to be embedded in the
+horizon source tree.
+
+These have been packaged in Debian, however to support continued inclusion of
+Horizon in Ubuntu main, and to limit the scope of use of such assets in
+Ubuntu main, these assets are bundled up alongside the upstream release tarball
+and are included in the python-django-horizon package under horizon.xstatic.
+
+To refresh the orig-xstatic.tar.gz and extract it run:
+
+    ./debian/rules refresh-xstatic
+
+this will use pip to retrieve all xstatic assets detailed in requirements.txt
+and bundle them into an additional 'upstream' tar.gz, leveraging the multi-orig
+feature of source format 3.0.

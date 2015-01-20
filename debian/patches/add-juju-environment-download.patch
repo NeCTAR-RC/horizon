@@ -1,0 +1,124 @@
+Description: Patch in download link for a Juju environment file.
+Author: James Page <james.page@ubuntu.com>
+Forwarded: not-needed
+
+--- /dev/null
++++ b/openstack_dashboard/dashboards/project/access_and_security/templates/access_and_security/api_access/juju.environments.template
+@@ -0,0 +1,22 @@
++# To use Juju with your Openstack cloud:
++#    1. Run: apt-get install juju
++#    2. Copy this file to $HOME/.juju/environments.yaml
++#    3. Complete any empty fields
++#    4. Run 'juju bootstrap' and deploy services!
++#
++# To find out more about juju visit http://juju.ubuntu.com
++environments:
++  openstack:
++    type: openstack
++    auth-url: {{ auth_url }}
++    auth-mode: userpass
++    use-floating-ip: true
++    # Please provide the UUID of the network to use if you have
++    # more than one network configured for your tenant.
++    # network:
++    region: {{ region }}
++    username: {{ user }}
++    # Please provide the password you use to access the
++    # OpenStack cloud.
++    password:
++    tenant-name: {{ tenant_name }}
+--- a/openstack_dashboard/dashboards/project/access_and_security/api_access/views.py
++++ b/openstack_dashboard/dashboards/project/access_and_security/api_access/views.py
+@@ -135,3 +135,37 @@ def download_rc_file(request):
+         LOG.exception("Exception in DownloadOpenRCForm.")
+         messages.error(request, _('Error Downloading RC File: %s') % e)
+         return shortcuts.redirect(request.build_absolute_uri())
++
++
++def download_juju_env_file(request):
++    tenant_id = request.user.tenant_id
++    tenant_name = request.user.tenant_name
++    region = request.user.services_region
++    if region is None:
++        region = ""
++
++    template = 'project/access_and_security/api_access/juju.environments.template'
++
++    try:
++        keystone_url = api.base.url_for(request,
++                                        'identity',
++                                        endpoint_type='publicURL')
++        context = {'auth_url': keystone_url,
++                   'tenant_name': tenant_name,
++                   'user': request.user,
++                   'region': region}
++
++        response = shortcuts.render(request,
++                                    template,
++                                    context,
++                                    content_type="text/yaml")
++        response['Content-Disposition'] = ('attachment; '
++                                           'filename="%s-environments.yaml"'
++                                           % tenant_name)
++        response['Content-Length'] = str(len(response.content))
++        return response
++
++    except Exception as e:
++        LOG.exception("Exception in DownloadJujuEnvironmentsForm.")
++        messages.error(request, _('Error Downloading Juju Environments File: %s') % e)
++        return shortcuts.redirect(request.build_absolute_uri())
+--- a/openstack_dashboard/dashboards/project/access_and_security/api_access/urls.py
++++ b/openstack_dashboard/dashboards/project/access_and_security/api_access/urls.py
+@@ -26,4 +26,5 @@ from openstack_dashboard.dashboards.proj
+ urlpatterns = patterns('',
+     url(r'^ec2/$', views.download_ec2_bundle, name='ec2'),
+     url(r'^openrc/$', views.download_rc_file, name='openrc'),
++    url(r'^juju/$', views.download_juju_env_file, name='juju'),
+ )
+--- a/openstack_dashboard/dashboards/project/access_and_security/api_access/tables.py
++++ b/openstack_dashboard/dashboards/project/access_and_security/api_access/tables.py
+@@ -48,6 +48,14 @@ class DownloadOpenRC(tables.LinkAction):
+     url = "horizon:project:access_and_security:api_access:openrc"
+ 
+ 
++class DownloadJujuEnv(tables.LinkAction):
++    name = "download_jujuenv"
++    verbose_name = _("Download Juju Environment File")
++    verbose_name_plural = _("Download Juju Environment File")
++    icon = "download"
++    url = "horizon:project:access_and_security:api_access:juju"
++
++
+ class EndpointsTable(tables.DataTable):
+     api_name = tables.Column('type',
+                              verbose_name=_("Service"),
+@@ -59,4 +67,4 @@ class EndpointsTable(tables.DataTable):
+         name = "endpoints"
+         verbose_name = _("API Endpoints")
+         multi_select = False
+-        table_actions = (DownloadOpenRC, DownloadEC2,)
++        table_actions = (DownloadOpenRC, DownloadEC2, DownloadJujuEnv)
+--- a/openstack_dashboard/usage/tables.py
++++ b/openstack_dashboard/usage/tables.py
+@@ -29,6 +29,14 @@ class CSVSummary(tables.LinkAction):
+         return self.table.kwargs['usage'].csv_link()
+ 
+ 
++class DownloadJujuEnv(tables.LinkAction):
++    name = "download_jujuenv"
++    verbose_name = _("Download Juju Environment File")
++    verbose_name_plural = _("Download Juju Environment File")
++    icon = "download"
++    url = "horizon:project:access_and_security:api_access:juju"
++
++
+ class BaseUsageTable(tables.DataTable):
+     vcpus = tables.Column('vcpus', verbose_name=_("VCPUs"))
+     disk = tables.Column('local_gb', verbose_name=_("Disk"),
+@@ -83,5 +91,5 @@ class ProjectUsageTable(BaseUsageTable):
+         name = "project_usage"
+         verbose_name = _("Usage")
+         columns = ("instance", "vcpus", "disk", "memory", "uptime")
+-        table_actions = (CSVSummary,)
++        table_actions = (CSVSummary, DownloadJujuEnv,)
+         multi_select = False

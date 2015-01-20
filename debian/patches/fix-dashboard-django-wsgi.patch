@@ -1,0 +1,12 @@
+diff -Naurp horizon-2014.2.b2.orig/openstack_dashboard/wsgi/django.wsgi horizon-2014.2.b2/openstack_dashboard/wsgi/django.wsgi
+--- horizon-2014.2.b2.orig/openstack_dashboard/wsgi/django.wsgi	2014-07-23 15:25:01.000000000 -0400
++++ horizon-2014.2.b2/openstack_dashboard/wsgi/django.wsgi	2014-07-25 11:19:00.825608706 -0400
+@@ -9,6 +9,8 @@ sys.path.insert(0, os.path.join(os.path.
+ os.environ['DJANGO_SETTINGS_MODULE'] = 'openstack_dashboard.settings'
+ sys.stdout = sys.stderr
+ 
++sys.path.append("/usr/share/openstack-dashboard/")
++
+ DEBUG = False
+ 
+ application = get_wsgi_application()

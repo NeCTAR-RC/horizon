@@ -1,0 +1,86 @@
+--- a/openstack_dashboard/local/local_settings.py.example
++++ b/openstack_dashboard/local/local_settings.py.example
+@@ -4,7 +4,7 @@ from django.utils.translation import uge
+ 
+ from openstack_dashboard import exceptions
+ 
+-DEBUG = True
++DEBUG = False
+ TEMPLATE_DEBUG = DEBUG
+ 
+ # Required for Django 1.5.
+@@ -95,25 +95,24 @@ LOCAL_PATH = os.path.dirname(os.path.abs
+ # requests routed to the same dashboard instance or you set the same SECRET_KEY
+ # for all of them.
+ from horizon.utils import secret_key
+-SECRET_KEY = secret_key.generate_or_read_from_file(
+-    os.path.join(LOCAL_PATH, '.secret_key_store'))
++SECRET_KEY = secret_key.generate_or_read_from_file('/var/lib/openstack-dashboard/secret_key')
+ 
+ # We recommend you use memcached for development; otherwise after every reload
+ # of the django development server, you will have to login again. To use
+ # memcached set CACHES to something like
+-# CACHES = {
++CACHES = {
++   'default': {
++       'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
++       'LOCATION': '127.0.0.1:11211',
++   }
++}
++
++#CACHES = {
+ #    'default': {
+-#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+-#        'LOCATION': '127.0.0.1:11211',
++#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+ #    }
+ #}
+ 
+-CACHES = {
+-    'default': {
+-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+-    }
+-}
+-
+ # Send email to the console by default
+ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ # Or send them to /dev/null
+@@ -536,3 +535,26 @@ SECURITY_GROUP_RULES = {
+ # algorithms supported by Python's hashlib library.
+ # OPENSTACK_TOKEN_HASH_ALGORITHM = 'md5'
+ 
++###############################################################################
++# Ubuntu Settings
++###############################################################################
++
++# Enable the Ubuntu theme if it is present.
++try:
++  from ubuntu_theme import *
++except ImportError:
++  pass
++
++# Default Ubuntu apache configuration uses /horizon as the application root.
++# Configure auth redirects here accordingly.
++LOGIN_URL='/horizon/auth/login/'
++LOGOUT_URL='/horizon/auth/logout/'
++LOGIN_REDIRECT_URL='/horizon'
++
++# By default, validation of the HTTP Host header is disabled.  Production
++# installations should have this set accordingly.  For more information
++# see https://docs.djangoproject.com/en/dev/ref/settings/.
++ALLOWED_HOSTS = '*'
++
++# Compress all assets offline as part of packaging installation
++COMPRESS_OFFLINE = True
+--- a/openstack_dashboard/settings.py
++++ b/openstack_dashboard/settings.py
+@@ -337,8 +337,7 @@ if not SECRET_KEY:
+                                   'local')
+ 
+     from horizon.utils import secret_key
+-    SECRET_KEY = secret_key.generate_or_read_from_file(os.path.join(LOCAL_PATH,
+-                                                       '.secret_key_store'))
++    SECRET_KEY = secret_key.generate_or_read_from_file('/var/lib/openstack-dashboard/secret_key')
+ 
+ from openstack_dashboard import policy
+ POLICY_CHECK_FUNCTION = policy.check

@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+export OSLO_PACKAGE_VERSION=$(shell dpkg-parsechangelog | sed -n -e 's/^Version: //p')
+
+%:
+	dh $@  --with python2
+
+PYVER=$(shell pyversions -d)
+
+DEB_VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' ')
+DEB_NOEPOCH_VERSION := $(shell echo $(DEB_VERSION) | cut -d: -f2-)
+DEB_UPSTREAM_VERSION := $(shell echo $(DEB_NOEPOCH_VERSION) | sed 's/-[^-]*$$//')
+
+override_dh_auto_clean:
+	find . -name "django*.mo" -delete || :
+	rm -f horizon/xstatic 
+	dh_auto_clean
+	rm -f horizon/openstack_dashboard/local/.secret_key_store
+
+override_dh_auto_build:
+	# NOTE(jamespage) this is a little horrible but works around
+	# the switch to /var/lib/openstack once installed for lockfiles
+	ln -sf ../xstatic horizon/xstatic
+	patch -p1 -R <debian/patches/ubuntu_settings.patch 
+	./run_tests.sh -N --compilemessages
+	patch -p1 <debian/patches/ubuntu_settings.patch 
+	dh_auto_build
+
+override_dh_auto_install:
+	# install horizon and dashboard
+	python setup.py install --root=$(CURDIR)/debian/tmp --no-compile -O0 --install-layout=deb
+	# install vendorfied xstatic assets
+	cp -r xstatic $(CURDIR)/debian/tmp/usr/lib/$(PYVER)/dist-packages/horizon
+	install -d -m 755 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard
+	install -d -m 755 $(CURDIR)/debian/tmp/etc/openstack-dashboard
+	install -d -m 755 $(CURDIR)/debian/tmp/etc/apache2/conf-available
+
+	cp -a $(CURDIR)/openstack_dashboard/ $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
+	install -d -m 755 $(CURDIR)/debian/tmp/etc/openstack-dashboard
+	cp -a $(CURDIR)/openstack_dashboard/settings.py $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/
+
+	cp $(CURDIR)/openstack_dashboard/local/local_settings.py.example \
+		$(CURDIR)/debian/tmp/etc/openstack-dashboard/local_settings.py
+	cp $(CURDIR)/manage.py \
+		 $(CURDIR)/debian/tmp/usr/share/openstack-dashboard/manage.py
+	ln -fs /etc/openstack-dashboard/local_settings.py \
+		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py
+	ln -fs /usr/lib/$(PYVER)/dist-packages/horizon/static/horizon \
+		$(CURDIR)/debian/tmp/usr/share/openstack-dashboard/openstack_dashboard/static/horizon
+
+ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
+override_dh_auto_test:
+	# Skip tests
+	:
+endif
+
+get-orig-source:
+	uscan --verbose --force-download --rename --destdir=../build-area
+
+refresh-xstatic:
+	bash debian/bundle-xstatic.sh $(DEB_UPSTREAM_VERSION)

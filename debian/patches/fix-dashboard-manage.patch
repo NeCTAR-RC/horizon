@@ -1,0 +1,12 @@
+diff -Naurp horizon-2014.2.b2.orig/manage.py horizon-2014.2.b2/manage.py
+--- horizon-2014.2.b2.orig/manage.py	2014-07-23 15:25:01.000000000 -0400
++++ horizon-2014.2.b2/manage.py	2014-07-25 11:20:09.989608740 -0400
+@@ -17,6 +17,8 @@ import sys
+ 
+ from django.core.management import execute_from_command_line  # noqa
+ 
++sys.path.append("/usr/share/openstack-dashboard")
++
+ if __name__ == "__main__":
+     os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                           "openstack_dashboard.settings")

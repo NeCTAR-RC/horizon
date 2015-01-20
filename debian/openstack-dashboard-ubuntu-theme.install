@@ -1,0 +1,4 @@
+debian/theme/css/* /usr/share/openstack-dashboard-ubuntu-theme/static/ubuntu/css
+debian/theme/img/* /usr/share/openstack-dashboard-ubuntu-theme/static/ubuntu/img
+debian/theme/templates/* /usr/share/openstack-dashboard-ubuntu-theme/templates
+debian/theme/ubuntu_theme.py /etc/openstack-dashboard
