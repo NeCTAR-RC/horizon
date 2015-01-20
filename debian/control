@@ -13,6 +13,7 @@ Build-Depends:
  python3-pbr (>= 2.0.0),
  python3-setuptools,
  python3-sphinx (>= 1.6.2),
+ python3-pip,
 Build-Depends-Indep:
  python3-astroid (>= 2.1.0),
  python3-babel (>= 2.3.4),

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -x
 
 version=$1
 
@@ -12,7 +12,7 @@ mkdir -p $TMPDIR/lib
 
 grep -i xstatic requirements.txt > $TMPDIR/requirements.txt
 
-pip install --system -t $TMPDIR/lib -r $TMPDIR/requirements.txt -c https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt
+pip3 install --system -t $TMPDIR/lib -r $TMPDIR/requirements.txt -c https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt
 
 (
     cd $TMPDIR/lib
@@ -26,4 +26,5 @@ pip install --system -t $TMPDIR/lib -r $TMPDIR/requirements.txt -c https://git.o
 
 mkdir -p ../build-area
 mv  $TMPDIR/lib/horizon_${version}.orig-xstatic.tar.gz ../build-area
+tar xvf ../build-area/horizon_${version}.orig-xstatic.tar.gz -C ..
 rm -rf $TMPDIR
