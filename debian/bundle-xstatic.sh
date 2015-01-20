@@ -10,9 +10,9 @@ echo "Installing to $TMPDIR for Horizon $version"
 
 mkdir -p $TMPDIR/lib
 
-grep -i xstatic requirements.txt > $TMPDIR/requirements.txt
+grep -i XStatic requirements.txt > $TMPDIR/requirements.txt
 
-pip install --system -t $TMPDIR/lib -r $TMPDIR/requirements.txt
+pip install -t $TMPDIR/lib -r $TMPDIR/requirements.txt
 
 (
     cd $TMPDIR/lib
@@ -25,4 +25,5 @@ pip install --system -t $TMPDIR/lib -r $TMPDIR/requirements.txt
 )
 
 mv  $TMPDIR/lib/horizon_${version}.orig-xstatic.tar.gz ..
+tar xvf ../horizon_${version}.orig-xstatic.tar.gz -C ..
 rm -rf $TMPDIR
