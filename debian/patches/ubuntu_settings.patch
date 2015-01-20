@@ -1,6 +1,6 @@
 --- a/openstack_dashboard/local/local_settings.py.example
 +++ b/openstack_dashboard/local/local_settings.py.example
-@@ -4,7 +4,7 @@ from django.utils.translation import uge
+@@ -4,7 +4,7 @@
  
  from openstack_dashboard import exceptions
  
@@ -9,7 +9,7 @@
  TEMPLATE_DEBUG = DEBUG
  
  # Required for Django 1.5.
-@@ -95,25 +95,24 @@ LOCAL_PATH = os.path.dirname(os.path.abs
+@@ -95,25 +95,24 @@
  # requests routed to the same dashboard instance or you set the same SECRET_KEY
  # for all of them.
  from horizon.utils import secret_key
@@ -45,7 +45,7 @@
  # Send email to the console by default
  EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
  # Or send them to /dev/null
-@@ -536,3 +535,26 @@ SECURITY_GROUP_RULES = {
+@@ -536,3 +535,26 @@
  # algorithms supported by Python's hashlib library.
  # OPENSTACK_TOKEN_HASH_ALGORITHM = 'md5'
  
@@ -74,7 +74,7 @@
 +COMPRESS_OFFLINE = True
 --- a/openstack_dashboard/settings.py
 +++ b/openstack_dashboard/settings.py
-@@ -337,8 +337,7 @@ if not SECRET_KEY:
+@@ -337,8 +337,7 @@
                                    'local')
  
      from horizon.utils import secret_key

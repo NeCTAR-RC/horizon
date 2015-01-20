@@ -5,7 +5,7 @@ Forwarded: no
 
 --- a/horizon/test/settings.py
 +++ b/horizon/test/settings.py
-@@ -22,25 +22,25 @@ import sys
+@@ -22,25 +22,25 @@
  
  import django
  from django.utils import html_parser
@@ -50,7 +50,7 @@ Forwarded: no
  
  from horizon.test import patches
  
-@@ -158,49 +158,49 @@ STATICFILES_FINDERS = (
+@@ -158,49 +158,49 @@
  
  STATICFILES_DIRS = [
      ('horizon/lib/angular',
@@ -122,7 +122,7 @@ Forwarded: no
      'version': 1,
 --- a/openstack_dashboard/settings.py
 +++ b/openstack_dashboard/settings.py
-@@ -22,25 +22,25 @@ import sys
+@@ -22,25 +22,25 @@
  import warnings
  
  from django.utils.translation import ugettext_lazy as _
@@ -167,7 +167,7 @@ Forwarded: no
  
  from openstack_dashboard import exceptions
  
-@@ -154,50 +154,50 @@ STATICFILES_FINDERS = (
+@@ -154,50 +154,50 @@
  
  STATICFILES_DIRS = [
      ('horizon/lib/angular',

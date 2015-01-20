@@ -1,7 +1,6 @@
-diff -Naurp horizon-2014.2.b2.orig/manage.py horizon-2014.2.b2/manage.py
---- horizon-2014.2.b2.orig/manage.py	2014-07-23 15:25:01.000000000 -0400
-+++ horizon-2014.2.b2/manage.py	2014-07-25 11:20:09.989608740 -0400
-@@ -17,6 +17,8 @@ import sys
+--- a/manage.py
++++ b/manage.py
+@@ -17,6 +17,8 @@
  
  from django.core.management import execute_from_command_line  # noqa
  
