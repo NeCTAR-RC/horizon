@@ -106,8 +106,8 @@ class ExtendView(forms.ModalFormView):
         context['volume'] = self.get_object()
         try:
             usages = quotas.tenant_limit_usages(self.request)
-            usages['gigabytesUsed'] = (usages['gigabytesUsed']
-                                       - context['volume'].size)
+            usages['totalGigabytesUsed'] = (
+                usages['totalGigabytesUsed'] - context['volume'].size)
             context['usages'] = usages
         except Exception:
             exceptions.handle(self.request)

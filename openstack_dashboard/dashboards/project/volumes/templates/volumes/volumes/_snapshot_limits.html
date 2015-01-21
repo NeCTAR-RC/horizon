@@ -9,20 +9,12 @@
   {% trans "Snapshot Limits" %}
 {% endblock %}
 
-{% block gigabytes_used %}
-  {{ usages.totalGigabytesUsed|intcomma }}
-{% endblock %}
-
-{% block gigabytes_used_progress %}
-  "{{ usages.totalGigabytesUsed }}"
-{% endblock %}
-
 {% block type_title %}
   {% trans "Number of Snapshots" %}
 {% endblock %}
 
 {% block used %}
-  {{ usages.snapshotsUsed|intcomma }}
+  {{ usages.totalSnapshotsUsed|intcomma }}
 {% endblock %}
 
 {% block total %}
@@ -38,5 +30,5 @@
 {% endblock %}
 
 {% block used_progress %}
-  "{{ usages.snapshotsUsed }}"
+  "{{ usages.totalSnapshotsUsed }}"
 {% endblock %}
