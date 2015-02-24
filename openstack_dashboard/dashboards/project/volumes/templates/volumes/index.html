@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n horizon sizeformat %}
 {% block title %}{% trans "Volumes" %}{% endblock %}
 
 {% block page_header %}
@@ -7,9 +7,31 @@
 {% endblock page_header %}
 
 {% block main %}
+{% for type, quota in quotas_per_type %}
+<div>
+    <strong>{{ type|title }}:
+       {% blocktrans with used=quota.gigabytes.in_use|diskgbformat available=quota.gigabytes.limit|quotainf|diskgbformat %}<span> {{ used }} </span> used of <span> {{ available }} </span>{% endblocktrans %}
+    </strong>
+    <br/>
+    <br/>
+    <div style="width: 100%" id="volume_quota_{{ forloop.counter0 }}" class="quota_bar" data-progress-indicator-step-by="integer" data-quota-limit="{{ quota.gigabytes.limit }}" data-quota-used="{{ quota.gigabytes.in_use }}">
+    </div>
+</div>
+{% endfor %}
+
 <div class="row">
   <div class="col-sm-12">
     {{ tab_group.render }}
   </div>
 </div>
+
+<script type="text/javascript" charset="utf-8">
+  if(typeof horizon.Quota !== 'undefined') {
+    horizon.Quota.init();
+  } else {
+    addHorizonLoadEvent(function() {
+        horizon.Quota.init();
+    });
+  }
+</script>
 {% endblock %}

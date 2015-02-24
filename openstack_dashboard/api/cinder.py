@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import
 
+import collections
 import logging
 
 from django.conf import settings
@@ -361,6 +362,22 @@ def tenant_quota_get(request, tenant_id):
     if c_client is None:
         return base.QuotaSet()
     return base.QuotaSet(c_client.quotas.get(tenant_id))
+
+
+def tenant_volume_type_quota_get(request, tenant_id):
+    c_client = cinderclient(request)
+    if c_client is None:
+        return {}
+    info = c_client.quotas.get(tenant_id, usage=True)._info
+    types = collections.defaultdict(dict)
+    for name, quota in info.items():
+        try:
+            resource, voltype = name.split('_', 1)
+        except ValueError:
+            continue
+        if resource in ('volumes', 'snapshots', 'gigabytes'):
+            types[voltype][resource] = quota
+    return types
 
 
 def tenant_quota_update(request, tenant_id, **kwargs):
