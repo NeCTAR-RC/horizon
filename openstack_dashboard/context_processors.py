@@ -49,6 +49,7 @@ def openstack(request):
                            'name': request.session.get('region_name')},
                'available': [{'endpoint': region[0], 'name':region[1]} for
                              region in available_regions]}
+    regions['support'] = False
     context['regions'] = regions
 
     return context

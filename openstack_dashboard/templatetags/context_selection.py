@@ -43,6 +43,7 @@ def show_overview(context):
                     len(request.user.available_services_regions) > 1,
                'region_name': request.user.services_region,
                'request': request}
+    context['multi_region'] = False
 
     return context
 
@@ -84,4 +85,5 @@ def show_region_list(context):
                'region_name': request.user.services_region,
                'regions': sorted(request.user.available_services_regions),
                'request': request}
+    context['multi_region'] = False
     return context
