@@ -10,7 +10,7 @@ echo "Installing to $TMPDIR for Horizon $version"
 
 mkdir -p $TMPDIR/lib
 
-grep xstatic requirements.txt > $TMPDIR/requirements.txt
+grep XStatic requirements.txt > $TMPDIR/requirements.txt
 
 pip install -t $TMPDIR/lib -r $TMPDIR/requirements.txt
 
