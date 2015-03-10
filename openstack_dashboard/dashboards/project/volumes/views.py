@@ -32,8 +32,7 @@ class IndexView(tabs.TabbedTableView):
         if quotas:
             context['quotas_per_type'] = [
                 (name, quota) for name, quota in sorted(quotas.items())
-                if quota['gigabytes']['limit'] > 0
-                or quota['gigabytes']['in_use'] > 0]
+                if quota['gigabytes']['limit'] > 0]
         return context
 
     def get_quotas(self):
