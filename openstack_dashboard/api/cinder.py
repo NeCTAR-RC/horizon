@@ -500,19 +500,38 @@ def qos_spec_get_associations(request, qos_spec_id):
 def tenant_absolute_limits(request):
     limits = cinderclient(request).limits.get().absolute
     limits_dict = {}
+    quotas = tenant_quota_get(request, request.user.tenant_id)
+    max_volumes = 0
+    max_gigabytes = 0
+    max_snapshots = 0
+    for q in quotas:
+        if q.name.startswith('volumes') and q.limit > 0:
+            max_volumes += q.limit
+        elif q.name.startswith('snapshots') and q.limit > 0:
+            max_snapshots += q.limit
+        elif q.name.startswith('gigabytes') and q.limit > 0:
+            max_gigabytes += q.limit
     for limit in limits:
-        if limit.value < 0:
-            # In some cases, the absolute limits data in Cinder can get
-            # out of sync causing the total.*Used limits to return
-            # negative values instead of 0. For such cases, replace
-            # negative values with 0.
-            if limit.name.startswith('total') and limit.name.endswith('Used'):
-                limits_dict[limit.name] = 0
-            else:
-                # -1 is used to represent unlimited quotas
-                limits_dict[limit.name] = float("inf")
+        if limit.name == 'maxTotalSnapshots':
+            limits_dict[limit.name] = max_snapshots
+        elif limit.name == 'maxTotalVolumeGigabytes':
+            limits_dict[limit.name] = max_gigabytes
+        elif limit.name == 'maxTotalVolumes':
+            limits_dict[limit.name] = max_volumes
         else:
-            limits_dict[limit.name] = limit.value
+
+            if limit.value < 0:
+                # In some cases, the absolute limits data in Cinder can get
+                # out of sync causing the total.*Used limits to return
+                # negative values instead of 0. For such cases, replace
+                # negative values with 0.
+                if limit.name.startswith('total') and limit.name.endswith('Used'):
+                    limits_dict[limit.name] = 0
+                else:
+                    # -1 is used to represent unlimited quotas
+                    limits_dict[limit.name] = float("inf")
+            else:
+                limits_dict[limit.name] = limit.value
     return limits_dict
 
 
