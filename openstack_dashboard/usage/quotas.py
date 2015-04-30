@@ -281,7 +281,10 @@ def tenant_quota_usages(request):
         security_groups = []
         security_groups = network.security_group_list(request)
         usages.tally('security_groups', len(security_groups))
-
+    else:
+        security_groups = []
+        security_groups = nova.SecurityGroupManager(request).list()
+        usages.tally('security_groups', len(security_groups))
     if 'network' not in disabled_quotas:
         networks = []
         networks = neutron.network_list(request, shared=False)
