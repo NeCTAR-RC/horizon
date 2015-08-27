@@ -52,7 +52,7 @@ def flavor_extra_specs(request, flavor_id):
 def group_flavors(request, flavors, extra_specs):
     groups = collections.defaultdict(list)
     for flavor in flavors:
-        group_name = extra_specs.get(flavor.id, {}).get('group')
+        group_name = extra_specs.get(flavor.id, {}).get('flavor_class:name')
         groups[group_name].append(flavor)
 
     choice_groups = []

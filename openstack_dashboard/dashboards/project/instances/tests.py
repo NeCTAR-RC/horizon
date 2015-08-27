@@ -3679,7 +3679,7 @@ class ConsoleManagerTests(helpers.TestCase):
 class InstanceUtilsTests(helpers.TestCase):
     def test_group_flavors(self):
         flavor = self.flavors.first()
-        extra_specs = {flavor.id: {'group': 'compute'}}
+        extra_specs = {flavor.id: {'flavor_class:name': 'compute'}}
         grouping = utils.group_flavors(self.request,
                                        [flavor],
                                        extra_specs)
