@@ -285,6 +285,8 @@ def url_for(request, service_type, endpoint_type=None, region=None):
 
 
 def is_service_enabled(request, service_type, service_name=None):
+    if service_type == 'network' and getattr(settings, 'NEUTRON_DISABLED', False):
+        return False
     service = get_service_from_catalog(request.user.service_catalog,
                                        service_type)
     if service:
