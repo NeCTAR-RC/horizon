@@ -864,13 +864,22 @@ class LaunchInstance(workflows.Workflow):
     failure_message = _('Unable to launch %(count)s named "%(name)s".')
     success_url = "horizon:project:instances:index"
     multipart = True
-    default_steps = (SelectProjectUser,
-                     SetInstanceDetails,
-                     SetAccessControls,
-                     SetNetwork,
-                     CellSelection,
-                     PostCreationStep,
-                     SetAdvanced)
+
+    if getattr(settings, 'NEUTRON_DISABLED', False):
+        default_steps = (SelectProjectUser,
+                         SetInstanceDetails,
+                         SetAccessControls,
+                         CellSelection,
+                         PostCreationStep,
+                         SetAdvanced)
+    else:
+        default_steps = (SelectProjectUser,
+                         SetInstanceDetails,
+                         SetAccessControls,
+                         SetNetwork,
+                         CellSelection,
+                         PostCreationStep,
+                         SetAdvanced)
 
     def format_status_message(self, message):
         name = self.context.get('name', 'unknown instance')
