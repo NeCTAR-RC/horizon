@@ -16,6 +16,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 import horizon
@@ -28,5 +29,5 @@ class NetworkTopology(horizon.Panel):
     slug = 'network_topology'
     permissions = ('openstack.services.network', )
 
-
-dashboard.Project.register(NetworkTopology)
+if not getattr(settings, 'NEUTRON_DISABLED', False):
+    dashboard.Project.register(NetworkTopology)
