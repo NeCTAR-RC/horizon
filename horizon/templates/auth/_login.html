@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load url from future %}
 
-{% block modal-header %}{% trans "Log In" %}{% endblock %}
+{% block modal-header %}{% endblock %}
 {% block modal_class %}login {% if hide %}modal hide{% endif %}{% endblock %}
 
 {% block form_action %}{% url 'login' %}{% endblock %}
