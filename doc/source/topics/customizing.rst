@@ -20,13 +20,13 @@ through ``horizon.less``. The first is shown at the login screen and the other
 on top of the menu bar::
 
     #splash .login {
-        background: url(/static/dashboard/img/logo-splash.png) no-repeat center 35px;
+        background: url(/static/dashboard/img/logo-splash.svg) no-repeat center 35px;
 
     h1.brand a {
-        background: url(/static/dashboard/img/logo.png) top left no-repeat;
+        background: url(/static/dashboard/img/logo.svg) top left no-repeat;
 
 To override the OpenStack Logo image, replace the image at the directory path
-``openstack_dashboard/static/dashboard/img/logo.png``.
+``openstack_dashboard/static/dashboard/img/logo.svg``.
 
 The dimensions should be ``width: 216px, height: 35px``.
 
