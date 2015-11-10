@@ -67,8 +67,6 @@ class UsageView(tables.DataTableView):
         types = [("totalInstancesUsed", "maxTotalInstances", _("Instances")),
                  ("totalCoresUsed", "maxTotalCores", _("VCPUs")),
                  ("totalRAMUsed", "maxTotalRAMSize", _("RAM")),
-                 ("totalFloatingIpsUsed", "maxTotalFloatingIps",
-                  "Floating IPs", _("Allocated")),
                  ("totalSecurityGroupsUsed", "maxSecurityGroups",
                   _("Security Groups"))]
         # Check for volume usage
