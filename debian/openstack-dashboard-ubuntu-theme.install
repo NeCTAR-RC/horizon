@@ -1,0 +1,2 @@
+debian/theme/ubuntu/* /usr/share/openstack-dashboard-ubuntu-theme/static/themes/ubuntu
+debian/theme/ubuntu_theme.py /usr/share/openstack-dashboard/openstack_dashboard/local

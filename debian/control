@@ -1,0 +1,115 @@
+Source: horizon
+Section: net
+Priority: extra
+Maintainer: Chuck Short <zulcss@ubuntu.com>
+Build-Depends: debhelper (>= 9~),
+               dh-python,
+               openstack-pkg-tools (>= 23~),
+               python-all,
+               python-pbr (>= 1.8),
+               python-setuptools,
+               python-sphinx,
+Build-Depends-Indep: python-babel (>= 1.3),
+                     python-ceilometerclient (>= 1.5.0),
+                     python-cinderclient (>= 1:1.3.1),
+                     python-compressor (>= 1.4),
+                     python-django (>= 1.7),
+                     python-django-pyscss (>= 2.0.2),
+                     python-eventlet (>= 0.17.4),
+                     python-glanceclient (>= 1:0.18.0),
+                     python-heatclient (>= 0.3.0),
+                     python-httplib2 (>= 0.7.5),
+                     python-iso8601 (>= 0.1.9),
+                     python-keystoneclient (>= 1:1.6.0),
+                     python-kombu (>= 3.0.7),
+                     python-mock (>= 1.2),
+                     python-mox3 (>= 0.7.0),
+                     python-netaddr (>= 0.7.12),
+                     python-neutronclient (>= 1:2.6.0),
+                     python-novaclient (>= 1:2.28.1),
+                     python-openstack-auth (>= 2.0.0),
+                     python-oslo.concurrency (>= 2.3.0),
+                     python-oslo.config (>= 1:2.3.0),
+                     python-oslo.i18n (>= 1.5.0),
+                     python-oslo.policy (>= 0.5.0),
+                     python-oslo.serialization (>= 1.4.0),
+                     python-oslo.utils (>= 2.0.0),
+                     python-pint (>= 0.5),
+                     python-pyscss (>= 1.3.4),
+                     python-saharaclient (>= 0.10.0),
+                     python-six (>= 1.9.0),
+                     python-swiftclient (>= 1:2.2.0),
+                     python-troveclient (>= 1.2.0),
+                     python-tz (>= 2013.6),
+                     python-yaml (>= 3.1.0),
+Standards-Version: 3.9.6
+Homepage: http://launchpad.net/horizon
+Vcs-Browser: https://git.launchpad.net/~ubuntu-server-dev/ubuntu/+source/horizon
+Vcs-Git: git://git.launchpad.net/~ubuntu-server-dev/ubuntu/+source/horizon
+XS-Testsuite: autopkgtest
+
+Package: python-django-horizon
+Section: python
+Architecture: all
+Depends: python-babel (>= 1.3),
+         python-ceilometerclient (>= 1.5.0),
+         python-cinderclient (>= 1:1.3.1),
+         python-compressor (>= 1.4),
+         python-django (>= 1.7),
+         python-django-pyscss (>= 2.0.2),
+         python-eventlet (>= 0.17.4),
+         python-glanceclient (>= 1:0.18.0),
+         python-heatclient (>= 0.3.0),
+         python-httplib2 (>= 0.7.5),
+         python-iso8601 (>= 0.1.9),
+         python-keystoneclient (>= 1:1.6.0),
+         python-kombu (>= 3.0.7),
+         python-netaddr (>= 0.7.12),
+         python-neutronclient (>= 1:2.6.0),
+         python-novaclient (>= 1:2.28.1),
+         python-openstack-auth (>= 2.0.0),
+         python-oslo.concurrency (>= 2.3.0),
+         python-oslo.config (>= 1:2.3.0),
+         python-oslo.i18n (>= 1.5.0),
+         python-oslo.policy (>= 0.5.0),
+         python-oslo.serialization (>= 1.4.0),
+         python-oslo.utils (>= 2.0.0),
+         python-pbr (>= 1.8),
+         python-pint (>= 0.5),
+         python-pyscss (>= 1.3.4),
+         python-saharaclient (>= 0.10.0),
+         python-six (>= 1.9.0),
+         python-swiftclient (>= 1:2.2.0),
+         python-troveclient (>= 1.2.0),
+         python-tz (>= 2013.6),
+         python-yaml (>= 3.1.0),
+         ${misc:Depends},
+         ${python:Depends},
+Recommends: memcached,
+Description: Django module providing web based interaction with OpenStack
+ The Django-Nova project is a Django module that is used to provide web based
+ interactions with the OpenStack Nova cloud controller.
+
+Package: openstack-dashboard
+Architecture: all
+Pre-Depends: dpkg (>= 1.15.7.2),
+Depends: adduser,
+         apache2 | httpd,
+         libapache2-mod-wsgi (>= 2.3),
+         python-django-horizon (= ${source:Version}),
+         ${misc:Depends},
+         ${python:Depends},
+Recommends: openstack-dashboard-ubuntu-theme,
+Description: Django web interface for OpenStack
+ The OpenStack Dashboard is a reference implementation of a Django site that
+ uses the Django-Nova project to provide web based interactions with the
+ OpenStack Nova cloud controller.
+
+Package: openstack-dashboard-ubuntu-theme
+Architecture: all
+Depends: openstack-dashboard (= ${source:Version}),
+         ${misc:Depends},
+         ${python:Depends},
+Description: Ubuntu theme for the OpenStack dashboard
+ A custom Ubuntu theme for Horizon.  This package is optional and overrides the
+ default theme and branding.
