@@ -14,6 +14,7 @@ from collections import defaultdict
 import itertools
 import logging
 
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -176,8 +177,8 @@ def get_tenant_quota_data(request, disabled_quotas=None, tenant_id=None):
     if not disabled_quotas:
         return qs
 
-    # Check if neutron is enabled by looking for network and router
-    if 'network' and 'router' not in disabled_quotas:
+    # Check if neutron is enabled by looking for network
+    if 'network' not in disabled_quotas:
         tenant_id = tenant_id or request.user.tenant_id
         neutron_quotas = neutron.tenant_quota_get(request, tenant_id)
     if 'floating_ips' in disabled_quotas:
@@ -248,6 +249,9 @@ def get_disabled_quotas(request):
             # If Nova security group is used, disable Neutron quotas
             disabled_quotas.extend(['security_group', 'security_group_rule'])
 
+        network_config = getattr(settings, 'OPENSTACK_NEUTRON_NETWORK', {})
+        if not network_config.get('enable_router', True):
+            disabled_quotas.append('router')
         try:
             if not neutron.is_quotas_extension_supported(request):
                 disabled_quotas.extend(NEUTRON_QUOTA_FIELDS)
