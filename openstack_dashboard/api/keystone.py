@@ -166,8 +166,6 @@ def keystoneclient(request, admin=False):
                 token_id = getattr(domain_token, 'auth_token', None)
 
     if admin:
-        if not policy.check((("identity", "admin_required"),), request):
-            raise exceptions.NotAuthorized
         endpoint_type = 'adminURL'
     else:
         endpoint_type = getattr(settings,
