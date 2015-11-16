@@ -162,8 +162,6 @@ def keystoneclient(request, admin=False, force_scoped=False):
             if domain_token:
                 token_id = getattr(domain_token, 'auth_token', None)
 
-    if admin and not policy.check((("identity", "admin_required"),), request):
-        raise exceptions.NotAuthorized
     endpoint_type = settings.OPENSTACK_KEYSTONE_ENDPOINT_TYPE
 
     # Take care of client connection caching/fetching a new client.
