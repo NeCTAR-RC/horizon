@@ -108,7 +108,19 @@ class AuditTab(tabs.TableTab):
         return sorted(actions, reverse=True, key=lambda y: y.start_time)
 
 
+class GraphTab(tabs.Tab):
+    name = _("Graph")
+    slug = "graph"
+    template_name = "project/instances/_detail_graph.html"
+    preload = False
+
+    def get_context_data(self, request):
+        instance = self.tab_group.kwargs['instance']
+        return {"instance": instance}
+
+
 class InstanceDetailTabs(tabs.TabGroup):
     slug = "instance_details"
-    tabs = (OverviewTab, LogTab, ConsoleTab, AuditTab)
+    tabs = (OverviewTab, LogTab, ConsoleTab, AuditTab, GraphTab)
     sticky = True
+

@@ -29,6 +29,11 @@ from django import shortcuts
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
+import requests
+import json
+import time
+from datetime import datetime
+
 from horizon import exceptions
 from horizon import forms
 from horizon import messages
@@ -49,6 +54,8 @@ from openstack_dashboard.dashboards.project.instances \
     import tabs as project_tabs
 from openstack_dashboard.dashboards.project.instances \
     import workflows as project_workflows
+from openstack_dashboard.dashboards.project.instances \
+    import gnocchi as project_gnocchi
 
 LOG = logging.getLogger(__name__)
 
@@ -197,6 +204,35 @@ def rdp(request, instance_id):
         redirect = reverse("horizon:project:instances:index")
         msg = _('Unable to get RDP console for instance "%s".') % instance_id
         exceptions.handle(request, msg, redirect=redirect)
+
+
+def cpu_usage(request, instance_id):
+    gnocchi = project_gnocchi.Gnocchi
+    #url = "http://144.6.226.29:8041"
+    url = "http://144.6.225.35:8041" # gnocchi-extra2
+
+    #metrics = gnocchi.listMetrics(url)
+    metrics = gnocchi.queryMeasures(url, "1f5504fb-14d5-4d8c-8973-aecf0dac8030")
+
+    if len(metrics) > 0:
+        graphdata = [0] * len(metrics)
+        for i in range(len(metrics)):
+            if metrics[i][1] == 1:
+                timestamp = datetime.strptime(metrics[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
+                metricdate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
+                #graphdata[i] = [time.mktime(timestamp.timetuple()), metrics [i][2]]
+                newdict = {'x': metricdate, 'y': metrics [i][2]}
+                graphdata[i] = newdict
+
+        seriesdata = {'name': '1f5504fb-14d5-4d8c-8973-aecf0dac8030', 'data': graphdata}
+
+        series = []
+        series.append(seriesdata)
+        jsondata = {'series': series, 'settings': {}}
+    else:
+        jsondata = {'series': [], 'settings': {}}
+
+    return http.HttpResponse(json.dumps(jsondata), content_type='application/json')
 
 
 class SerialConsoleView(generic.TemplateView):
@@ -474,3 +510,5 @@ class DetachInterfaceView(forms.ModalFormView):
 
     def get_initial(self):
         return {'instance_id': self.kwargs['instance_id']}
+
+
