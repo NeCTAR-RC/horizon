@@ -48,5 +48,5 @@ urlpatterns = patterns(
         views.AttachInterfaceView.as_view(), name='attach_interface'),
     url(INSTANCES % 'detach_interface',
         views.DetachInterfaceView.as_view(), name='detach_interface'),
-    url(r'^api/cpu_usage', views.cpu_usage, name='cpu_usage'),
+    url(INSTANCES % 'cpu_usage', 'cpu_usage', name='cpu_usage'),
 )

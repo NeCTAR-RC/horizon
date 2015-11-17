@@ -207,7 +207,7 @@ def rdp(request, instance_id):
 
 
 def cpu_usage(request, instance_id):
-    gnocchi = project_gnocchi.Gnocchi
+    gnocchi = project_gnocchi.Gnocchi()
     #url = "http://144.6.226.29:8041"
     url = "http://144.6.225.35:8041" # gnocchi-extra2
 
