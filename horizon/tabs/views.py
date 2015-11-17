@@ -71,6 +71,10 @@ class TabView(views.HorizonTemplateView):
         context = self.get_context_data(**kwargs)
         return self.handle_tabbed_response(context["tab_group"], context)
 
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return self.handle_tabbed_response(context["tab_group"], context)
+
     def render_to_response(self, *args, **kwargs):
         response = super(TabView, self).render_to_response(*args, **kwargs)
         # Because Django's TemplateView uses the TemplateResponse class

@@ -108,7 +108,20 @@ class AuditTab(tabs.TableTab):
         return sorted(actions, reverse=True, key=lambda y: y.start_time)
 
 
+class GraphTab(tabs.Tab):
+    name = _("Metrics")
+    slug = "graph"
+    template_name = "project/instances/_detail_graph.html"
+    preload = False
+
+    def get_context_data(self, request):
+        instance = self.tab_group.kwargs['instance']
+        time_range = request.COOKIES.get("time_limit", 21600)
+        return {"instance": instance, "time_limit": time_range}
+
+
 class InstanceDetailTabs(tabs.TabGroup):
     slug = "instance_details"
-    tabs = (OverviewTab, LogTab, ConsoleTab, AuditTab)
+    tabs = (OverviewTab, LogTab, ConsoleTab, AuditTab, GraphTab)
     sticky = True
+

@@ -28,6 +28,14 @@ from django import http
 from django import shortcuts
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
+from django.utils.decorators import method_decorator
+
+import requests
+import json
+import time
+from datetime import datetime
 
 from horizon import exceptions
 from horizon import forms
@@ -49,6 +57,8 @@ from openstack_dashboard.dashboards.project.instances \
     import tabs as project_tabs
 from openstack_dashboard.dashboards.project.instances \
     import workflows as project_workflows
+from openstack_dashboard.dashboards.project.instances \
+    import gnocchi as project_gnocchi
 
 LOG = logging.getLogger(__name__)
 
@@ -197,6 +207,51 @@ def rdp(request, instance_id):
         redirect = reverse("horizon:project:instances:index")
         msg = _('Unable to get RDP console for instance "%s".') % instance_id
         exceptions.handle(request, msg, redirect=redirect)
+
+
+def metric_data(request, instance_id, metric_name, time_range):
+    gnocchi = project_gnocchi.Gnocchi()
+    for i, service in enumerate(request.user.service_catalog):
+        if service['name'] == 'gnocchi':
+            service['id'] = i
+            url = api.keystone.Service(service, request.user.services_region).url
+            break
+
+    authtoken = request.user.token.id
+
+    resource = gnocchi.getResource(url, authtoken, instance_id)
+    contents = json.loads(resource)
+    if metric_name in contents[0]['metrics']:
+        metric = contents[0]['metrics'][metric_name]
+        if time_range == "None":
+            time_range = None
+        measures = gnocchi.queryMeasures(url, str(metric), authtoken, time_range)
+    else:
+        measures = ""
+
+    if len(measures) > 0:
+        graphdata = [0] * len(measures)
+        for i in range(len(measures)):
+            if len(measures[i]) > 1:
+                hasdata = True
+                if measures[i][1] == 1:
+                    timestamp = datetime.strptime(measures[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
+                    measuredate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
+                    newdict = {'x': measuredate, 'y': measures [i][2]}
+                    graphdata[i] = newdict
+            else:
+                hasdata = False
+
+        series = []
+        if hasdata:
+            seriesdata = {'name': str(metric), 'data': graphdata}
+            series.append(seriesdata)
+
+        jsondata = {'series': series, 'settings': {'auto_size': False, 'axes_x': False}}
+    else:
+        jsondata = {'series': [], 'settings': {}}
+
+    return http.HttpResponse(json.dumps(jsondata), content_type='application/json')
 
 
 class SerialConsoleView(generic.TemplateView):
@@ -378,6 +433,15 @@ class DetailView(tabs.TabView):
         instance = self.get_data()
         return self.tab_group_class(request, instance=instance, **kwargs)
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(DetailView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        response = http.HttpResponseRedirect(reverse('horizon:project:instances:detail', kwargs={'instance_id': self.get_data().id}))
+        response.set_cookie("time_limit", request.POST.get("time_limit"))
+        return response
+
 
 class ResizeView(workflows.WorkflowView):
     workflow_class = project_workflows.ResizeInstance
@@ -474,3 +538,5 @@ class DetachInterfaceView(forms.ModalFormView):
 
     def get_initial(self):
         return {'instance_id': self.kwargs['instance_id']}
+
+
