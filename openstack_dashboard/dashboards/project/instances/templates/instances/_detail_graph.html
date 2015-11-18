@@ -6,11 +6,24 @@
 </div>
 
 {% block main %}
+    <h4>CPU usage</h4>
+    <br/>
     <div id="line_chart"
         data-chart-type="line_chart"
-        data-url="{% url 'horizon:project:instances:cpu_usage' instance.id %}"
+        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'nectar4_cpu' %}"
         data-form-selector='#linechart_general_form'>
     </div>
+    <br/>
+
+    <h4>Memory usage</h4>
+    <br/>
+    <div id="line_chart"
+        data-chart-type="line_chart"
+        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'nectar4_load' %}"
+        data-form-selector='#linechart_general_form'>
+    </div>
+    <br/>
+
     <script type="text/javascript">
         if (typeof horizon.d3_line_chart !== 'undefined') {
             horizon.d3_line_chart.init("div[data-chart-type='line_chart']");

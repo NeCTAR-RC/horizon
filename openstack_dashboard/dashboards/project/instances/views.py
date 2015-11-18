@@ -206,25 +206,26 @@ def rdp(request, instance_id):
         exceptions.handle(request, msg, redirect=redirect)
 
 
-def cpu_usage(request, instance_id):
+def metric_data(request, instance_id, metric_name):
     gnocchi = project_gnocchi.Gnocchi()
     #url = "http://144.6.226.29:8041"
     url = "http://144.6.225.35:8041" # gnocchi-extra2
 
     #metrics = gnocchi.listMetrics(url)
-    metrics = gnocchi.queryMeasures(url, "1f5504fb-14d5-4d8c-8973-aecf0dac8030")
+    metric = gnocchi.findMetric(url, metric_name)
+    measures = gnocchi.queryMeasures(url, str(metric))
 
-    if len(metrics) > 0:
-        graphdata = [0] * len(metrics)
-        for i in range(len(metrics)):
-            if metrics[i][1] == 1:
-                timestamp = datetime.strptime(metrics[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
-                metricdate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
+    if len(measures) > 0:
+        graphdata = [0] * len(measures)
+        for i in range(len(measures)):
+            if measures[i][1] == 1:
+                timestamp = datetime.strptime(measures[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
+                measuredate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
                 #graphdata[i] = [time.mktime(timestamp.timetuple()), metrics [i][2]]
-                newdict = {'x': metricdate, 'y': metrics [i][2]}
+                newdict = {'x': measuredate, 'y': measures [i][2]}
                 graphdata[i] = newdict
 
-        seriesdata = {'name': '1f5504fb-14d5-4d8c-8973-aecf0dac8030', 'data': graphdata}
+        seriesdata = {'name': str(metric), 'data': graphdata}
 
         series = []
         series.append(seriesdata)
