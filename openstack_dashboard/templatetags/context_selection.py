@@ -24,7 +24,7 @@ register = template.Library()
 
 
 def is_multi_region_configured(request):
-    return len(request.user.available_services_regions) > 1
+    return False
 
 
 def is_multidomain_supported():
