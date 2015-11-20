@@ -29,39 +29,7 @@ class Gnocchi(object):
         print r.content
         return False
 
-    def getToken(self):
-        now = time.time()
-
-        if (not hasattr(self, "token")) or (hasattr(self, "timeout") and self.timeout < now):
-            print "Looking for a keystone token"
-            keystone = 'https://keystone.test.rc.nectar.org.au:5000'
-            headers = {'Content-Type': "application/json"}
-            payload = json.dumps({
-                "auth": {
-                    "passwordCredentials": {
-                        "username": "evan@catalyst-au.net",
-                        "password": "YjBmMjFhMTA0ZTg0N2Rl"
-                    }
-                }
-            })
-
-            response = self.postJson(
-                "%s/v2.0/tokens" % keystone,
-                headers,
-                payload
-            )
-
-            if response:
-                access = response['access']
-                token = access['token']
-                id = token['id']
-                self.token = id
-                self.timeout = now + 3600
-
-        return self.token
-
-    def findMetric(self, gnocchi, name):
-        token = self.getToken()
+    def findMetric(self, gnocchi, name, token):
         headers = {'Content-Type': "application/json",
         'X-Auth-Token': token}
         url = gnocchi + "/v1/metric"
@@ -71,8 +39,7 @@ class Gnocchi(object):
                 if record['name'] == name:
                     return record['id']
 
-    def listMetrics(self, gnocchi):
-        token = self.getToken()
+    def listMetrics(self, gnocchi, token):
         headers = {'Content-Type': "application/json",
         'X-Auth-Token': token}
         url = gnocchi + "/v1/metric"
@@ -80,8 +47,7 @@ class Gnocchi(object):
         if r.status_code in [200]:
             return r.content
 
-    def listResources(self, gnocchi):
-        token = self.getToken()
+    def listResources(self, gnocchi, token):
         headers = {'Content-Type': "application/json",
         'X-Auth-Token': token}
         url = gnocchi + "/v1/resource/generic"
@@ -89,8 +55,7 @@ class Gnocchi(object):
         if r.status_code in [200]:
             return r.content
 
-    def queryMeasures(self, gnocchi, metric, qStart=None, qStop=None):
-        token = self.getToken()
+    def queryMeasures(self, gnocchi, metric, token, qStart=None, qStop=None):
         headers = {'Content-Type': "application/json",
         'X-Auth-Token': token}
 

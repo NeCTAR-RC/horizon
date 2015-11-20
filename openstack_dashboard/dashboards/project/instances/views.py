@@ -208,12 +208,17 @@ def rdp(request, instance_id):
 
 def metric_data(request, instance_id, metric_name):
     gnocchi = project_gnocchi.Gnocchi()
-    #url = "http://144.6.226.29:8041"
-    url = "http://144.6.225.35:8041" # gnocchi-extra2
+    for i, service in enumerate(request.user.service_catalog):
+        if service['name'] == 'gnocchi':
+            service['id'] = i
+            url = api.keystone.Service(service, request.user.services_region).url
+            break
+
+    authtoken = request.user.token.id
 
     #metrics = gnocchi.listMetrics(url)
-    metric = gnocchi.findMetric(url, metric_name)
-    measures = gnocchi.queryMeasures(url, str(metric))
+    metric = gnocchi.findMetric(url, metric_name, authtoken)
+    measures = gnocchi.queryMeasures(url, str(metric), authtoken)
 
     if len(measures) > 0:
         graphdata = [0] * len(measures)
@@ -221,7 +226,6 @@ def metric_data(request, instance_id, metric_name):
             if measures[i][1] == 1:
                 timestamp = datetime.strptime(measures[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
                 measuredate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
-                #graphdata[i] = [time.mktime(timestamp.timetuple()), metrics [i][2]]
                 newdict = {'x': measuredate, 'y': measures [i][2]}
                 graphdata[i] = newdict
 
