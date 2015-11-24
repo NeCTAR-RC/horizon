@@ -215,25 +215,31 @@ def metric_data(request, instance_id, metric_name):
             break
 
     authtoken = request.user.token.id
+    time_range = request.POST.get('time_limit')
 
     #metrics = gnocchi.listMetrics(url)
     metric = gnocchi.findMetric(url, metric_name, authtoken)
-    measures = gnocchi.queryMeasures(url, str(metric), authtoken)
+    measures = gnocchi.queryMeasures(url, str(metric), authtoken, time_range)
 
     if len(measures) > 0:
         graphdata = [0] * len(measures)
         for i in range(len(measures)):
-            if measures[i][1] == 1:
-                timestamp = datetime.strptime(measures[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
-                measuredate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
-                newdict = {'x': measuredate, 'y': measures [i][2]}
-                graphdata[i] = newdict
-
-        seriesdata = {'name': str(metric), 'data': graphdata}
+            if len(measures[i]) > 1:
+                hasdata = True
+                if measures[i][1] == 1:
+                    timestamp = datetime.strptime(measures[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
+                    measuredate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
+                    newdict = {'x': measuredate, 'y': measures [i][2]}
+                    graphdata[i] = newdict
+            else:
+                hasdata = False
 
         series = []
-        series.append(seriesdata)
-        jsondata = {'series': series, 'settings': {'axes_x': False}}
+        if hasdata:
+            seriesdata = {'name': str(metric), 'data': graphdata}
+            series.append(seriesdata)
+
+        jsondata = {'series': series, 'settings': {'axes_x': False, "auto_size": False, 'auto_resize': False}}
     else:
         jsondata = {'series': [], 'settings': {}}
 
