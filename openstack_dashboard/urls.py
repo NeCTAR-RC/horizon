@@ -26,6 +26,7 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import re_path
 from django.views import defaults
+from django.views.generic.base import TemplateView
 
 from oslo_utils import importutils
 
@@ -37,10 +38,16 @@ from horizon.decorators import require_auth
 from openstack_dashboard.api import rest
 from openstack_dashboard import views
 
+
+class TermsView(TemplateView):
+    template_name = 'terms.html'
+
+
 urlpatterns = [
     re_path(r'^$', views.splash, name='splash'),
     re_path(r'^api/', include(rest.urls)),
     re_path(r'^header/', views.ExtensibleHeaderView.as_view()),
+    re_path(r'^terms/$', TermsView.as_view(), name='terms'),
     re_path(r'', horizon.base._wrapped_include(horizon.urls)),
 ]
 
