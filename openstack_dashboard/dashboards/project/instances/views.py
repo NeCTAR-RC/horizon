@@ -217,9 +217,13 @@ def metric_data(request, instance_id, metric_name):
     authtoken = request.user.token.id
     time_range = request.POST.get('time_limit')
 
-    #metrics = gnocchi.listMetrics(url)
-    metric = gnocchi.findMetric(url, metric_name, authtoken)
-    measures = gnocchi.queryMeasures(url, str(metric), authtoken, time_range)
+    resource = gnocchi.getResource(url, authtoken, instance_id)
+    contents = json.loads(resource)
+    if metric_name in contents[0]['metrics']:
+        metric = contents[0]['metrics'][metric_name]
+        measures = gnocchi.queryMeasures(url, str(metric), authtoken, time_range)
+    else:
+        measures = ""
 
     if len(measures) > 0:
         graphdata = [0] * len(measures)

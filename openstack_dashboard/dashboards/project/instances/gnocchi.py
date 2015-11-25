@@ -55,16 +55,33 @@ class Gnocchi(object):
         if r.status_code in [200]:
             return r.content
 
-    def queryMeasures(self, gnocchi, metric, token, qStart=None, qStop=None):
+    def getResource(self, gnocchi, token, resourceid):
+        headers = {'Content-Type': "application/json",
+        'X-Auth-Token': token}
+        url = gnocchi + "/v1/resource/instance"
+        payload = json.dumps(
+            {
+                "=": {
+                    "id": resourceid
+                }
+            }
+        )
+        r = requests.get(url, headers=headers, params=payload)
+        if r.status_code in [200]:
+            return r.content
+
+    def queryMeasures(self, gnocchi, metric, token, time_range=None):
         headers = {'Content-Type': "application/json",
         'X-Auth-Token': token}
 
         timeQuery = True
-        if not qStart or not qStop:
-            timeQuery = False
-            now = time.time()
-            qStop = now
-            qStart = now - 3600
+        timeQuery = False
+        now = time.time()
+        qStop = now
+        if not time_range:
+            qStart = now - 21600
+        else:
+            qStart = now - time_range
 
         timerange="?start=" + str(qStart) + "&stop=" + str(qStop)
         url = gnocchi + "/v1/metric/" + metric + "/measures" + timerange
