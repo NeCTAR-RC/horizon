@@ -24,6 +24,8 @@ from horizon import messages
 from horizon.utils import validators
 
 from openstack_dashboard import api
+from openstack_dashboard.dashboards.project.images.images \
+    import tables as image_common
 from openstack_dashboard.dashboards.project.images \
     import utils as image_utils
 from openstack_dashboard.dashboards.project.instances \
@@ -63,7 +65,19 @@ class RebuildInstanceForm(forms.SelfHandlingForm):
 
         images = image_utils.get_available_images(request,
                                                   request.user.tenant_id)
-        choices = [(image.id, image) for image in images]
+
+        categories = image_common.categorize_images(images,
+                                                    request.user.tenant_id)
+        choices = []
+        for name, images in categories.items():
+            if images:
+                def key(image):
+                    name = getattr(image, 'name', '') or ''
+                    return name.lower()
+                images.sort(key=key)
+                text = image_common.image_category_text(name)
+                choices.append(
+                    (text, [(image.id, image) for image in images]))
         if choices:
             choices.insert(0, ("", _("Select Image")))
         else:

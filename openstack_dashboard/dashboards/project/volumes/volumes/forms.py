@@ -37,9 +37,12 @@ from openstack_dashboard import api
 from openstack_dashboard.api import cinder
 from openstack_dashboard.api import glance
 from openstack_dashboard.api import nova
+from openstack_dashboard.dashboards.project.images.images \
+    import tables as image_common
 from openstack_dashboard.dashboards.project.images import utils
 from openstack_dashboard.dashboards.project.instances import tables
 from openstack_dashboard.usage import quotas
+
 
 IMAGE_BACKEND_SETTINGS = getattr(settings, 'OPENSTACK_IMAGE_BACKEND', {})
 IMAGE_FORMAT_CHOICES = IMAGE_BACKEND_SETTINGS.get('image_formats', [])
@@ -239,7 +242,19 @@ class CreateForm(forms.SelfHandlingForm):
             for image in images:
                 image.bytes = image.size
                 image.size = functions.bytes_to_gigabytes(image.bytes)
-                choices.append((image.id, image))
+
+            categories = image_common.categorize_images(images,
+                                                        request.user.tenant_id)
+            for name, images in categories.items():
+                if images:
+                    def key(image):
+                        name = getattr(image, 'name', '') or ''
+                        return name.lower()
+                    images.sort(key=key)
+                    text = image_common.image_category_text(name)
+                    choices.append(
+                        (text, [(image.id, image) for image in images]))
+
             self.fields['image_source'].choices = choices
         else:
             del self.fields['image_source']
