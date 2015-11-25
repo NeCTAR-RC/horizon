@@ -28,6 +28,9 @@ from django import http
 from django import shortcuts
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
+from django.utils.decorators import method_decorator
 
 import requests
 import json
@@ -206,7 +209,7 @@ def rdp(request, instance_id):
         exceptions.handle(request, msg, redirect=redirect)
 
 
-def metric_data(request, instance_id, metric_name):
+def metric_data(request, instance_id, metric_name, time_range):
     gnocchi = project_gnocchi.Gnocchi()
     for i, service in enumerate(request.user.service_catalog):
         if service['name'] == 'gnocchi':
@@ -215,12 +218,13 @@ def metric_data(request, instance_id, metric_name):
             break
 
     authtoken = request.user.token.id
-    time_range = request.POST.get('time_limit')
 
     resource = gnocchi.getResource(url, authtoken, instance_id)
     contents = json.loads(resource)
     if metric_name in contents[0]['metrics']:
         metric = contents[0]['metrics'][metric_name]
+        if time_range == "None":
+            time_range = None
         measures = gnocchi.queryMeasures(url, str(metric), authtoken, time_range)
     else:
         measures = ""
@@ -428,6 +432,15 @@ class DetailView(tabs.TabView):
     def get_tabs(self, request, *args, **kwargs):
         instance = self.get_data()
         return self.tab_group_class(request, instance=instance, **kwargs)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(DetailView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        response = http.HttpResponseRedirect(reverse('horizon:project:instances:detail', kwargs={'instance_id': self.get_data().id}))
+        response.set_cookie("time_limit", request.POST.get("time_limit"))
+        return response
 
 
 class ResizeView(workflows.WorkflowView):

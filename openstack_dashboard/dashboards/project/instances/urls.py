@@ -48,5 +48,5 @@ urlpatterns = patterns(
         views.AttachInterfaceView.as_view(), name='attach_interface'),
     url(INSTANCES % 'detach_interface',
         views.DetachInterfaceView.as_view(), name='detach_interface'),
-    url(INSTANCES % 'metric_data/(?P<metric_name>[^/]+)', 'metric_data', name='metric_data'),
+    url(INSTANCES % 'metric_data/(?P<metric_name>[^/]+)/(?P<time_range>[^/]+)', 'metric_data', name='metric_data'),
 )

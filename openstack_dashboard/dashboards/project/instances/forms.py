@@ -247,3 +247,4 @@ class DetachInterface(forms.SelfHandlingForm):
             exceptions.handle(request, _("Unable to detach interface."),
                               redirect=redirect)
         return True
+

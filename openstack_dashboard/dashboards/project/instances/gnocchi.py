@@ -81,7 +81,7 @@ class Gnocchi(object):
         if not time_range:
             qStart = now - 21600
         else:
-            qStart = now - time_range
+            qStart = now - float(time_range)
 
         timerange="?start=" + str(qStart) + "&stop=" + str(qStop)
         url = gnocchi + "/v1/metric/" + metric + "/measures" + timerange

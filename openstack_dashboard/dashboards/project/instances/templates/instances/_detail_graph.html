@@ -6,11 +6,22 @@
       <h3 class="pull-left">{% trans "Metric Graphs" %}</h3>
     </div>
       
+    <form class="form-group" id="time_limit" method="post" action="{% url 'horizon:project:instances:detail' instance.id %}">
+      <label for="time_limit">Display the last:
+        <select onchange="this.form.submit()" data-line-chart-command="date_picker_change" name="time_limit">
+            <option value=3600 {% if time_limit == 3600 %} selected="selected"{% endif %}>1 hour</option>
+            <option value=21600 {% if time_limit == 21600 %} selected="selected"{% endif %}>6 hours</option>
+            <option value=86400 {% if time_limit == 86400 %} selected="selected"{% endif %}>24 hours</option>
+            <option value=604800 {% if time_limit == 604800 %} selected="selected"{% endif %}>1 week</option>
+        </select>
+      </label>
+    </form>
+
     <h4>CPU usage</h4>
     <br/>
     <div id="line_chart"
         data-chart-type="line_chart"
-        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'cpu.util' %}"
+        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'cpu.util' time_limit %}"
         data-form-selector='#linechart_general_form'>
     </div>
     <br/>
@@ -19,7 +30,7 @@
     <br/>
     <div id="line_chart"
         data-chart-type="line_chart"
-        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'nectar4_load' %}"
+        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'nectar4_load' time_limit %}"
         data-form-selector='#linechart_general_form'>
     </div>
     <br/>
