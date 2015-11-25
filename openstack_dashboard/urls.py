@@ -26,13 +26,20 @@ from django.conf.urls import patterns
 from django.conf.urls.static import static  # noqa
 from django.conf.urls import url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns  # noqa
+from django.views.generic.base import TemplateView
 
 import horizon
+
+
+class TermsView(TemplateView):
+    template_name = 'terms.html'
+
 
 urlpatterns = patterns(
     '',
     url(r'^$', 'openstack_dashboard.views.splash', name='splash'),
     url(r'^api/', include('openstack_dashboard.api.rest.urls')),
+    url(r'^terms/$', TermsView.as_view(), name='terms'),
     url(r'', include(horizon.urls)),
 )
 
