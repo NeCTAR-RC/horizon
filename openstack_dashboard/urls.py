@@ -27,6 +27,8 @@ from django.conf.urls import url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views import defaults
 
+from oslo_utils import importutils
+
 import horizon
 import horizon.base
 from horizon.browsers import views as browsers_views
@@ -62,3 +64,16 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     urlpatterns.append(url(r'^500/$', defaults.server_error))
+
+
+if getattr(settings, 'REST_VIEW_SETS', ()):
+    try:
+        from rest_framework import routers
+        router = routers.DefaultRouter()
+        for name, class_str in settings.REST_VIEW_SETS:
+            klass = importutils.import_class(class_str)
+            router.register(name, klass)
+
+        urlpatterns.append(url(r'^rest_api/', include(router.urls)))
+    except ImportError:
+        pass
