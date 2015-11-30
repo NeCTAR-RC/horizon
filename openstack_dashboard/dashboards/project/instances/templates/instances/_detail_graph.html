@@ -19,19 +19,67 @@
 
     <h4>CPU usage</h4>
     <br/>
-    <div id="line_chart"
-        data-chart-type="line_chart"
-        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'cpu.util' time_limit %}"
-        data-form-selector='#linechart_general_form'>
+    <div id="chart-wrapper" style="height:250px !important;">
+        <div id="line_chart"
+            data-chart-type="line_chart"
+            data-url="{% url 'horizon:project:instances:metric_data' instance.id 'cpu_util' time_limit %}"
+            data-form-selector='#linechart_general_form'>
+        </div>
     </div>
     <br/>
 
     <h4>Memory usage</h4>
     <br/>
-    <div id="line_chart"
-        data-chart-type="line_chart"
-        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'nectar4_load' time_limit %}"
-        data-form-selector='#linechart_general_form'>
+    <div id="chart-wrapper" style="height:250px !important;">
+        <div id="line_chart2"
+            data-chart-type="line_chart"
+            data-url="{% url 'horizon:project:instances:metric_data' instance.id 'memory.usage' time_limit %}"
+            data-form-selector='#linechart_general_form'>
+        </div>
+    </div>
+    <br/>
+
+    <h4>Disk read requests</h4>
+    <br/>
+    <div id="chart-wrapper" style="height:250px !important;">
+        <div id="line_chart3"
+            data-chart-type="line_chart"
+            data-url="{% url 'horizon:project:instances:metric_data' instance.id 'disk.read.requests' time_limit %}"
+            data-form-selector='#linechart_general_form'>
+        </div>
+    </div>
+    <br/>
+
+    <h4>Disk write requests</h4>
+    <br/>
+    <div id="chart-wrapper" style="height:250px !important;">
+        <div id="line_chart4"
+            data-chart-type="line_chart"
+            data-url="{% url 'horizon:project:instances:metric_data' instance.id 'disk.write.requests' time_limit %}"
+            data-form-selector='#linechart_general_form'>
+        </div>
+    </div>
+    <br/>
+
+    <h4>Disk read rate</h4>
+    <br/>
+    <div id="chart-wrapper" style="height:250px !important;">
+        <div id="line_chart5"
+            data-chart-type="line_chart"
+            data-url="{% url 'horizon:project:instances:metric_data' instance.id 'disk.read.bytes.rate' time_limit %}"
+            data-form-selector='#linechart_general_form'>
+        </div>
+    </div>
+    <br/>
+
+    <h4>Disk write rate</h4>
+    <br/>
+    <div id="chart-wrapper" style="height:250px !important;">
+        <div id="line_chart6"
+            data-chart-type="line_chart"
+            data-url="{% url 'horizon:project:instances:metric_data' instance.id 'disk.write.bytes.rate' time_limit %}"
+            data-form-selector='#linechart_general_form'>
+        </div>
     </div>
     <br/>
 
@@ -40,4 +88,5 @@
             horizon.d3_line_chart.init("div[data-chart-type='line_chart']");
         }
     </script>
+
 {% endblock %}

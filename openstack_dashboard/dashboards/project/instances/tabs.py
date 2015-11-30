@@ -109,7 +109,7 @@ class AuditTab(tabs.TableTab):
 
 
 class GraphTab(tabs.Tab):
-    name = _("Graph")
+    name = _("Metrics")
     slug = "graph"
     template_name = "project/instances/_detail_graph.html"
     preload = False
