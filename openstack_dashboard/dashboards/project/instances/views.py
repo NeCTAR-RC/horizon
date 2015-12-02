@@ -44,6 +44,9 @@ from horizon import tables
 from horizon import tabs
 from horizon.utils import memoized
 from horizon import workflows
+from keystoneclient.auth.identity import v2, v3
+from keystoneclient import session
+from gnocchiclient.v1 import client
 
 from openstack_dashboard import api
 
@@ -57,8 +60,6 @@ from openstack_dashboard.dashboards.project.instances \
     import tabs as project_tabs
 from openstack_dashboard.dashboards.project.instances \
     import workflows as project_workflows
-from openstack_dashboard.dashboards.project.instances \
-    import gnocchi as project_gnocchi
 
 LOG = logging.getLogger(__name__)
 
@@ -210,22 +211,37 @@ def rdp(request, instance_id):
 
 
 def metric_data(request, instance_id, metric_name, time_range):
-    gnocchi = project_gnocchi.Gnocchi()
-    for i, service in enumerate(request.user.service_catalog):
-        if service['name'] == 'gnocchi':
-            service['id'] = i
-            url = api.keystone.Service(service, request.user.services_region).url
-            break
+    keystone_url = api.base.url_for(request,
+                                    'identity',
+                                    endpoint_type='publicURL')
 
-    authtoken = request.user.token.id
+    version = keystone_url.rsplit('/', 1)[-1]
 
-    resource = gnocchi.getResource(url, authtoken, instance_id)
-    contents = json.loads(resource)
-    if metric_name in contents[0]['metrics']:
-        metric = contents[0]['metrics'][metric_name]
+    if version == "v2.0":
+        auth = v2.Token(
+                    auth_url=keystone_url,
+                    token=request.user.token.id,
+                    tenant_id=request.user.tenant_id)
+    else:
+        auth = v3.Token(
+                    auth_url=keystone_url,
+                    token=request.user.token.id,
+                    tenant_id=request.user.tenant_id)
+
+    sess = session.Session(auth=auth)
+    gnocchi_client = client.Client(sess)
+
+    resource = gnocchi_client.resource.get("instance", instance_id)
+
+    if metric_name in resource['metrics']:
+        metric = resource['metrics'][metric_name]
+        now = time.time()
         if time_range == "None":
-            time_range = None
-        measures = gnocchi.queryMeasures(url, str(metric), authtoken, time_range)
+            start = now - 21600
+        else:
+            start = now - float(time_range)
+        
+        measures = gnocchi_client.metric.get_measures(str(metric), start, now)
     else:
         measures = ""
 
