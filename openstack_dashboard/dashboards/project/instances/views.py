@@ -44,7 +44,7 @@ from horizon import tables
 from horizon import tabs
 from horizon.utils import memoized
 from horizon import workflows
-from keystoneclient.auth.identity import v2, v3
+from keystoneclient.auth.identity import v2
 from keystoneclient import session
 from gnocchiclient.v1 import client
 
@@ -217,16 +217,10 @@ def metric_data(request, instance_id, metric_name, time_range):
 
     version = keystone_url.rsplit('/', 1)[-1]
 
-    if version == "v2.0":
-        auth = v2.Token(
-                    auth_url=keystone_url,
-                    token=request.user.token.id,
-                    tenant_id=request.user.tenant_id)
-    else:
-        auth = v3.Token(
-                    auth_url=keystone_url,
-                    token=request.user.token.id,
-                    tenant_id=request.user.tenant_id)
+    auth = v2.Token(
+                auth_url=keystone_url,
+                token=request.user.token.id,
+                tenant_id=request.user.tenant_id)
 
     sess = session.Session(auth=auth)
     gnocchi_client = client.Client(sess)
