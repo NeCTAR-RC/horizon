@@ -250,11 +250,10 @@ def metric_data(request, instance_id, metric_name, time_range):
         for i in range(len(measures)):
             if len(measures[i]) > 1:
                 hasdata = True
-                if measures[i][1] == 1:
-                    timestamp = datetime.strptime(measures[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
-                    measuredate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
-                    newdict = {'x': measuredate, 'y': measures [i][2]}
-                    graphdata[i] = newdict
+                timestamp = datetime.strptime(measures[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
+                measuredate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
+                newdict = {'x': measuredate, 'y': measures [i][2]}
+                graphdata[i] = newdict
             else:
                 hasdata = False
 
