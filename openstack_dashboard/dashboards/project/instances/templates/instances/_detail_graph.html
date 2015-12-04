@@ -19,10 +19,12 @@
 
     <h4>CPU usage</h4>
     <br/>
-    <div id="line_chart"
-        data-chart-type="line_chart"
-        data-url="{% url 'horizon:project:instances:metric_data' instance.id 'cpu_util' time_limit %}"
-        data-form-selector='#linechart_general_form'>
+    <div id="chart-wrapper" style="height:300px;">
+        <div id="line_chart"
+            data-chart-type="line_chart"
+            data-url="{% url 'horizon:project:instances:metric_data' instance.id 'cpu_util' time_limit %}"
+            data-form-selector='#linechart_general_form'>
+        </div>
     </div>
 
     <h4>Memory usage</h4>
