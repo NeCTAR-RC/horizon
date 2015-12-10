@@ -256,7 +256,7 @@ def metric_data(request, instance_id, metric_name, time_range):
             seriesdata = {'name': str(metric), 'data': graphdata}
             series.append(seriesdata)
 
-        jsondata = {'series': series, 'settings': {'auto_size': False, 'axes_x': False}}
+        jsondata = {'series': series, 'settings': {'auto_size': False}}
     else:
         jsondata = {'series': [], 'settings': {}}
 
