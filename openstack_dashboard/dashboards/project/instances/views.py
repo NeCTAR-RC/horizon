@@ -35,7 +35,7 @@ from django.utils.decorators import method_decorator
 import requests
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from horizon import exceptions
 from horizon import forms
@@ -230,14 +230,28 @@ def metric_data(request, instance_id, metric_name, time_range):
     if metric_name in resource['metrics']:
         metric = resource['metrics'][metric_name]
         now = time.time()
+        datenow = datetime.now()
         if time_range == "None":
             start = now - 21600
+            start = datetime.fromtimestamp(time.mktime(time.localtime(start))).strftime('%Y-%m-%dT%H:%M:%S')
         else:
             start = now - float(time_range)
+            start = datetime.fromtimestamp(time.mktime(time.localtime(start))).strftime('%Y-%m-%dT%H:%M:%S')
+        now = datetime.fromtimestamp(time.mktime(time.localtime(now))).strftime('%Y-%m-%dT%H:%M:%S')
         
         measures = gnocchi_client.metric.get_measures(str(metric), start, now)
+        while datetime.strptime(measures[-1][0], '%Y-%m-%dT%H:%M:%S+00:00') < datenow - timedelta(minutes=measures[-1][1]):
+            paged = gnocchi_client.metric.get_measures(str(metric), measures[-1][0], now)
+            measures = measures + paged
     else:
         measures = ""
+
+    f = open('/tmp/' +metric_name, 'w+' )
+    f.write('Start: ' + start + '\n')
+    f.write('Now:' + now + '\n')
+    f.write('Total records: ' + str(len(measures)) + '\n')
+    f.write(str(measures))
+    f.close()
 
     if len(measures) > 0:
         graphdata = [0] * len(measures)
@@ -253,10 +267,10 @@ def metric_data(request, instance_id, metric_name, time_range):
 
         series = []
         if hasdata:
-            seriesdata = {'name': str(metric), 'data': graphdata}
+            seriesdata = {'name': str(metric_name), 'data': graphdata}
             series.append(seriesdata)
 
-        jsondata = {'series': series, 'settings': {'auto_size': False}}
+        jsondata = {'series': series, 'settings': {'axes_x': False, 'auto_size': False}}
     else:
         jsondata = {'series': [], 'settings': {}}
 
