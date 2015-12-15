@@ -116,7 +116,7 @@ class GraphTab(tabs.Tab):
 
     def get_context_data(self, request):
         instance = self.tab_group.kwargs['instance']
-        time_range = request.COOKIES.get("time_limit", 21600)
+        time_range = request.COOKIES.get("time_limit", '21600')
         return {"instance": instance, "time_limit": time_range}
 
 
