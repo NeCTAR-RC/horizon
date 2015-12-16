@@ -587,6 +587,8 @@ horizon.d3_line_chart = {
       // Display the backdrop that will be over the chart.
       self.backdrop = $('<div class="modal-backdrop"></div>');
       self.backdrop.css('width', self.width).css('height', self.height);
+      // Hide the black box loaded on page load.
+      self.backdrop.hide();
       $(self.html_element).append(self.backdrop);
 
       // Hide the legend.
