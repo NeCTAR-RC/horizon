@@ -390,6 +390,8 @@ horizon.d3_line_chart = {
           self.stats = data.stats;
           // The highest priority settings are sent with the data.
           self.apply_settings(data.settings);
+          // Get correct size of chart and the wrapper.
+          self.get_size();
 
           if (self.series.length <= 0) {
             $(self.html_element).html(gettext('No data available.'));

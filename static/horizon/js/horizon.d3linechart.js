@@ -399,7 +399,7 @@ horizon.d3_line_chart = {
             // Setting a fix height breaks things when legend is getting
             // bigger.
             $(self.legend_element).css('height', '');
-      e   } else {
+          } else {
             self.render();
           }
         },
