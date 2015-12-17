@@ -495,7 +495,7 @@ horizon.d3_line_chart = {
               ("00" + d.getUTCMinutes()).slice(-2) + ":" +
               ("00" + d.getUTCSeconds()).slice(-2) + " GMT";
 
-            var date = '<span class="date">' + dtoString() + '</span>';
+            var date = '<span class="date">' + d.toString() + '</span>';
             var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
             if (series.name) {
                 return swatch + series.name + ': ' + y + ' ' + series.unit + '<br>' + date;
