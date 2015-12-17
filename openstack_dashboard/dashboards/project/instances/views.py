@@ -240,18 +240,13 @@ def metric_data(request, instance_id, metric_name, time_range):
         now = datetime.fromtimestamp(time.mktime(time.localtime(now))).strftime('%Y-%m-%dT%H:%M:%S')
         
         measures = gnocchi_client.metric.get_measures(str(metric), start, now)
-        while datetime.strptime(measures[-1][0], '%Y-%m-%dT%H:%M:%S+00:00') < datenow - timedelta(minutes=measures[-1][1]):
-            paged = gnocchi_client.metric.get_measures(str(metric), measures[-1][0], now)
-            measures = measures + paged
+        paged = [0, 1]
+        if len(measures) > 0:
+            while (datetime.strptime(measures[-1][0], '%Y-%m-%dT%H:%M:%S+00:00') < datenow - timedelta(minutes=measures[-1][1])) and len(paged) > 0:
+                paged = gnocchi_client.metric.get_measures(str(metric), measures[-1][0], now)
+                measures = measures + paged
     else:
         measures = ""
-
-    f = open('/tmp/' +metric_name, 'w+' )
-    f.write('Start: ' + start + '\n')
-    f.write('Now:' + now + '\n')
-    f.write('Total records: ' + str(len(measures)) + '\n')
-    f.write(str(measures))
-    f.close()
 
     if len(measures) > 0:
         graphdata = [0] * len(measures)
@@ -259,7 +254,7 @@ def metric_data(request, instance_id, metric_name, time_range):
             if len(measures[i]) > 1:
                 hasdata = True
                 timestamp = datetime.strptime(measures[i][0], '%Y-%m-%dT%H:%M:%S+00:00')
-                measuredate = datetime.fromtimestamp(time.mktime((timestamp.timetuple()))).strftime('%Y-%m-%dT%H:%M:%S')
+                measuredate = datetime.fromtimestamp(time.mktime(timestamp.timetuple())).strftime('%Y-%m-%dT%H:%M:%S')
                 newdict = {'x': measuredate, 'y': measures [i][2]}
                 graphdata[i] = newdict
             else:
@@ -267,7 +262,7 @@ def metric_data(request, instance_id, metric_name, time_range):
 
         series = []
         if hasdata:
-            seriesdata = {'name': str(metric_name), 'data': graphdata}
+            seriesdata = {'name': '', 'data': graphdata}
             series.append(seriesdata)
 
         jsondata = {'series': series, 'settings': {'axes_x': False, 'auto_size': False}}
