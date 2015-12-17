@@ -29,51 +29,56 @@
 
     <h4>Memory usage</h4>
     <br/>
-    <div id="chart-wrapper" style="height:300px;">
+    <div id="chart-wrapper" style="height:300px; position: relative;">
         <div id="line_chart2"
             data-chart-type="line_chart"
             data-url="{% url 'horizon:project:instances:metric_data' instance.id 'memory.usage' time_limit %}"
-            data-form-selector='#linechart_general_form'>
+            data-form-selector='#linechart_general_form'
+            style="position: relative;">
         </div>
     </div>
 
     <h4>Disk read requests</h4>
     <br/>
-    <div id="chart-wrapper" style="height:300px;">
+    <div id="chart-wrapper" style="height:300px; position: relative;">
         <div id="line_chart3"
             data-chart-type="line_chart"
             data-url="{% url 'horizon:project:instances:metric_data' instance.id 'disk.read.requests' time_limit %}"
-            data-form-selector='#linechart_general_form'>
+            data-form-selector='#linechart_general_form'
+            style="position: relative;">
         </div>
     </div>
 
     <h4>Disk write requests</h4>
     <br/>
-    <div id="chart-wrapper" style="height:300px;">
+    <div id="chart-wrapper" style="height:300px; position: relative;">
         <div id="line_chart4"
             data-chart-type="line_chart"
             data-url="{% url 'horizon:project:instances:metric_data' instance.id 'disk.write.requests' time_limit %}"
-            data-form-selector='#linechart_general_form'>
+            data-form-selector='#linechart_general_form'
+            style="position: relative;">
         </div>
     </div>
 
     <h4>Disk read rate</h4>
     <br/>
-    <div id="chart-wrapper" style="height:300px;">
+    <div id="chart-wrapper" style="height:300px; position: relative;">
         <div id="line_chart5"
             data-chart-type="line_chart"
             data-url="{% url 'horizon:project:instances:metric_data' instance.id 'disk.read.bytes.rate' time_limit %}"
-            data-form-selector='#linechart_general_form'>
+            data-form-selector='#linechart_general_form'
+            style="position: relative;">
         </div>
     </div>
 
     <h4>Disk write rate</h4>
     <br/>
-    <div id="chart-wrapper" style="height:300px;">
+    <div id="chart-wrapper" style="height:300px; position: relative;">
         <div id="line_chart6"
             data-chart-type="line_chart"
             data-url="{% url 'horizon:project:instances:metric_data' instance.id 'disk.write.bytes.rate' time_limit %}"
-            data-form-selector='#linechart_general_form'>
+            data-form-selector='#linechart_general_form'
+            style="position: relative;">
         </div>
     </div>
 
