@@ -255,6 +255,8 @@ def metric_data(request, instance_id, metric_name, time_range):
 
     granular = {}
 
+    # Filter the returned points by granularity. We get them back in 1 minute, 10 minutes
+    # and 1 hour aggregations. We want them consistant across the graph.
     if len(measures) > 0:
         for i in measures:
             k = int(i[1])
@@ -263,19 +265,22 @@ def metric_data(request, instance_id, metric_name, time_range):
             else:
                 granular[k]=[i]
 
-        # take the one with the most points
+        # take the one with the most points for now.
         maxkey = 0
         maxlength = 0;
         for key in granular:
             if len(granular[key]) > maxlength:
                 maxlength = len(granular[key])
-                f.write(str(maxlength) + '\n')
                 maxkey = key
+                f.write(str(maxlength) + '\n')
                 f.write(str(maxkey) + '\n')
 
         f.write(str(granular[maxkey]))
         f.close()
 
+        # We are trying to remove duplicated records. This compares the entire list - time, granularity and value.
+        # This is probably not what we actualy want long term, we should probably be just checking for the timestamp,
+        # but this is what we are doing for now due to time constraints.
         times = []
         for i in granular[maxkey]:
             if not i in times:
