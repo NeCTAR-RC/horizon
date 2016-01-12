@@ -232,60 +232,26 @@ def metric_data(request, instance_id, metric_name, time_range):
         now = time.time()
         datenow = datetime.now()
         if time_range == "None":
+            time_range = 21600
             start = now - 21600
             start = datetime.fromtimestamp(time.mktime(time.localtime(start))).strftime('%Y-%m-%dT%H:%M:%S')
         else:
             start = now - float(time_range)
             start = datetime.fromtimestamp(time.mktime(time.localtime(start))).strftime('%Y-%m-%dT%H:%M:%S')
         now = datetime.fromtimestamp(time.mktime(time.localtime(now))).strftime('%Y-%m-%dT%H:%M:%S')
-        
-        measures = gnocchi_client.metric.get_measures(str(metric), start, now)
-        paged = [0, 1]
-        if len(measures) > 0:
-            while (datetime.strptime(measures[-1][0], '%Y-%m-%dT%H:%M:%S+00:00') < datenow - timedelta(minutes=measures[-1][1])) and len(paged) > 0:
-                paged = gnocchi_client.metric.get_measures(str(metric), measures[-1][0], now)
-                measures = measures + paged
+        if int(time_range) <= 3600:
+            granularity = 60
+        elif int(time_range) <= 86400:
+            granularity = 600
+        else:
+            granularity = 3600
+        measures = gnocchi_client.metric.get_measures(str(metric), start=start, stop=now, granularity=granularity)
     else:
-        measures = ""
+        measures = 0
 
-    f = open('/tmp/' +metric_name, 'w+' )
-    f.write('Start: ' + start + '\n')
-    f.write('Now:' + now + '\n')
-    f.write('Total records: ' + str(len(measures)) + '\n')
-
-    granular = {}
-
-    # Filter the returned points by granularity. We get them back in 1 minute, 10 minutes
-    # and 1 hour aggregations. We want them consistant across the graph.
     if len(measures) > 0:
-        for i in measures:
-            k = int(i[1])
-            if granular.has_key(k):
-                granular[k].append(i)
-            else:
-                granular[k]=[i]
 
-        # take the one with the most points for now.
-        maxkey = 0
-        maxlength = 0;
-        for key in granular:
-            if len(granular[key]) > maxlength:
-                maxlength = len(granular[key])
-                maxkey = key
-                f.write(str(maxlength) + '\n')
-                f.write(str(maxkey) + '\n')
-
-        f.write(str(granular[maxkey]))
-        f.close()
-
-        # We are trying to remove duplicated records. This compares the entire list - time, granularity and value.
-        # This is probably not what we actualy want long term, we should probably be just checking for the timestamp,
-        # but this is what we are doing for now due to time constraints.
-        times = []
-        for i in granular[maxkey]:
-            if not i in times:
-                times.append(i)
-        
+        times = measures
         graphdata = [0] * len(times)
         for i in range(len(times)):
             if len(times[i]) > 1:
