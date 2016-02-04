@@ -738,7 +738,9 @@ class SetNetworkAction(workflows.Action):
     def __init__(self, request, *args, **kwargs):
         super(SetNetworkAction, self).__init__(request, *args, **kwargs)
         network_list = self.fields["network"].choices
-        if len(network_list) == 1:
+        if len(network_list) == 1 or getattr(settings,
+                                             'NECTAR_DEFAULT_NETWORK_ENABLED',
+                                             False):
             self.fields['network'].initial = [network_list[0][0]]
         if api.neutron.is_port_profiles_supported():
             self.fields['profile'].choices = (

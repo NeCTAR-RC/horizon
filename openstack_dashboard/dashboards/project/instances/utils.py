@@ -130,8 +130,14 @@ def network_field_data(request, include_empty_option=False):
     if api.base.is_service_enabled(request, 'network'):
         try:
             networks = api.neutron.network_list_for_tenant(request, tenant_id)
-            networks = [(n.id, n.name_or_id) for n in networks]
+            if getattr(settings, 'NECTAR_DEFAULT_NETWORK_ENABLED', False):
+                networks = [(n.id, n.name_or_id) for n in networks
+                            if not n.shared]
+            else:
+                networks = [(n.id, n.name_or_id) for n in networks]
             networks.sort(key=lambda obj: obj[1])
+            if getattr(settings, 'NECTAR_DEFAULT_NETWORK_ENABLED', False):
+                networks.insert(0, ('', 'Default'))
         except Exception as e:
             msg = _('Failed to get network list {0}').format(six.text_type(e))
             exceptions.handle(request, msg)
