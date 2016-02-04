@@ -130,8 +130,9 @@ def network_field_data(request, include_empty_option=False):
     if api.base.is_service_enabled(request, 'network'):
         try:
             networks = api.neutron.network_list_for_tenant(request, tenant_id)
-            networks = [(n.id, n.name_or_id) for n in networks]
+            networks = [(n.id, n.name_or_id) for n in networks if not n.shared]
             networks.sort(key=lambda obj: obj[1])
+            networks.insert(0, ('', 'Default'))
         except Exception as e:
             msg = _('Failed to get network list {0}').format(six.text_type(e))
             exceptions.handle(request, msg)
