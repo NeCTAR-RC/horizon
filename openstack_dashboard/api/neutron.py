@@ -523,6 +523,10 @@ class FloatingIpManager(object):
         :returns: List of FloatingIpPool objects
         """
         search_opts = {'router:external': True}
+        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                                  False)
+        if filter_provider:
+            search_opts['provider:network_type'] = filter_provider
         return [FloatingIpPool(pool) for pool
                 in self.client.list_networks(**search_opts).get('networks')]
 
@@ -655,7 +659,12 @@ class FloatingIpManager(object):
                                  if p.device_id in gw_routers])
         # we have to include any shared subnets as well because we may not
         # have permission to see the router interface to infer connectivity
-        shared = set([s.id for n in network_list(self.request, shared=True)
+        search_opts = {'shared': True}
+        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                                  False)
+        if filter_provider:
+            search_opts['provider:network_type'] = filter_provider
+        shared = set([s.id for n in network_list(self.request, **search_opts)
                       for s in n.subnets])
         return reachable_subnets | shared
 
