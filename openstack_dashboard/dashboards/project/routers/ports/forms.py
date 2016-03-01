@@ -14,6 +14,7 @@
 
 import logging
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -53,7 +54,14 @@ class AddInterface(forms.SelfHandlingForm):
                                         self.initial.get('router_id'))
 
         try:
-            networks = api.neutron.network_list_for_tenant(request, tenant_id)
+            search_opts = {}
+            filter_provider = getattr(settings,
+                                      'NECTAR_NETWORK_PROVIDER_FILTER', False)
+            if filter_provider:
+                search_opts['provider:network_type'] = filter_provider
+
+            networks = api.neutron.network_list_for_tenant(
+                request, tenant_id, **search_opts)
             if router_id:
                 ports = api.neutron.port_list(request, device_id=router_id)
                 router_subnet_ids = [fixed_ip["subnet_id"] for port in ports
@@ -166,6 +174,10 @@ class SetGatewayForm(forms.SelfHandlingForm):
 
     def populate_network_id_choices(self, request):
         search_opts = {'router:external': True}
+        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER', False)
+        if filter_provider:
+            search_opts['provider:network_type'] = filter_provider
+
         try:
             networks = api.neutron.network_list(request, **search_opts)
         except Exception as e:
