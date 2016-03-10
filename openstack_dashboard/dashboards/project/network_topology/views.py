@@ -214,11 +214,7 @@ class JSONView(View):
         console_type = getattr(settings, 'CONSOLE_TYPE', 'AUTO')
         # lowercase of the keys will be used at the end of the console URL.
         for server in servers:
-            try:
-                console = i_console.get_console(
-                    request, console_type, server)[0].lower()
-            except exceptions.NotAvailable:
-                console = None
+            console = None
 
             server_data = {'name': server.name,
                            'status': server.status,
