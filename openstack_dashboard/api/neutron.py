@@ -651,10 +651,6 @@ def network_list_for_tenant(request, tenant_id, **params):
     networks = network_list(request, tenant_id=tenant_id,
                             shared=False, **params)
 
-    # In the current Neutron API, there is no way to retrieve
-    # both owner networks and public networks in a single API call.
-    networks += network_list(request, shared=True, **params)
-
     return networks
 
 
