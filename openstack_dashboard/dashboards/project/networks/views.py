@@ -15,6 +15,7 @@
 """
 Views for managing Neutron Networks.
 """
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -47,8 +48,15 @@ class IndexView(tables.DataTableView):
     def get_data(self):
         try:
             tenant_id = self.request.user.tenant_id
-            networks = api.neutron.network_list_for_tenant(self.request,
-                                                           tenant_id)
+            filter_provider = getattr(settings,
+                                      'NECTAR_NETWORK_PROVIDER_FILTER',
+                                      False)
+            if filter_provider:
+                include_shared = False
+            else:
+                include_shared = True
+            networks = api.neutron.network_list_for_tenant(
+                self.request, tenant_id, include_shared=include_shared)
         except Exception:
             networks = []
             msg = _('Network list can not be retrieved.')

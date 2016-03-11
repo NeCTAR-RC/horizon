@@ -636,7 +636,7 @@ def network_list(request, **params):
     return [Network(n) for n in networks]
 
 
-def network_list_for_tenant(request, tenant_id, **params):
+def network_list_for_tenant(request, tenant_id, include_shared=True, **params):
     """Return a network list available for the tenant.
 
     The list contains networks owned by the tenant and public networks.
@@ -651,9 +651,7 @@ def network_list_for_tenant(request, tenant_id, **params):
     networks = network_list(request, tenant_id=tenant_id,
                             shared=False, **params)
 
-    filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
-                              False)
-    if not filter_provider:
+    if include_shared:
         # In the current Neutron API, there is no way to retrieve
         # both owner networks and public networks in a single API call.
         networks += network_list(request, shared=True, **params)
