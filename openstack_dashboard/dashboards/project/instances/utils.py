@@ -137,7 +137,7 @@ def network_field_data(request, include_empty_option=False):
                 networks = [(n.id, n.name_or_id) for n in networks]
             networks.sort(key=lambda obj: obj[1])
             if getattr(settings, 'NECTAR_DEFAULT_NETWORK_ENABLED', False):
-                networks.insert(0, ('', 'Default'))
+                networks.insert(0, ('', 'Classic Provider'))
         except Exception as e:
             msg = _('Failed to get network list {0}').format(six.text_type(e))
             exceptions.handle(request, msg)
