@@ -272,6 +272,8 @@ class UsageViewTests(test.TestCase):
                                        max_fip_expected=50,
                                        max_sg_expected=20):
         res = self.client.get(reverse('horizon:project:overview:index'))
+        if neutron_fip_expected:
+            self.assertContains(res, 'Floating IPs')
         self.assertContains(res, 'Security Groups')
 
         res_limits = res.context['usage'].limits
