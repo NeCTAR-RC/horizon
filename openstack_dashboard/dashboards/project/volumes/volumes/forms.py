@@ -311,10 +311,9 @@ class CreateForm(forms.SelfHandlingForm):
 
         # Don't require AZ for volume or snapshot source.
         if (cleaned_data.get("snapshot_source", None) and
-                    source_type in [None, 'snapshot_source']
-            or
+                source_type in [None, 'snapshot_source'] or
                 cleaned_data.get("volume_source", None) and
-                    source_type in [None, 'volume_source']):
+                source_type in [None, 'volume_source']):
             cleaned_data['availability_zone'] = None
             self.errors.pop('availability_zone', None)
 
@@ -336,7 +335,7 @@ class CreateForm(forms.SelfHandlingForm):
             try:
                 zones = api.cinder.availability_zone_list(request)
                 zone_list = [(zone.zoneName, zone.zoneName)
-                              for zone in zones if zone.zoneState['available']]
+                             for zone in zones if zone.zoneState['available']]
                 zone_list.sort()
             except Exception:
                 exceptions.handle(request, _('Unable to retrieve availability '

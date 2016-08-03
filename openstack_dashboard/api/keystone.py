@@ -35,7 +35,6 @@ from horizon import messages
 from horizon.utils import functions as utils
 
 from openstack_dashboard.api import base
-from openstack_dashboard import policy
 
 
 LOG = logging.getLogger(__name__)
@@ -146,7 +145,7 @@ def keystoneclient(request, admin=False):
     """
     user = request.user
     if admin:
-        #if not policy.check((("identity", "admin_required"),), request):
+        # if not policy.check((("identity", "admin_required"),), request):
         #    raise exceptions.NotAuthorized
         endpoint_type = 'adminURL'
     else:

@@ -57,9 +57,9 @@ SNAPSHOT_SEARCH_OPTS = dict(status=AVAILABLE)
 
 
 class InstanceTests(helpers.TestCase):
-    #def setUp(self):
-        #super(InstanceTests, self).setUp()
-        #self.mock_api('nova.flavor_get_extras', {})
+    # def setUp(self):
+        # super(InstanceTests, self).setUp()
+        # self.mock_api('nova.flavor_get_extras', {})
 
     @helpers.create_stubs({
         api.nova: (
@@ -548,7 +548,8 @@ class InstanceTests(helpers.TestCase):
         api.nova.server_list(IsA(http.HttpRequest), search_opts=search_opts) \
             .AndReturn([servers, False])
         api.network.servers_update_addresses(IsA(http.HttpRequest), servers)
-        api.nova.server_suspend(IsA(http.HttpRequest), six.text_type(server.id)) \
+        api.nova.server_suspend(IsA(http.HttpRequest),
+                                six.text_type(server.id)) \
             .AndRaise(self.exceptions.nova)
 
         self.mox.ReplayAll()
@@ -2239,7 +2240,7 @@ class InstanceTests(helpers.TestCase):
                      'project_id': self.tenants.first().id,
                      'user_id': self.user.id,
                      'groups': str(sec_group.id),
-                     #'availability_zone': avail_zone.zoneName,
+                     # 'availability_zone': avail_zone.zoneName,
                      'volume_size': '1',
                      'cell': avail_zone.zoneName,
                      'subcell': avail_zone.zoneName,
@@ -2384,7 +2385,7 @@ class InstanceTests(helpers.TestCase):
                      'project_id': self.tenants.first().id,
                      'user_id': self.user.id,
                      'groups': str(sec_group.id),
-                     #'availability_zone': avail_zone.zoneName,
+                     # 'availability_zone': avail_zone.zoneName,
                      'cell': avail_zone.zoneName,
                      'subcell': avail_zone.zoneName,
                      'network': self.networks.first().id,
@@ -2493,7 +2494,7 @@ class InstanceTests(helpers.TestCase):
                      'project_id': self.tenants.first().id,
                      'user_id': self.user.id,
                      'groups': str(sec_group.id),
-                     #'availability_zone': avail_zone.zoneName,
+                     # 'availability_zone': avail_zone.zoneName,
                      'cell': avail_zone.zoneName,
                      'subcell': avail_zone.zoneName,
                      'volume_type': '',
@@ -3770,7 +3771,7 @@ class InstanceTests(helpers.TestCase):
             'flavor': flavor.id,
             'source_type': 'volume_image_id',
             'image_id': image.id,
-            #'availability_zone': avail_zone.zoneName,
+            # 'availability_zone': avail_zone.zoneName,
             'cell': avail_zone.zoneName,
             'subcell': avail_zone.zoneName,
             'keypair': keypair.name,
@@ -4914,9 +4915,8 @@ class ConsoleManagerTests(helpers.TestCase):
         api.nova.extension_supported('BlockDeviceMappingV2Boot',
                                      IsA(http.HttpRequest)) \
             .AndReturn(True)
-        volumes = [v for v in self.volumes.list() if (v.status == AVAILABLE
-                                                      and v.bootable ==
-                                                      'true')]
+        volumes = [v for v in self.volumes.list()
+                   if (v.status == AVAILABLE and v.bootable == 'true')]
         cinder.volume_list(IsA(http.HttpRequest),
                            search_opts=VOLUME_SEARCH_OPTS) \
             .AndReturn(volumes)
@@ -4990,7 +4990,7 @@ class ConsoleManagerTests(helpers.TestCase):
                      'source_id': image.id,
                      'volume_size': '1',
                      'image_id': image.id,
-                     #'availability_zone': avail_zone.zoneName,
+                     # 'availability_zone': avail_zone.zoneName,
                      'cell': avail_zone.zoneName,
                      'subcell': avail_zone.zoneName,
                      'keypair': keypair.name,

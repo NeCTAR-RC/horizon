@@ -73,7 +73,8 @@ class CreateForm(forms.SelfHandlingForm):
 
     def _get_network_list(self, request):
         search_opts = {'router:external': True}
-        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER', False)
+        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                                  False)
         if filter_provider:
             search_opts['provider:network_type'] = filter_provider
 

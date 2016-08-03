@@ -373,7 +373,8 @@ class FloatingIpManager(network_base.FloatingIpManager):
 
     def list_pools(self):
         search_opts = {'router:external': True}
-        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER', False)
+        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                                  False)
         if filter_provider:
             search_opts['provider:network_type'] = filter_provider
         return [FloatingIpPool(pool) for pool
@@ -459,12 +460,13 @@ class FloatingIpManager(network_base.FloatingIpManager):
                           in ext_net_ids)]
         reachable_subnets = set([p.fixed_ips[0]['subnet_id'] for p in ports
                                 if ((p.device_owner in
-                                     ROUTER_INTERFACE_OWNERS)
-                                    and (p.device_id in gw_routers))])
+                                     ROUTER_INTERFACE_OWNERS) and
+                                 (p.device_id in gw_routers))])
         # we have to include any shared subnets as well because we may not
         # have permission to see the router interface to infer connectivity
         search_opts = {'shared': True}
-        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER', False)
+        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                                  False)
         if filter_provider:
             search_opts['provider:network_type'] = filter_provider
         shared = set([s.id for n in network_list(self.request, **search_opts)

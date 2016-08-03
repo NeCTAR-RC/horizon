@@ -92,7 +92,8 @@ def sort_flavor_list(request, flavors):
         sort_key = flavor_sort.get('key', 'ram')
         rev = flavor_sort.get('reverse', False)
         if not callable(sort_key):
-            key = lambda flavor: get_key(flavor, sort_key)
+            def key(flavor):
+                return get_key(flavor, sort_key)
         else:
             key = sort_key
         flavor_list = [(flavor.id, '%s' % flavor.name)
@@ -131,8 +132,9 @@ def network_field_data(request, include_empty_option=False):
         try:
             networks = api.neutron.network_list_for_tenant(request, tenant_id)
             if getattr(settings, 'NECTAR_DEFAULT_NETWORK_ENABLED', False):
-                networks = [(n.id, n.name_or_id) for n in networks
-                            if not n.shared or n.id == '00000000-0000-0000-0000-000000000000']
+                networks = [(n.id, n.name_or_id)
+                            for n in networks if not n.shared or
+                            n.id == '00000000-0000-0000-0000-000000000000']
             else:
                 networks = [(n.id, n.name_or_id) for n in networks]
             networks.sort(key=lambda obj: obj[1])

@@ -368,6 +368,7 @@ def tenant_absolute_limits(request):
     account = swift_api(request).head_account()
     limit = account.get(QUOTA_LIMIT_HEADER, 'inf')
     limit = float(limit) / (1024 ** 3)
-    used = float("%.1f" % (float(account.get(QUOTA_USAGE_HEADER, 0)) / (1024 ** 3)))
+    used = float("%.1f" %
+                 (float(account.get(QUOTA_USAGE_HEADER, 0)) / (1024 ** 3)))
     return {'maxObjectGigabytes': limit,
             'totalObjectGigabytesUsed': used}

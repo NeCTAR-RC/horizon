@@ -25,7 +25,6 @@ from django.http import HttpResponse  # noqa
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View  # noqa
 
-from horizon import exceptions
 from horizon import views
 
 from openstack_dashboard import api
@@ -42,8 +41,6 @@ from openstack_dashboard.dashboards.project.network_topology.routers \
 from openstack_dashboard.dashboards.project.network_topology.subnets \
     import tables as subnets_tables
 
-from openstack_dashboard.dashboards.project.instances import\
-    console as i_console
 from openstack_dashboard.dashboards.project.instances import\
     views as i_views
 from openstack_dashboard.dashboards.project.instances.workflows import\
@@ -211,7 +208,6 @@ class JSONView(View):
         except Exception:
             servers = []
         data = []
-        console_type = getattr(settings, 'CONSOLE_TYPE', 'AUTO')
         # lowercase of the keys will be used at the end of the console URL.
         for server in servers:
             console = None
