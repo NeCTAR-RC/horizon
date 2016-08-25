@@ -319,7 +319,7 @@ class ImagesTable(tables.DataTable):
     )
     name = tables.Column(get_image_name,
                          link="horizon:project:images:images:detail",
-                         truncate=40,
+                         truncate=70,
                          verbose_name=_("Image Name"),)
     image_type = tables.Column(get_image_type,
                                verbose_name=_("Type"),
