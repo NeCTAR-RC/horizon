@@ -522,13 +522,15 @@ def get_project_groups_roles(request, project):
 
 
 def role_assignments_list(request, project=None, user=None, role=None,
-                          group=None, domain=None, effective=False):
+                          group=None, domain=None, effective=False,
+                          include_names=False):
     if VERSIONS.active < 3:
         raise exceptions.NotAvailable
 
     manager = keystoneclient(request, admin=True).role_assignments
     return manager.list(project=project, user=user, role=role, group=group,
-                        domain=domain, effective=effective)
+                        domain=domain, effective=effective,
+                        include_names=include_names)
 
 
 def role_create(request, name):
