@@ -323,7 +323,7 @@ def _get_tenant_network_usages(request, usages, disabled_quotas, tenant_id):
 
     if 'subnet' not in disabled_quotas:
         subnets = []
-        subnets = neutron.subnet_list(request)
+        subnets = neutron.subnet_list(request, shared=False)
         usages.tally('subnets', len(subnets))
 
     if 'router' not in disabled_quotas:

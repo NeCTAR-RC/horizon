@@ -328,7 +328,7 @@ class FloatingIpNeutronViewTests(FloatingIpViewTests):
             .AndReturn(self.neutron_quotas.first())
         api.neutron.router_list(IsA(http.HttpRequest)) \
             .AndReturn(self.routers.list())
-        api.neutron.subnet_list(IsA(http.HttpRequest)) \
+        api.neutron.subnet_list(IsA(http.HttpRequest), shared=False) \
             .AndReturn(self.subnets.list())
         api.neutron.network_list(IsA(http.HttpRequest), shared=False) \
             .AndReturn(self.networks.list())
