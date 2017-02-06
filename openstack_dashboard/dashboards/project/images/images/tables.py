@@ -157,8 +157,8 @@ class CreateVolumeFromImage(tables.LinkAction):
         return "?".join([base_url, params])
 
     def allowed(self, request, image=None):
-        if (image and image.container_format not in NOT_LAUNCHABLE_FORMATS
-                and base.is_service_enabled(request, 'volume')):
+        if (image and image.container_format not in NOT_LAUNCHABLE_FORMATS and
+                base.is_service_enabled(request, 'volume')):
             return image.status == "active"
         return False
 
@@ -191,9 +191,21 @@ def filter_tenants():
     return getattr(settings, 'IMAGES_LIST_FILTER_TENANTS', [])
 
 
+def filter_properties():
+    return getattr(settings, 'IMAGES_LIST_FILTER_PROPERTIES', [])
+
+
 @memoized
 def filter_tenant_ids():
     return map(lambda ft: ft['tenant'], filter_tenants())
+
+
+@memoized
+def filter_property_name(pv):
+    # Generate a sanitised name
+    p = filter(lambda c: c.isalpha(), pv.get('property'))
+    v = filter(lambda c: c.isalpha(), pv.get('value'))
+    return "{}__{}".format(p, v)
 
 
 class OwnerFilter(tables.FixedFilterAction):
@@ -202,10 +214,17 @@ class OwnerFilter(tables.FixedFilterAction):
             return dict(text=text, value=tenant, icon=icon)
 
         buttons = [make_dict(_('Project'), 'project', 'fa-home')]
+
         for button_dict in filter_tenants():
             new_dict = button_dict.copy()
             new_dict['value'] = new_dict['tenant']
             buttons.append(new_dict)
+
+        for button_dict in filter_properties():
+            new_dict = button_dict.copy()
+            new_dict['value'] = filter_property_name(new_dict)
+            buttons.append(new_dict)
+
         buttons.append(make_dict(_('Shared with Me'), 'shared',
                                  'fa-share-square-o'))
         buttons.append(make_dict(_('Public'), 'public', 'fa-group'))
@@ -222,6 +241,11 @@ def image_categories():
     text_map['project'] = _('Project')
     for project in filter_tenants():
         text_map[project['tenant']] = project['text']
+
+    for pv in filter_properties():
+        pv_name = filter_property_name(pv)
+        text_map[pv_name] = pv['text']
+
     text_map['shared'] = _('Shared With Me')
     text_map['public'] = _('Public')
     return text_map
@@ -235,6 +259,12 @@ def categorize_image(im, user_tenant_id):
     categories = []
     if im.is_public:
         categories.append('public')
+
+    for pv in filter_properties():
+        p = pv.get('property')
+        if getattr(im, 'properties', {}).get(p, None) == pv.get('value'):
+            categories.append(filter_property_name(pv))
+
     if im.owner == user_tenant_id:
         categories.append('project')
     elif im.owner in filter_tenant_ids():
