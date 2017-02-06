@@ -391,11 +391,17 @@ class OwnerFilterTests(test.TestCase):
     @override_settings(IMAGES_LIST_FILTER_TENANTS=[{'text': 'Official',
                                                     'tenant': 'officialtenant',
                                                     'icon': 'fa-check'}])
+    @override_settings(
+        IMAGES_LIST_FILTER_PROPERTIES=[{'text': 'FilterProperties',
+                                        'property': 'test_property',
+                                        'value': 'test.value',
+                                        'icon': 'fa-check'}])
     def test_filter(self):
         self.mox.ReplayAll()
         all_images = self.images.list()
         table = self.table
         self.filter_tenants = settings.IMAGES_LIST_FILTER_TENANTS
+        self.filter_properties = settings.IMAGES_LIST_FILTER_PROPERTIES
 
         filter_ = tables.OwnerFilter()
 
@@ -410,6 +416,9 @@ class OwnerFilterTests(test.TestCase):
 
         images = filter_.filter(table, all_images, 'officialtenant')
         self.assertEqual(images, self._expected('officialtenant'))
+
+        images = filter_.filter(table, all_images, 'testproperty__testvalue')
+        self.assertEqual(images, self._expected('testproperty__testvalue'))
 
     def _expected(self, filter_string):
         my_tenant_id = self.request.user.tenant_id
