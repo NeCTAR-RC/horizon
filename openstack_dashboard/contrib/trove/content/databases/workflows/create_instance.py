@@ -27,6 +27,8 @@ from openstack_dashboard.contrib.trove import api
 
 from openstack_dashboard.dashboards.project.instances \
     import utils as instance_utils
+from openstack_dashboard.dashboards.project.volumes \
+    import utils as cinder_utils
 
 
 LOG = logging.getLogger(__name__)
@@ -40,6 +42,9 @@ class SetInstanceDetailsAction(workflows.Action):
                                 min_value=0,
                                 initial=1,
                                 help_text=_("Size of the volume in GB."))
+    availability_zone = forms.ChoiceField(label=_("Availability Zone"),
+                                          help_text=_("Availability zone "
+                                                      "for datastore."))
     datastore = forms.ChoiceField(label=_("Datastore"),
                                   help_text=_(
                                       "Type and version of datastore."))
@@ -49,6 +54,10 @@ class SetInstanceDetailsAction(workflows.Action):
         help_text_template = "project/databases/_launch_details_help.html"
 
     def clean(self):
+        if self.data.get("availability_zone", None) == \
+                'select_availability_zone':
+            msg = _("You must select an availability zone.")
+            self._errors["availability_zone"] = self.error_class([msg])
         if self.data.get("datastore", None) == "select_datastore_type_version":
             msg = _("You must select a datastore type and version.")
             self._errors["datastore"] = self.error_class([msg])
@@ -70,6 +79,15 @@ class SetInstanceDetailsAction(workflows.Action):
         if flavors:
             return instance_utils.sort_flavor_list(request, flavors)
         return []
+
+    @memoized.memoized_method
+    def populate_availability_zone_choices(self, request, context):
+        az_list = [('select_availability_zone',
+                   _('Select an availability zone'))]
+        az_list.extend([(az.zoneName, az.zoneName)
+                        for az in cinder_utils.availability_zone_list(request)
+                        if az.zoneState['available']])
+        return az_list
 
     @memoized.memoized_method
     def datastores(self, request):
@@ -125,7 +143,8 @@ TROVE_ADD_PERMS = TROVE_ADD_USER_PERMS + TROVE_ADD_DATABASE_PERMS
 
 class SetInstanceDetails(workflows.Step):
     action_class = SetInstanceDetailsAction
-    contributes = ("name", "volume", "flavor", "datastore")
+    contributes = ("name", "volume", "flavor",
+                   "availability_zone", "datastore")
 
 
 class SetNetworkAction(workflows.Action):
@@ -394,19 +413,20 @@ class LaunchInstance(workflows.Workflow):
             datastore = self.context['datastore'].split(',')[0]
             datastore_version = self.context['datastore'].split(',')[1]
             LOG.info("Launching database instance with parameters "
-                     "{name=%s, volume=%s, flavor=%s, "
+                     "{name=%s, volume=%s, flavor=%s, availability_zone=%s, "
                      "datastore=%s, datastore_version=%s, "
                      "dbs=%s, users=%s, "
                      "backups=%s, nics=%s, replica_of=%s}",
                      context['name'], context['volume'], context['flavor'],
-                     datastore, datastore_version,
-                     self._get_databases(context), self._get_users(context),
-                     self._get_backup(context), self._get_nics(context),
-                     context.get('master'))
+                     context['availability_zone'], datastore,
+                     datastore_version, self._get_databases(context),
+                     self._get_users(context), self._get_backup(context),
+                     self._get_nics(context), context.get('master'))
             api.trove.instance_create(request,
                                       context['name'],
                                       context['volume'],
                                       context['flavor'],
+                                      context['availability_zone'],
                                       datastore=datastore,
                                       datastore_version=datastore_version,
                                       databases=self._get_databases(context),

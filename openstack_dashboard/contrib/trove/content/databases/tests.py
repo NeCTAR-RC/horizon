@@ -26,6 +26,8 @@ import six
 from horizon import exceptions
 from openstack_dashboard import api as dash_api
 from openstack_dashboard.contrib.trove import api
+from openstack_dashboard.dashboards.project.volumes \
+    import utils as cinder_utils
 from openstack_dashboard.test import helpers as test
 
 from troveclient import common
@@ -190,6 +192,7 @@ class DatabaseTests(test.TestCase):
         api.trove: ('flavor_list', 'backup_list', 'instance_create',
                     'datastore_list', 'datastore_version_list',
                     'instance_list'),
+        cinder_utils: ('availability_zone_list',),
         dash_api.neutron: ('network_list',)})
     def test_create_simple_instance(self):
         api.trove.flavor_list(IsA(http.HttpRequest)).AndReturn(
@@ -209,6 +212,11 @@ class DatabaseTests(test.TestCase):
         api.trove.datastore_version_list(IsA(http.HttpRequest), IsA(str))\
             .MultipleTimes().AndReturn(self.datastore_versions.list())
 
+        cinder_utils.availability_zone_list(IsA(http.HttpRequest)).AndReturn(
+            self.cinder_availability_zones.list())
+
+        availability_zone = self.cinder_availability_zones.first().zoneName
+
         dash_api.neutron.network_list(IsA(http.HttpRequest),
                                       tenant_id=self.tenant.id,
                                       shared=False).AndReturn(
@@ -226,6 +234,7 @@ class DatabaseTests(test.TestCase):
             IsA(six.text_type),
             IsA(int),
             IsA(six.text_type),
+            availability_zone,
             databases=None,
             datastore=IsA(six.text_type),
             datastore_version=IsA(six.text_type),
@@ -239,6 +248,7 @@ class DatabaseTests(test.TestCase):
             'name': "MyDB",
             'volume': '1',
             'flavor': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            'availability_zone': availability_zone,
             'network': self.networks.first().id,
             'datastore': 'mysql,5.5',
         }
@@ -250,6 +260,7 @@ class DatabaseTests(test.TestCase):
         api.trove: ('flavor_list', 'backup_list', 'instance_create',
                     'datastore_list', 'datastore_version_list',
                     'instance_list'),
+        cinder_utils: ('availability_zone_list',),
         dash_api.neutron: ('network_list',)})
     def test_create_simple_instance_exception(self):
         trove_exception = self.exceptions.nova
@@ -270,6 +281,11 @@ class DatabaseTests(test.TestCase):
         api.trove.datastore_version_list(IsA(http.HttpRequest), IsA(str))\
             .MultipleTimes().AndReturn(self.datastore_versions.list())
 
+        cinder_utils.availability_zone_list(IsA(http.HttpRequest)).AndReturn(
+            self.cinder_availability_zones.list())
+
+        availability_zone = self.cinder_availability_zones.first().zoneName
+
         dash_api.neutron.network_list(IsA(http.HttpRequest),
                                       tenant_id=self.tenant.id,
                                       shared=False).AndReturn(
@@ -287,6 +303,7 @@ class DatabaseTests(test.TestCase):
             IsA(six.text_type),
             IsA(int),
             IsA(six.text_type),
+            availability_zone,
             databases=None,
             datastore=IsA(six.text_type),
             datastore_version=IsA(six.text_type),
@@ -300,6 +317,7 @@ class DatabaseTests(test.TestCase):
             'name': "MyDB",
             'volume': '1',
             'flavor': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            'availability_zone': availability_zone,
             'network': self.networks.first().id,
             'datastore': 'mysql,5.5',
         }
@@ -483,6 +501,7 @@ class DatabaseTests(test.TestCase):
         api.trove: ('flavor_list', 'backup_list', 'instance_create',
                     'datastore_list', 'datastore_version_list',
                     'instance_list', 'instance_get'),
+        cinder_utils: ('availability_zone_list',),
         dash_api.neutron: ('network_list',)})
     def test_create_replica_instance(self):
         api.trove.flavor_list(IsA(http.HttpRequest)).AndReturn(
@@ -500,6 +519,11 @@ class DatabaseTests(test.TestCase):
         api.trove.datastore_version_list(IsA(http.HttpRequest),
                                          IsA(str))\
             .MultipleTimes().AndReturn(self.datastore_versions.list())
+
+        cinder_utils.availability_zone_list(IsA(http.HttpRequest)).AndReturn(
+            self.cinder_availability_zones.list())
+
+        availability_zone = self.cinder_availability_zones.first().zoneName
 
         dash_api.neutron.network_list(IsA(http.HttpRequest),
                                       tenant_id=self.tenant.id,
@@ -521,6 +545,7 @@ class DatabaseTests(test.TestCase):
             IsA(six.text_type),
             IsA(int),
             IsA(six.text_type),
+            availability_zone,
             databases=None,
             datastore=IsA(six.text_type),
             datastore_version=IsA(six.text_type),
@@ -534,6 +559,7 @@ class DatabaseTests(test.TestCase):
             'name': "MyDB",
             'volume': '1',
             'flavor': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            'availability_zone': availability_zone,
             'network': self.networks.first().id,
             'datastore': 'mysql,5.5',
             'initial_state': 'master',
