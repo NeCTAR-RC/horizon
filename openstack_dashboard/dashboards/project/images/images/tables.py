@@ -13,6 +13,7 @@
 #    under the License.
 
 from collections import defaultdict
+from collections import OrderedDict
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -281,7 +282,7 @@ def categorize_images(images, user_tenant_id):
         for category in categories:
             tenants[category].append(im)
     all_categories = image_categories().keys()
-    return dict((name, tenants[name]) for name in all_categories)
+    return OrderedDict((name, tenants[name]) for name in all_categories)
 
 
 def get_image_name(image):
