@@ -19,6 +19,7 @@ import zipfile
 
 from django import http
 from django import shortcuts
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -116,6 +117,12 @@ def download_rc_file(request):
     template = 'project/access_and_security/api_access/openrc.sh.template'
     try:
         context = _get_openrc_credentials(request)
+
+        api_access_doc = ('https://support.ehelp.edu.au/'
+                          'support/solutions/articles/6000078065-api')
+        context['api_access_doc'] = getattr(settings,
+                                            'NECTAR_API_ACCESS_DOC',
+                                            api_access_doc)
 
         response = shortcuts.render(request,
                                     template,
