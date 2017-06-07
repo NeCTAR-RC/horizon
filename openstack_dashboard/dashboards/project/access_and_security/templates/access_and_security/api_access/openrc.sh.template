@@ -24,6 +24,7 @@ export OS_PROJECT_NAME="{{ tenant_name|shellfilter }}"
 export OS_USERNAME="{{ user.username|shellfilter }}"
 
 # With Keystone you pass the keystone password.
+echo "NOTE! You will need to reset your password on first use: {{ pw_reset_url|shellfilter }}"
 echo "Please enter your OpenStack Password: "
 read -sr OS_PASSWORD_INPUT
 export OS_PASSWORD=$OS_PASSWORD_INPUT

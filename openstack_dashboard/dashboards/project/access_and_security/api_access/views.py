@@ -64,10 +64,15 @@ def _get_ec2_credentials(request):
 
 
 def _get_openrc_credentials(request):
+
+    pw_reset_url = request.build_absolute_uri('/settings/reset-password/')
+
     keystone_url = api.base.url_for(request,
                                     'identity',
                                     endpoint_type='publicURL')
-    credentials = dict(tenant_id=request.user.tenant_id,
+
+    credentials = dict(pw_reset_url=pw_reset_url,
+                       tenant_id=request.user.tenant_id,
                        tenant_name=request.user.tenant_name,
                        auth_url=keystone_url,
                        user=request.user,
