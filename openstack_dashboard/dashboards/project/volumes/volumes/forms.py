@@ -115,11 +115,7 @@ class CreateForm(forms.SelfHandlingForm):
     type = forms.ChoiceField(
         label=_("Type"),
         required=False,
-        widget=forms.Select(
-            attrs={'class': 'switched',
-                   'data-switch-on': 'source',
-                   'data-source-no_source_type': _('Type'),
-                   'data-source-image_source': _('Type')}))
+        widget=forms.HiddenInput())
     size = forms.IntegerField(min_value=1, initial=1, label=_("Size (GB)"))
     availability_zone = forms.ChoiceField(
         label=_("Availability Zone"),
