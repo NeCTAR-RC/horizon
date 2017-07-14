@@ -69,7 +69,7 @@ def _get_openrc_credentials(request):
                                     endpoint_type='publicURL')
     credentials = dict(tenant_id=request.user.tenant_id,
                        tenant_name=request.user.tenant_name,
-                       auth_url=keystone_url,
+                       auth_url=keystone_url.replace('v2.0', 'v3'),
                        user=request.user,
                        region=getattr(request.user, 'services_region') or "")
     return credentials
@@ -116,6 +116,11 @@ def download_rc_file(request):
     template = 'project/access_and_security/api_access/openrc.sh.template'
     try:
         context = _get_openrc_credentials(request)
+
+        context['os_identity_api_version'] = 3
+        context['interface'] = 'public'
+        context['user_domain_name'] = request.user.user_domain_name
+        context['project_domain_name'] = request.user.domain_name
 
         response = shortcuts.render(request,
                                     template,

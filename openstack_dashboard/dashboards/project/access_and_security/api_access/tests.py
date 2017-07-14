@@ -57,7 +57,7 @@ class APIAccessTests(test.TestCase):
         openrc = 'project/access_and_security/api_access/openrc.sh.template'
         self.assertTemplateUsed(res, openrc)
         name = 'export OS_USERNAME="{}"'.format(self.request.user.username)
-        id = 'export OS_TENANT_ID={}'.format(self.request.user.tenant_id)
+        id = 'export OS_PROJECT_ID={}'.format(self.request.user.tenant_id)
         self.assertIn(name.encode('utf-8'), res.content)
         self.assertIn(id.encode('utf-8'), res.content)
 
