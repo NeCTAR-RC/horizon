@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_13f51283",
+        "filename": "openstack_dashboard/dashboards/project/access_and_security/api_access/views.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2017-07-14T23:12:19Z",
+      "side": 1,
+      "message": "is this one not referenced in the openrc template?",
+      "range": {
+        "startLine": 121,
+        "startChar": 8,
+        "endLine": 121,
+        "endChar": 38
+      },
+      "revId": "4b4c9469ef927e6211e6a35fe4afa3d052d5259b",
+      "serverId": "f182a8af-62ca-4ceb-ab81-14f8fec9c6c5",
+      "unresolved": false
+    }
+  ]
+}
