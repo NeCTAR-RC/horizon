@@ -48,9 +48,13 @@ class IndexView(tables.DataTableView):
                        'admin_state_up': {_("up"): True, _("down"): False}}
 
     def get_data(self):
+        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                                  False)
         try:
             tenant_id = self.request.user.tenant_id
             search_opts = self.get_filters(filters_map=self.FILTERS_MAPPING)
+            if filter_provider and 'shared' not in search_opts:
+                search_opts['shared'] = False
             networks = api.neutron.network_list_for_tenant(
                 self.request, tenant_id, include_external=True, **search_opts)
         except Exception:
