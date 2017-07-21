@@ -1,0 +1,112 @@
+--- a/openstack_dashboard/local/local_settings.py.example
++++ b/openstack_dashboard/local/local_settings.py.example
+@@ -8,7 +8,7 @@
+ 
+ from openstack_dashboard.settings import HORIZON_CONFIG
+ 
+-DEBUG = True
++DEBUG = False
+ 
+ 
+ # WEBROOT is the location relative to Webserver root
+@@ -122,25 +122,25 @@
+ # (usually behind a load-balancer). Either you have to make sure that a session
+ # gets all requests routed to the same dashboard instance or you set the same
+ # SECRET_KEY for all of them.
+-SECRET_KEY = secret_key.generate_or_read_from_file(
+-    os.path.join(LOCAL_PATH, '.secret_key_store'))
++SECRET_KEY = secret_key.generate_or_read_from_file('/var/lib/openstack-dashboard/secret_key')
+ 
+ # We recommend you use memcached for development; otherwise after every reload
+ # of the django development server, you will have to login again. To use
+ # memcached set CACHES to something like
+-#CACHES = {
+-#    'default': {
+-#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+-#        'LOCATION': '127.0.0.1:11211',
+-#    },
+-#}
+ 
+ CACHES = {
+     'default': {
+-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
++        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
++        'LOCATION': '127.0.0.1:11211',
+     },
+ }
+ 
++#CACHES = {
++#    'default': {
++#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
++#    }
++#}
++
+ # Send email to the console by default
+ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ # Or send them to /dev/null
+@@ -765,6 +765,24 @@
+ # may be deprecated in the future without notice.
+ #REST_API_ADDITIONAL_SETTINGS = []
+ 
++###############################################################################
++# Ubuntu Settings
++###############################################################################
++
++ # The default theme if no cookie is present
++DEFAULT_THEME = 'ubuntu'
++
++# Default Ubuntu apache configuration uses /horizon as the application root.
++WEBROOT='/horizon/'
++
++# By default, validation of the HTTP Host header is disabled.  Production
++# installations should have this set accordingly.  For more information
++# see https://docs.djangoproject.com/en/dev/ref/settings/.
++ALLOWED_HOSTS = '*'
++
++# Compress all assets offline as part of packaging installation
++COMPRESS_OFFLINE = True
++
+ # DISALLOW_IFRAME_EMBED can be used to prevent Horizon from being embedded
+ # within an iframe. Legacy browsers are still vulnerable to a Cross-Frame
+ # Scripting (XFS) vulnerability, so this option allows extra security hardening
+--- a/openstack_dashboard/settings.py
++++ b/openstack_dashboard/settings.py
+@@ -51,7 +51,7 @@
+ LOGIN_REDIRECT_URL = None
+ MEDIA_ROOT = None
+ MEDIA_URL = None
+-STATIC_ROOT = None
++STATIC_ROOT = '/var/lib/openstack-dashboard/static'
+ STATIC_URL = None
+ INTEGRATION_TESTS_SUPPORT = False
+ NG_TEMPLATE_CACHE_AGE = 2592000
+@@ -286,6 +286,10 @@
+ # 'key', 'label', 'path'
+ AVAILABLE_THEMES = [
+     (
++        'ubuntu',
++        pgettext_lazy('Ubuntu theme', 'Ubuntu'),
++        'themes/ubuntu'
++    ), (
+         'default',
+         pgettext_lazy('Default style theme', 'Default'),
+         'themes/default'
+@@ -297,7 +301,7 @@
+ ]
+ 
+ # The default theme if no cookie is present
+-DEFAULT_THEME = 'default'
++DEFAULT_THEME = 'ubuntu'
+ 
+ # Theme Static Directory
+ THEME_COLLECTION_DIR = 'themes'
+@@ -419,8 +423,7 @@
+                                   'local')
+ 
+     from horizon.utils import secret_key
+-    SECRET_KEY = secret_key.generate_or_read_from_file(os.path.join(LOCAL_PATH,
+-                                                       '.secret_key_store'))
++    SECRET_KEY = secret_key.generate_or_read_from_file('/var/lib/openstack-dashboard/secret_key')
+ 
+ # populate HORIZON_CONFIG with auto-discovered JavaScript sources, mock files,
+ # specs files and external templates.

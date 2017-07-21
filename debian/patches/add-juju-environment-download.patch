@@ -1,0 +1,122 @@
+Description: Patch in download link for a Juju environment file.
+Author: James Page <james.page@ubuntu.com>
+Forwarded: not-needed
+diff -Naurp horizon-11.0.0.0rc1.orig/openstack_dashboard/dashboards/project/api_access/tables.py horizon-11.0.0.0rc1/openstack_dashboard/dashboards/project/api_access/tables.py
+--- horizon-11.0.0.0rc1.orig/openstack_dashboard/dashboards/project/api_access/tables.py	2017-02-02 16:22:54.000000000 -0500
++++ horizon-11.0.0.0rc1/openstack_dashboard/dashboards/project/api_access/tables.py	2017-02-08 09:28:56.069924000 -0500
+@@ -94,6 +94,12 @@ class RecreateCredentials(tables.LinkAct
+             pass
+         return False
+ 
++class DownloadJujuEnv(tables.LinkAction):
++    name = "download_jujuenv"
++    verbose_name = _("Download Juju Environment File")
++    verbose_name_plural = _("Download Juju Environment File")
++    icon = "download"
++    url = "horizon:project:access_and_security:api_access:juju"
+ 
+ class EndpointsTable(tables.DataTable):
+     api_name = tables.Column('type',
+diff -Naurp horizon-11.0.0.0rc1.orig/openstack_dashboard/dashboards/project/api_access/templates/api_access/juju.environments.template horizon-11.0.0.0rc1/openstack_dashboard/dashboards/project/api_access/templates/api_access/juju.environments.template
+--- horizon-11.0.0.0rc1.orig/openstack_dashboard/dashboards/project/api_access/templates/api_access/juju.environments.template	1969-12-31 19:00:00.000000000 -0500
++++ horizon-11.0.0.0rc1/openstack_dashboard/dashboards/project/api_access/templates/api_access/juju.environments.template	2017-02-08 09:27:49.429465251 -0500
+@@ -0,0 +1,22 @@
++# To use Juju with your Openstack cloud:
++#    1. Run: apt-get install juju
++#    2. Copy this file to $HOME/.juju/environments.yaml
++#    3. Complete any empty fields
++#    4. Run 'juju bootstrap' and deploy services!
++#
++# To find out more about juju visit http://juju.ubuntu.com
++environments:
++  openstack:
++    type: openstack
++    auth-url: {{ auth_url }}
++    auth-mode: userpass
++    use-floating-ip: true
++    # Please provide the UUID of the network to use if you have
++    # more than one network configured for your tenant.
++    # network:
++    region: {{ region }}
++    username: {{ user }}
++    # Please provide the password you use to access the
++    # OpenStack cloud.
++    password:
++    tenant-name: {{ tenant_name }}
+diff -Naurp horizon-11.0.0.0rc1.orig/openstack_dashboard/dashboards/project/api_access/urls.py horizon-11.0.0.0rc1/openstack_dashboard/dashboards/project/api_access/urls.py
+--- horizon-11.0.0.0rc1.orig/openstack_dashboard/dashboards/project/api_access/urls.py	2017-02-02 16:22:54.000000000 -0500
++++ horizon-11.0.0.0rc1/openstack_dashboard/dashboards/project/api_access/urls.py	2017-02-08 09:29:11.166028109 -0500
+@@ -28,4 +28,5 @@ urlpatterns = [
+         name='view_credentials'),
+     url(r'^recreate_ec2_credentials/$',
+         views.RecreateCredentialsView.as_view(), name='recreate_credentials'),
++    url(r'^juju/$', views.download_juju_env_file, name='juju'),
+ ]
+diff -Naurp horizon-11.0.0.0rc1.orig/openstack_dashboard/dashboards/project/api_access/views.py horizon-11.0.0.0rc1/openstack_dashboard/dashboards/project/api_access/views.py
+--- horizon-11.0.0.0rc1.orig/openstack_dashboard/dashboards/project/api_access/views.py	2017-02-02 16:22:54.000000000 -0500
++++ horizon-11.0.0.0rc1/openstack_dashboard/dashboards/project/api_access/views.py	2017-02-08 09:33:13.009306612 -0500
+@@ -192,6 +192,39 @@ class RecreateCredentialsView(forms.Moda
+         "horizon:project:api_access:recreate_credentials")
+     success_url = reverse_lazy('horizon:project:api_access:index')
+ 
++def download_juju_env_file(request):
++    tenant_id = request.user.tenant_id
++    tenant_name = request.user.tenant_name
++    region = request.user.services_region
++    if region is None:
++        region = ""
++
++    template = 'project/api_access/juju.environments.template'
++
++    try:
++        keystone_url = api.base.url_for(request,
++                                        'identity',
++                                        endpoint_type='publicURL')
++        context = {'auth_url': keystone_url,
++                   'tenant_name': tenant_name,
++                   'user': request.user,
++                   'region': region}
++
++        response = shortcuts.render(request,
++                                    template,
++                                    context,
++                                    content_type="text/yaml")
++        response['Content-Disposition'] = ('attachment; '
++                                           'filename="%s-environments.yaml"'
++                                           % tenant_name)
++        response['Content-Length'] = str(len(response.content))
++        return response
++
++    except Exception as e:
++        LOG.exception("Exception in DownloadJujuEnvironmentsForm.")
++        messages.error(request, _('Error Downloading Juju Environments File: %s') % e)
++        return shortcuts.redirect(request.build_absolute_uri())
++
+ 
+ class IndexView(tables.DataTableView):
+     table_class = api_access_tables.EndpointsTable
+diff -Naurp horizon-11.0.0.0rc1.orig/openstack_dashboard/usage/tables.py horizon-11.0.0.0rc1/openstack_dashboard/usage/tables.py
+--- horizon-11.0.0.0rc1.orig/openstack_dashboard/usage/tables.py	2017-02-02 16:22:54.000000000 -0500
++++ horizon-11.0.0.0rc1/openstack_dashboard/usage/tables.py	2017-02-08 09:24:27.176082975 -0500
+@@ -29,6 +29,14 @@ class CSVSummary(tables.LinkAction):
+         return self.table.kwargs['usage'].csv_link()
+ 
+ 
++class DownloadJujuEnv(tables.LinkAction):
++    name = "download_jujuenv"
++    verbose_name = _("Download Juju Environment File")
++    verbose_name_plural = _("Download Juju Environment File")
++    icon = "download"
++    url = "horizon:project:access_and_security:api_access:juju"
++
++
+ class BaseUsageTable(tables.DataTable):
+     vcpus = tables.Column('vcpus', verbose_name=_("VCPUs"))
+     disk = tables.Column('local_gb', verbose_name=_("Disk"),
+@@ -96,5 +104,5 @@ class ProjectUsageTable(BaseUsageTable):
+         hidden_title = False
+         verbose_name = _("Usage")
+         columns = ("instance", "vcpus", "disk", "memory", "uptime")
+-        table_actions = (CSVSummary,)
++        table_actions = (CSVSummary, DownloadJujuEnv,)
+         multi_select = False

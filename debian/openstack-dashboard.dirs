@@ -1,0 +1,6 @@
+/etc/openstack-dashboard
+/usr/share/openstack-dashboard
+/usr/share/openstack-dashboard/bin/less/
+/var/lib/openstack-dashboard
+/var/lib/openstack-dashboard/static
+/var/lib/openstack-dashboard/secret-key

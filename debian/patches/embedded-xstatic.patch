@@ -1,0 +1,92 @@
+From 4736af89b4d6d01354896c7a1063bd1cec26ec71 Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Tue, 11 Nov 2014 12:24:22 -0500
+Subject: [PATCH] xstatic
+
+Signed-off-by: Your Name <you@example.com>
+---
+ horizon/test/settings.py        | 76 +++++++++++++++++++--------------------
+ openstack_dashboard/settings.py | 78 ++++++++++++++++++++---------------------
+ 2 files changed, 77 insertions(+), 77 deletions(-)
+
+--- a/openstack_dashboard/utils/settings.py
++++ b/openstack_dashboard/utils/settings.py
+@@ -180,42 +180,42 @@
+ # This list is to be used as the base list which is potentially added to in
+ # local_settings.py before being passed to get_xstatic_dirs()
+ BASE_XSTATIC_MODULES = [
+-    ('xstatic.pkg.jquery', ['jquery.js']),
+-    ('xstatic.pkg.jquery_migrate', ['jquery-migrate.js']),
+-    ('xstatic.pkg.angular', [
++    ('horizon.xstatic.pkg.jquery', ['jquery.js']),
++    ('horizon.xstatic.pkg.jquery_migrate', ['jquery-migrate.js']),
++    ('horizon.xstatic.pkg.angular', [
+         'angular.js',
+         'angular-cookies.js',
+         'angular-sanitize.js',
+         'angular-route.js'
+     ]),
+-    ('xstatic.pkg.angular_bootstrap', ['angular-bootstrap.js']),
+-    ('xstatic.pkg.angular_gettext', ['angular-gettext.js']),
+-    ('xstatic.pkg.angular_lrdragndrop', None),
+-    ('xstatic.pkg.angular_smart_table', None),
+-    ('xstatic.pkg.angular_fileupload', ['ng-file-upload-all.js']),
+-    ('xstatic.pkg.d3', ['d3.js']),
+-    ('xstatic.pkg.jquery_quicksearch', ['jquery.quicksearch.js']),
+-    ('xstatic.pkg.jquery_tablesorter', ['jquery.tablesorter.js']),
+-    ('xstatic.pkg.spin', ['spin.js', 'spin.jquery.js']),
+-    ('xstatic.pkg.jquery_ui', ['jquery-ui.js']),
+-    ('xstatic.pkg.bootstrap_scss', ['js/bootstrap.js']),
+-    ('xstatic.pkg.bootstrap_datepicker', ['bootstrap-datepicker.js']),
+-    ('xstatic.pkg.hogan', ['hogan.js']),
+-    ('xstatic.pkg.rickshaw', ['rickshaw.js']),
+-    ('xstatic.pkg.jsencrypt', ['jsencrypt.js']),
+-    ('xstatic.pkg.objectpath', ['ObjectPath.js']),
+-    ('xstatic.pkg.tv4', ['tv4.js']),
+-    ('xstatic.pkg.angular_schema_form', ['schema-form.js']),
++    ('horizon.xstatic.pkg.angular_bootstrap', ['angular-bootstrap.js']),
++    ('horizon.xstatic.pkg.angular_gettext', ['angular-gettext.js']),
++    ('horizon.xstatic.pkg.angular_lrdragndrop', None),
++    ('horizon.xstatic.pkg.angular_smart_table', None),
++    ('horizon.xstatic.pkg.angular_fileupload', ['ng-file-upload-all.js']),
++    ('horizon.xstatic.pkg.d3', ['d3.js']),
++    ('horizon.xstatic.pkg.jquery_quicksearch', ['jquery.quicksearch.js']),
++    ('horizon.xstatic.pkg.jquery_tablesorter', ['jquery.tablesorter.js']),
++    ('horizon.xstatic.pkg.spin', ['spin.js', 'spin.jquery.js']),
++    ('horizon.xstatic.pkg.jquery_ui', ['jquery-ui.js']),
++    ('horizon.xstatic.pkg.bootstrap_scss', ['js/bootstrap.js']),
++    ('horizon.xstatic.pkg.bootstrap_datepicker', ['bootstrap-datepicker.js']),
++    ('horizon.xstatic.pkg.hogan', ['hogan.js']),
++    ('horizon.xstatic.pkg.rickshaw', ['rickshaw.js']),
++    ('horizon.xstatic.pkg.jsencrypt', ['jsencrypt.js']),
++    ('horizon.xstatic.pkg.objectpath', ['ObjectPath.js']),
++    ('horizon.xstatic.pkg.tv4', ['tv4.js']),
++    ('horizon.xstatic.pkg.angular_schema_form', ['schema-form.js']),
+ 
+     # @imported in scss files diectly
+-    ('xstatic.pkg.font_awesome', []),
+-    ('xstatic.pkg.bootswatch', []),
+-    ('xstatic.pkg.roboto_fontface', []),
+-    ('xstatic.pkg.mdi', []),
++    ('horizon.xstatic.pkg.font_awesome', []),
++    ('horizon.xstatic.pkg.bootswatch', []),
++    ('horizon.xstatic.pkg.roboto_fontface', []),
++    ('horizon.xstatic.pkg.mdi', []),
+ 
+     # testing only, not included in application
+-    ('xstatic.pkg.jasmine', []),
+-    ('xstatic.pkg.termjs', []),
++    ('horizon.xstatic.pkg.jasmine', []),
++    ('horizon.xstatic.pkg.termjs', []),
+ ]
+ 
+ 
+@@ -238,7 +238,7 @@
+     HORIZON_CONFIG['xstatic_lib_files'] = []
+     for module_name, files in XSTATIC_MODULES:
+         module = import_module(module_name)
+-        if module_name == 'xstatic.pkg.jquery_ui':
++        if module_name == 'horizon.xstatic.pkg.jquery_ui':
+             # determine the correct path for jquery-ui which packagers moved
+             if module.VERSION.startswith('1.10.'):
+                 # The 1.10.x versions already contain 'ui' directory.
