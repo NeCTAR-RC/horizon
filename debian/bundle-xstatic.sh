@@ -5,14 +5,18 @@ set -e
 version=$1
 
 TMPDIR=$(mktemp -d)
+TMPDIR2=$(mktemp -d)
 
 echo "Installing to $TMPDIR for Horizon $version"
 
 mkdir -p $TMPDIR/lib
 
+virtualenv $TMPDIR2
+. $TMPDIR2/bin/activate
 grep -i XStatic requirements.txt > $TMPDIR/requirements.txt
-
+pip install -U pip
 pip install -t $TMPDIR/lib -r $TMPDIR/requirements.txt
+deactivate
 
 (
     cd $TMPDIR/lib
