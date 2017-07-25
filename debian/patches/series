@@ -4,3 +4,4 @@ fix-dashboard-manage.patch
 ubuntu_settings.patch
 embedded-xstatic.patch
 add-juju-environment-download.patch
+include-css.patch
