@@ -327,7 +327,7 @@ def find_static_files(
             #       'framework/widgets/help-panel/help-panel.html'
             #   ] = 'themes/material/templates/framework/widgets/\
             #        help-panel/help-panel.html'
-            (templates_part, override_path) = theme_file.split('/templates/')
+            (templates_part, override_path) = theme_file.split('templates/')
             template_overrides[override_path] = 'themes/' + \
                                                 theme_name + theme_file
 
