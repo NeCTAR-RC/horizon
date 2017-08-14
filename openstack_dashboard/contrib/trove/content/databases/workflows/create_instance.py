@@ -169,12 +169,22 @@ class SetNetworkAction(workflows.Action):
         help_text = _("Select networks for your instance.")
 
     def populate_network_choices(self, request, context):
+        search_opts = {}
+        filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                                  False)
         try:
             tenant_id = self.request.user.tenant_id
-            networks = dash_api.neutron.network_list_for_tenant(request,
-                                                                tenant_id)
+
+            if filter_provider:
+                search_opts['provider:network_type'] = filter_provider
+
+            networks = dash_api.neutron.network_list_for_tenant(
+                request, tenant_id, include_shared=False, **search_opts)
+
             network_list = [(network.id, network.name_or_id)
                             for network in networks]
+            network_list.insert(0, ('00000000-0000-0000-0000-000000000000',
+                                'Classic Provider'))
         except Exception:
             network_list = []
             exceptions.handle(request,
