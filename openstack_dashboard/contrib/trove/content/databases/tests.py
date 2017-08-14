@@ -149,10 +149,6 @@ class DatabaseTests(test.TestCase):
                                       shared=False).AndReturn(
                                           self.networks.list()[:1])
 
-        dash_api.neutron.network_list(IsA(http.HttpRequest),
-                                      shared=True).AndReturn(
-                                          self.networks.list()[1:])
-
         self.mox.ReplayAll()
         res = self.client.get(LAUNCH_URL)
         self.assertTemplateUsed(res, 'project/databases/launch.html')
@@ -222,10 +218,6 @@ class DatabaseTests(test.TestCase):
                                       shared=False).AndReturn(
                                           self.networks.list()[:1])
 
-        dash_api.neutron.network_list(IsA(http.HttpRequest),
-                                      shared=True).AndReturn(
-                                          self.networks.list()[1:])
-
         nics = [{"net-id": self.networks.first().id, "v4-fixed-ip": ''}]
 
         # Actual create database call
@@ -290,10 +282,6 @@ class DatabaseTests(test.TestCase):
                                       tenant_id=self.tenant.id,
                                       shared=False).AndReturn(
                                           self.networks.list()[:1])
-
-        dash_api.neutron.network_list(IsA(http.HttpRequest),
-                                      shared=True).AndReturn(
-                                          self.networks.list()[1:])
 
         nics = [{"net-id": self.networks.first().id, "v4-fixed-ip": ''}]
 
@@ -529,10 +517,6 @@ class DatabaseTests(test.TestCase):
                                       tenant_id=self.tenant.id,
                                       shared=False).\
             AndReturn(self.networks.list()[:1])
-
-        dash_api.neutron.network_list(IsA(http.HttpRequest),
-                                      shared=True).\
-            AndReturn(self.networks.list()[1:])
 
         nics = [{"net-id": self.networks.first().id, "v4-fixed-ip": ''}]
 
