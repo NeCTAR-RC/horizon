@@ -12,6 +12,7 @@
 # Image API v1.1, Block Storage API v2, and Compute API v2.0. OS_AUTH_URL is
 # only for the Identity API served through keystone.
 export OS_AUTH_URL={{ auth_url }}
+export OS_AUTH_TYPE=password
 
 # With the addition of Keystone we have standardized on the term **project**
 # as the entity that owns the resources.
