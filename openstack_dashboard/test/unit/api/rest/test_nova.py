@@ -23,6 +23,19 @@ from openstack_dashboard.test import helpers as test
 from openstack_dashboard.usage import quotas
 
 
+# NOTE(flwang): mock.Mock and mock.MagicMock do not support sort, so the test
+# case involved sorted will fail. This fake class is for the flavor test cases
+# related to sort.
+class FakeFlavor(object):
+    def __init__(self, id, ram=1):
+        self.id = id
+        self.ram = ram
+        self.extras = {}
+
+    def to_dict(self):
+        return {"id": self.id}
+
+
 class NovaRestTestCase(test.TestCase):
     #
     # Snapshots
@@ -660,9 +673,9 @@ class NovaRestTestCase(test.TestCase):
             request = self.mock_rest_request(GET={})
         else:
             request = self.mock_rest_request(GET={'is_public': 'fAlsE'})
+
         nc.flavor_list.return_value = [
-            mock.Mock(**{'to_dict.return_value': {'id': '1'}}),
-            mock.Mock(**{'to_dict.return_value': {'id': '2'}}),
+            FakeFlavor("1"), FakeFlavor("2")
         ]
         response = nova.Flavors().get(request)
         self.assertStatusCode(response, 200)
@@ -689,9 +702,9 @@ class NovaRestTestCase(test.TestCase):
             get_extras = False
         else:
             request = self.mock_rest_request(GET={'get_extras': 'fAlsE'})
+
         nc.flavor_list.return_value = [
-            mock.Mock(**{'extras': {}, 'to_dict.return_value': {'id': '1'}}),
-            mock.Mock(**{'extras': {}, 'to_dict.return_value': {'id': '2'}}),
+            FakeFlavor("1"), FakeFlavor("2")
         ]
         response = nova.Flavors().get(request)
         self.assertStatusCode(response, 200)
