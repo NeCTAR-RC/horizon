@@ -244,16 +244,6 @@ class JSONView(View):
                            'original_status': server.status,
                            'task': getattr(server, 'OS-EXT-STS:task_state'),
                            'id': server.id}
-            # Avoid doing extra calls for console if the server is in
-            # a invalid status for console connection
-            if server.status.lower() not in console_invalid_status:
-                try:
-                    console = i_console.get_console(
-                        request, console_type, server)[0].lower()
-                    server_data['console'] = console
-                except exceptions.NotAvailable:
-                    pass
-
             data.append(server_data)
         self.add_resource_url('horizon:project:instances:detail', data)
         return data
