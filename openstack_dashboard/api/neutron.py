@@ -663,10 +663,17 @@ def network_list_for_tenant(request, tenant_id, include_external=False,
     LOG.debug("network_list_for_tenant(): tenant_id=%s, params=%s"
               % (tenant_id, params))
 
+    filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                              False)
     networks = []
     shared = params.get('shared')
     if shared is not None:
         del params['shared']
+    if filter_provider:
+        params['provider:network_type'] = filter_provider
+        networks = network_list(
+            request, id='00000000-0000-0000-0000-000000000000')
+        shared = False
 
     if shared in (None, False):
         # If a user has admin role, network list returned by Neutron API
@@ -748,6 +755,10 @@ def network_delete(request, network_id):
 @profiler.trace
 def subnet_list(request, **params):
     LOG.debug("subnet_list(): params=%s" % (params))
+    filter_provider = getattr(settings, 'NECTAR_NETWORK_PROVIDER_FILTER',
+                              False)
+    if filter_provider and 'tenant_id' not in params:
+        params['tenant_id'] = request.user.tenant_id
     subnets = neutronclient(request).list_subnets(**params).get('subnets')
     return [Subnet(s) for s in subnets]
 
