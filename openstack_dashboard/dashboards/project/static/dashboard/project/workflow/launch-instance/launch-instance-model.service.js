@@ -483,11 +483,9 @@
       model.networks.length = 0;
       push.apply(model.networks,
         data.data.items.filter(function(net) {
-          return net.subnets.length > 0;
+          return net.subnets.length > -1;
         }));
-      if (model.networks.length === 1) {
-        model.newInstanceSpec.networks.push(model.networks[0]);
-      }
+      model.newInstanceSpec.networks.push(model.networks[0]);
       return data;
     }
 
