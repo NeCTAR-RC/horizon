@@ -238,6 +238,7 @@ class JSONView(View):
         data = []
         console_type = getattr(settings, 'CONSOLE_TYPE', 'AUTO')
         # lowercase of the keys will be used at the end of the console URL.
+        get_console = getattr(settings, 'CONSOLE_TOPOLOGY_ENABLED', True)
         for server in servers:
             server_data = {'name': server.name,
                            'status': self.trans.instance[server.status],
@@ -246,7 +247,8 @@ class JSONView(View):
                            'id': server.id}
             # Avoid doing extra calls for console if the server is in
             # a invalid status for console connection
-            if server.status.lower() not in console_invalid_status:
+            if get_console and \
+               server.status.lower() not in console_invalid_status:
                 try:
                     console = i_console.get_console(
                         request, console_type, server)[0].lower()
