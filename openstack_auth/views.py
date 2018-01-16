@@ -158,8 +158,7 @@ def login(request, template_name=None, extra_context=None, **kwargs):
 @never_cache
 def websso(request):
     """Logs a user in using a token from Keystone's POST."""
-    referer = request.META.get('HTTP_REFERER', settings.OPENSTACK_KEYSTONE_URL)
-    auth_url = utils.clean_up_auth_url(referer)
+    auth_url = settings.OPENSTACK_KEYSTONE_URL
     token = request.POST.get('token')
     try:
         request.user = auth.authenticate(request=request, auth_url=auth_url,
@@ -177,7 +176,12 @@ def websso(request):
     auth.login(request, request.user)
     if request.session.test_cookie_worked():
         request.session.delete_test_cookie()
-    return django_http.HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+
+    redirect_to = request.GET.get(auth.REDIRECT_FIELD_NAME, '')
+    if not is_safe_url(url=redirect_to, host=request.get_host()):
+        redirect_to = settings.LOGIN_REDIRECT_URL
+
+    return django_http.HttpResponseRedirect(redirect_to)
 
 
 def logout(request, login_url=None, **kwargs):
