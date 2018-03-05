@@ -1,0 +1,4 @@
+debian/openstack-dashboard.conf etc/apache2/conf-available
+debian/theme/ubuntu/* /usr/share/openstack-dashboard/openstack_dashboard/themes/ubuntu
+etc/openstack-dashboard
+usr/share/openstack-dashboard
