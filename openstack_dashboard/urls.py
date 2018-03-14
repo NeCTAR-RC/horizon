@@ -31,6 +31,9 @@ from django.views.generic.base import TemplateView
 from oslo_utils import importutils
 
 import horizon
+import horizon.base
+from horizon.browsers import views as browsers_views
+from horizon.decorators import require_auth
 
 from openstack_dashboard.api import rest
 from openstack_dashboard import views
@@ -47,6 +50,13 @@ urlpatterns = [
     url(r'^terms/$', TermsView.as_view(), name='terms'),
     url(r'', include(horizon.urls)),
 ]
+
+# add URL for ngdetails
+ngdetails_url = url(r'^ngdetails/',
+                    browsers_views.AngularDetailsView.as_view(),
+                    name='ngdetails')
+urlpatterns.append(ngdetails_url)
+horizon.base._decorate_urlconf([ngdetails_url], require_auth)
 
 for u in getattr(settings, 'AUTHENTICATION_URLS', ['openstack_auth.urls']):
     urlpatterns.append(url(r'^auth/', include(u)))
