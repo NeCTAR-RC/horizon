@@ -3,8 +3,6 @@
 
 set -e
 
-CONF="openstack-dashboard.conf"
-
 if [ "$1" = "configure" ]; then
 
   if ! getent group horizon > /dev/null 2>&1 ; then
@@ -42,7 +40,6 @@ if [ "$1" = "configure" ]; then
   if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
       . /usr/share/apache2/apache2-maintscript-helper
   fi
-  apache2_invoke enconf $CONF || exit $?
 
 fi
 
