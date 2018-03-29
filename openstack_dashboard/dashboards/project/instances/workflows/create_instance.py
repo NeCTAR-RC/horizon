@@ -723,8 +723,7 @@ class SetNetworkAction(workflows.Action):
         self.use_required_attribute = False
 
         network_list = self.fields["network"].choices
-        if len(network_list) == 1:
-            self.fields['network'].initial = [network_list[0][0]]
+        self.fields['network'].initial = [network_list[0][0]]
 
     class Meta(object):
         name = _("Networking")
