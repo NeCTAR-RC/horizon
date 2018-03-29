@@ -12,7 +12,6 @@
 
 from collections import namedtuple
 import logging
-from operator import itemgetter
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -107,7 +106,8 @@ def network_field_data(request, include_empty_option=False, with_cidr=False,
 
         _networks = []
         for n in networks:
-            if not n['subnet_ids']:
+            if not n['subnet_ids'] and \
+               n['id'] != '00000000-0000-0000-0000-000000000000':
                 continue
             v = n.name_or_id
             if with_cidr:
@@ -117,7 +117,8 @@ def network_field_data(request, include_empty_option=False, with_cidr=False,
                           if subnet.ip_version == 6])
                 v += ' (%s)' % ', '.join(cidrs)
             _networks.append((n.id, v))
-        networks = sorted(_networks, key=itemgetter(1))
+
+        return _networks
 
     if not networks:
         if include_empty_option:
