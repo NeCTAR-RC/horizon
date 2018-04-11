@@ -22,6 +22,7 @@ from __future__ import absolute_import
 from django.conf import settings
 from django import http
 from django.test.utils import override_settings
+import mock
 
 from mox3.mox import IsA
 from novaclient import api_versions
@@ -681,3 +682,17 @@ class ComputeApiTests(test.APITestCase):
         ret_val = api.nova.server_group_list(self.request)
         self.assertIsInstance(ret_val, list)
         self.assertEqual(len(ret_val), len(server_groups))
+
+    @mock.patch.object(api.nova, 'novaclient')
+    def test_availability_zone_list(self, mock_novaclient):
+        novaclient = mock_novaclient.return_value
+        detailed = False
+        zones = [mock.Mock(zoneName='john'), mock.Mock(zoneName='sam'),
+                 mock.Mock(zoneName='bob')]
+        novaclient.availability_zones.list.return_value = zones
+
+        ret_val = api.nova.availability_zone_list(self.request, detailed)
+        self.assertEqual([zone.zoneName for zone in ret_val],
+                         ['bob', 'john', 'sam'])
+        novaclient.availability_zones.list.assert_called_once_with(
+            detailed=detailed)
