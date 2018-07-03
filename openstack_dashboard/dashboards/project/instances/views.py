@@ -43,6 +43,9 @@ from horizon import workflows
 from openstack_dashboard import api
 from openstack_dashboard.utils import filters
 
+from openstack_dashboard.dashboards.project.images \
+    import utils as image_utils
+
 from openstack_dashboard.dashboards.project.instances \
     import console as project_console
 from openstack_dashboard.dashboards.project.instances \
@@ -123,8 +126,7 @@ class IndexView(tables.DataTableView):
             # Gather our images to correlate our instances to them
             try:
                 # TODO(gabriel): Handle pagination.
-                tmp_images = api.glance.image_list_detailed(self.request)[0]
-                images.extend(tmp_images)
+                images = image_utils.get_available_images(self.request)
                 image_map.update([(str(image.id), image) for image in images])
             except Exception:
                 exceptions.handle(self.request, ignore=True)

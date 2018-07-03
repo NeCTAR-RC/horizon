@@ -100,6 +100,7 @@
       // this will show the untranslated visibility. This allows the code
       // to be more forgiving if a new status is added to images and the UI
       // code isn't immediately updated.
+      console.log("Image is " + imageVisibility[visibility]);
       var translation = imageVisibility[visibility];
       if (angular.isDefined(translation)) {
         return translation;
@@ -118,6 +119,8 @@
 
     function deriveSharingStatus(image, currentProjectId, translatedVisibility) {
       if (angular.equals(translatedVisibility, imageVisibility.public)) {
+        return translatedVisibility;
+      } else if (angular.equals(translatedVisibility, imageVisibility.community)) {
         return translatedVisibility;
       } else if (angular.isDefined(currentProjectId) &&
         !angular.equals(image.owner, currentProjectId)) {
