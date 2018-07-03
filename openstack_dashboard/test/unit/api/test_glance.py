@@ -152,7 +152,7 @@ class GlanceApiTests(test.APIMockTestCase):
         self.assertFalse(has_more)
         self.assertFalse(has_prev)
 
-    @override_settings(API_RESULT_PAGE_SIZE=9)
+    @override_settings(API_RESULT_PAGE_SIZE=10)
     def test_image_list_detailed_pagination_equal_page_size(self):
         # The total image count equals page size, should return
         # page_size images. more, prev should return False

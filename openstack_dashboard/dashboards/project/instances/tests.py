@@ -205,7 +205,7 @@ class InstanceTests(helpers.ResetImageAPIVersionMixin, helpers.TestCase):
 
         self.assertTemplateUsed(res, INDEX_TEMPLATE)
         self.assertEqual(len(res.context['instances_table'].data), 0)
-        self.assertMessageCount(res, error=1)
+        self.assertMessageCount(res, error=4)
 
     @helpers.create_stubs({
         api.nova: ('flavor_list', 'server_list', 'flavor_get',
