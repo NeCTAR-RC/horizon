@@ -34,8 +34,9 @@ def get_available_images(request, project_id=None, images_cache=None):
     public_images = images_cache.get('public_images', [])
     images_by_project = images_cache.get('images_by_project', {})
     shared_images = images_cache.get('shared_images', [])
+    community_images = images_cache.get('community_images', [])
     if 'public_images' not in images_cache:
-        public = {"is_public": True,
+        public = {"visibility": "public",
                   "status": "active"}
         try:
             images, _more, _prev = glance.image_list_detailed(
@@ -76,10 +77,22 @@ def get_available_images(request, project_id=None, images_cache=None):
             exceptions.handle(request,
                               _("Unable to retrieve shared images."))
 
+    if 'community_images' not in images_cache:
+        community = {"visibility": "community",
+                     "status": "active"}
+        try:
+            images, _more, _prev = glance.image_list_detailed(
+                request, filters=community)
+            [community_images.append(image) for image in images]
+            images_cache['community_images'] = community_images
+        except Exception:
+            exceptions.handle(request,
+                              _("Unable to retrieve community images."))
+
     if 'images_by_project' not in images_cache:
         images_cache['images_by_project'] = images_by_project
 
-    images = owned_images + public_images + shared_images
+    images = owned_images + public_images + shared_images + community_images
 
     image_ids = []
     final_images = []
