@@ -312,6 +312,42 @@ class ImagesRestTestCase(test.ResetImageAPIVersionMixin, test.TestCase):
         self.mock_image_create.assert_called_once_with(request, **metadata)
 
     @test.create_mocks(api.glance, ['image_create', 'VERSIONS'])
+    def test_image_create_v2_community(self):
+        request = self.mock_rest_request(body='''{"name": "Test",
+            "disk_format": "aki", "import_data": false,
+            "visibility": "community", "container_format": "aki",
+            "protected": false, "image_url": "test.com",
+            "source_type": "url", "architecture": "testArch",
+            "description": "description", "kernel": "kernel",
+            "min_disk": 10, "min_ram": 5, "ramdisk": 10 }
+        ''')
+        self.mock_VERSIONS.active = 2
+        new = self.mock_image_create.return_value
+        new.to_dict.return_value = {'name': 'testimage'}
+        new.name = 'testimage'
+
+        metadata = {'name': 'Test',
+                    'disk_format': 'aki',
+                    'container_format': 'aki',
+                    'visibility': 'community',
+                    'protected': False,
+                    'min_disk': 10,
+                    'min_ram': 5,
+                    'location': 'test.com',
+                    'description': 'description',
+                    'architecture': 'testArch',
+                    'ramdisk_id': 10,
+                    'kernel_id': 'kernel',
+                    }
+
+        response = glance.Images().put(request)
+        self.assertStatusCode(response, 201)
+        self.assertEqual(response.content.decode('utf-8'),
+                         '{"name": "testimage"}')
+        self.assertEqual(response['location'], '/api/glance/images/testimage')
+        self.mock_image_create.assert_called_once_with(request, **metadata)
+
+    @test.create_mocks(api.glance, ['image_create', 'VERSIONS'])
     def test_image_create_v1_private(self):
         request = self.mock_rest_request(body='''{"name": "Test",
             "disk_format": "aki", "import_data": false,
