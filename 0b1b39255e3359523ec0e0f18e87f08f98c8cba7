@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30af04b0_d780786b",
+        "filename": "openstack_dashboard/dashboards/project/instances/tests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1000104
+      },
+      "writtenOn": "2018-07-05T02:20:49Z",
+      "side": 1,
+      "message": "I don\u0027t understand why this is now 4...?",
+      "range": {
+        "startLine": 208,
+        "startChar": 43,
+        "endLine": 208,
+        "endChar": 45
+      },
+      "revId": "0b1b39255e3359523ec0e0f18e87f08f98c8cba7",
+      "serverId": "f182a8af-62ca-4ceb-ab81-14f8fec9c6c5",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc4c3471_d9747e4b",
+        "filename": "openstack_dashboard/test/test_data/glance_data.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1000104
+      },
+      "writtenOn": "2018-07-05T02:20:49Z",
+      "side": 1,
+      "message": "does the position of this image in array have anything to do with changes to openstack_dashboard/dashboards/project/images/images/tests.py ?",
+      "range": {
+        "startLine": 257,
+        "startChar": 0,
+        "endLine": 257,
+        "endChar": 54
+      },
+      "revId": "0b1b39255e3359523ec0e0f18e87f08f98c8cba7",
+      "serverId": "f182a8af-62ca-4ceb-ab81-14f8fec9c6c5",
+      "unresolved": false
+    }
+  ]
+}
