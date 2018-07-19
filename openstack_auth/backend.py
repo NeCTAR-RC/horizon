@@ -130,8 +130,13 @@ class KeystoneBackend(object):
         domain_name = kwargs.get('user_domain_name', None)
         domain_auth, domain_auth_ref = plugin.get_domain_scoped_auth(
             unscoped_auth, unscoped_auth_ref, domain_name)
-        scoped_auth, scoped_auth_ref = plugin.get_project_scoped_auth(
-            unscoped_auth, unscoped_auth_ref, recent_project=recent_project)
+        if unscoped_auth_ref.project_name and not recent_project:
+            scoped_auth = unscoped_auth
+            scoped_auth_ref = unscoped_auth_ref
+        else:
+            scoped_auth, scoped_auth_ref = plugin.get_project_scoped_auth(
+                unscoped_auth, unscoped_auth_ref,
+                recent_project=recent_project)
 
         # Abort if there are no projects for this user and a valid domain
         # token has not been obtained
