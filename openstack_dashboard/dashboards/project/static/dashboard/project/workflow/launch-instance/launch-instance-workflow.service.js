@@ -58,7 +58,6 @@
           templateUrl: basePath + 'network/network.html',
           helpUrl: basePath + 'network/network.help.html',
           formName: 'launchInstanceNetworkForm',
-          requiredServiceTypes: ['network']
         },
         {
           id: 'secgroups',
@@ -66,14 +65,13 @@
           templateUrl: basePath + 'security-groups/security-groups.html',
           helpUrl: basePath + 'security-groups/security-groups.help.html',
           formName: 'launchInstanceAccessAndSecurityForm',
-          requiredServiceTypes: ['network']
         },
         {
           id: 'keypair',
           title: gettext('Key Pair'),
           templateUrl: basePath + 'keypair/keypair.html',
           helpUrl: basePath + 'keypair/keypair.help.html',
-          formName: 'launchInstanceKeypairForm'
+          formName: 'launchInstanceKeypairForm',
         },
         {
           id: 'configuration',
@@ -89,15 +87,6 @@
           helpUrl: basePath + 'server-groups/server-groups.help.html',
           formName: 'launchInstanceServerGroupsForm',
           policy: stepPolicy.serverGroups
-        },
-        {
-          id: 'hints',
-          title: gettext('Scheduler Hints'),
-          templateUrl: basePath + 'scheduler-hints/scheduler-hints.html',
-          helpUrl: basePath + 'scheduler-hints/scheduler-hints.help.html',
-          formName: 'launchInstanceSchedulerHintsForm',
-          policy: stepPolicy.schedulerHints,
-          setting: 'LAUNCH_INSTANCE_DEFAULTS.enable_scheduler_hints'
         },
         {
           id: 'metadata',
