@@ -230,7 +230,7 @@
               </td>
             </tr>
 
-            <tr ng-repeat-start="row in ctrl.tableData.displayedAvailable track by row.id"
+            <tr ng-repeat-start="row in ctrl.tableData.displayedAvailable track by $index"
                 ng-if="!trCtrl.allocatedIds[row.id]">
               <td class="expander">
                 <span class="fa fa-chevron-right"
