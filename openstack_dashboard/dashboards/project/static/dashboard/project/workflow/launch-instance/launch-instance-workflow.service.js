@@ -58,7 +58,6 @@
           templateUrl: basePath + 'network/network.html',
           helpUrl: basePath + 'network/network.help.html',
           formName: 'launchInstanceNetworkForm',
-          requiredServiceTypes: ['network']
         },
         {
           id: 'secgroups',
@@ -66,7 +65,6 @@
           templateUrl: basePath + 'security-groups/security-groups.html',
           helpUrl: basePath + 'security-groups/security-groups.help.html',
           formName: 'launchInstanceAccessAndSecurityForm',
-          requiredServiceTypes: ['network']
         },
         {
           id: 'keypair',
@@ -74,7 +72,6 @@
           templateUrl: basePath + 'keypair/keypair.html',
           helpUrl: basePath + 'keypair/keypair.help.html',
           formName: 'launchInstanceKeypairForm',
-          novaExtension: 'Keypairs'
         },
         {
           id: 'configuration',
@@ -89,18 +86,6 @@
           templateUrl: basePath + 'server-groups/server-groups.html',
           helpUrl: basePath + 'server-groups/server-groups.help.html',
           formName: 'launchInstanceServerGroupsForm',
-          policy: stepPolicy.serverGroups,
-          novaExtension: 'ServerGroups'
-        },
-        {
-          id: 'hints',
-          title: gettext('Scheduler Hints'),
-          templateUrl: basePath + 'scheduler-hints/scheduler-hints.html',
-          helpUrl: basePath + 'scheduler-hints/scheduler-hints.help.html',
-          formName: 'launchInstanceSchedulerHintsForm',
-          policy: stepPolicy.schedulerHints,
-          setting: 'LAUNCH_INSTANCE_DEFAULTS.enable_scheduler_hints',
-          novaExtension: 'SchedulerHints'
         },
         {
           id: 'metadata',
