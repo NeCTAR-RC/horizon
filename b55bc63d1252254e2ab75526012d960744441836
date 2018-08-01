@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "15a35264_46fdb98d",
+        "filename": "openstack_dashboard/dashboards/project/static/dashboard/project/workflow/launch-instance/launch-instance-workflow.service.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-08-01T02:12:05Z",
+      "side": 0,
+      "message": "this is already disabled by config so possibly not needed?",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 10
+      },
+      "revId": "b55bc63d1252254e2ab75526012d960744441836",
+      "serverId": "f182a8af-62ca-4ceb-ab81-14f8fec9c6c5",
+      "unresolved": false
+    }
+  ]
+}
