@@ -53,6 +53,7 @@ class JSONMessage(object):
         self.message = ''
         self.level = self.INFO
         self.level_name = 'info'
+        self.show_label = True
 
     def _read(self):
         with open(self._path, 'rb') as file_obj:
@@ -81,6 +82,7 @@ class JSONMessage(object):
 
             self.level = self.MESSAGE_LEVELS.get(self.level_name, self.INFO)
             self.message = attrs.get('message', '')
+            self.show_label = attrs.get('show_label', True)
 
     def load(self):
         """Read and parse the message file."""
@@ -102,7 +104,11 @@ class JSONMessage(object):
     def send_message(self, request):
         if self.failed:
             return
-        self.level(request, mark_safe(self.message))
+
+        extra_tags = ''
+        if self.show_label:
+            extra_tags = 'show_label'
+        self.level(request, mark_safe(self.message), extra_tags=extra_tags)
 
 
 def _is_path(path):

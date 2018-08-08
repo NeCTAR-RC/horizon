@@ -7,7 +7,7 @@
       <a class="close" data-dismiss="alert" href="#">
         <span class="fa fa-times"></span>
       </a>
-      <p><strong>{% trans "Info: " %}</strong>{{ message }}</p>
+      <p>{% if "show_label" in message.tags %}<strong>{% trans "Info: " %}</strong>{% endif %}{{ message }}</p>
     </div>
   {% endif %}
   {% if "warning" in message.tags %}
@@ -15,7 +15,7 @@
       <a class="close" data-dismiss="alert" href="#">
         <span class="fa fa-times"></span>
       </a>
-      <p><strong>{% trans "Warning: " %}</strong>{{ message }}</p>
+      <p>{% if "show_label" in message.tags %}<strong>{% trans "Warning: " %}</strong>{% endif %}{{ message }}</p>
     </div>
   {% endif %}
   {% if "success" in message.tags %}
@@ -23,7 +23,7 @@
       <a class="close" data-dismiss="alert" href="#">
         <span class="fa fa-times"></span>
       </a>
-      <p><strong>{% trans "Success: " %}</strong>{{ message }}</p>
+      <p>{% if "show_label" in message.tags %}<strong>{% trans "Success: " %}</strong>{% endif %}{{ message }}</p>
     </div>
   {% endif %}
   {% if "error" in message.tags %}
@@ -31,7 +31,7 @@
       <a class="close" data-dismiss="alert" href="#">
         <span class="fa fa-times"></span>
       </a>
-      <p><strong>{% trans "Error: " %}</strong>{{ message }}</p>
+      <p>{% if "show_label" in message.tags %}<strong>{% trans "Error: " %}</strong>{% endif %}{{ message }}</p>
     </div>
   {% endif %}
 {% endfor %}
