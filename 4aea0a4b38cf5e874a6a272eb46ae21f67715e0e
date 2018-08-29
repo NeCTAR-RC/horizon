@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e959364_7150a2a2",
+        "filename": "openstack_dashboard/static/app/core/images/steps/create-image/create-image.controller.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-08-29T05:15:37Z",
+      "side": 1,
+      "message": "I think default visibility is shared?",
+      "range": {
+        "startLine": 68,
+        "startChar": 19,
+        "endLine": 68,
+        "endChar": 26
+      },
+      "revId": "4aea0a4b38cf5e874a6a272eb46ae21f67715e0e",
+      "serverId": "f182a8af-62ca-4ceb-ab81-14f8fec9c6c5",
+      "unresolved": false
+    }
+  ]
+}
