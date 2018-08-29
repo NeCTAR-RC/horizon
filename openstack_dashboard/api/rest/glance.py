@@ -108,7 +108,7 @@ class ImageProperties(generic.View):
         """
         api.glance.image_update_properties(
             request, image_id, request.DATA.get('removed'),
-            **request.DATA['updated']
+            **request.DATA.get('updated', {})
         )
 
 
