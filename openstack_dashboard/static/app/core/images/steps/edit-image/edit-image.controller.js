@@ -25,7 +25,8 @@
     '$scope',
     'horizon.app.core.images.imageFormats',
     'horizon.app.core.images.validationRules',
-    'horizon.app.core.openstack-service-api.settings'
+    'horizon.app.core.openstack-service-api.settings',
+    'horizon.app.core.openstack-service-api.policy'
   ];
 
   /**
@@ -38,7 +39,8 @@
     $scope,
     imageFormats,
     validationRules,
-    settings
+    settings,
+    policy
   ) {
     var ctrl = this;
 
@@ -51,13 +53,9 @@
       { label: gettext('No'), value: false }
     ];
 
-    ctrl.imageVisibilityOptions = [
-      { label: gettext('Public'), value: 'public' },
-      { label: gettext('Private'), value: 'private' }
-    ];
+    ctrl.imageVisibilityOptions = [];
 
     ctrl.setFormats = setFormats;
-    ctrl.allowPublicizeImage = { rules: [['image', 'image:publicize_image']] };
 
     $scope.imagePromise.then(init);
 
@@ -80,13 +78,31 @@
       ctrl.image.kernel = ctrl.image.properties.kernel_id;
       ctrl.image.ramdisk = ctrl.image.properties.ramdisk_id;
       ctrl.image.architecture = ctrl.image.properties.architecture;
-      ctrl.image.visibility = ctrl.image.is_public ? 'public' : 'private';
       ctrl.image_format = ctrl.image.disk_format;
       if (ctrl.image.container_format === 'docker') {
         ctrl.image_format = 'docker';
         ctrl.image.disk_format = 'raw';
       }
       setFormats();
+      getVisibilities();
+    }
+
+    function getVisibilities() {
+      ctrl.imageVisibilityOptions = [
+        { label: gettext('Private'), value: 'private' },
+        { label: gettext('Shared'), value: 'shared' }
+      ];
+
+      policy.ifAllowed({rules: [['image', 'publicize_image']]}).then(
+        function () {
+          ctrl.imageVisibilityOptions.push({ label: gettext('Public'), value: 'public' });
+        }
+      );
+      policy.ifAllowed({rules: [['image', 'communitize_image']]}).then(
+        function () {
+          ctrl.imageVisibilityOptions.push({ label: gettext('Community'), value: 'community' });
+        }
+      );
     }
 
     function setFormats() {
