@@ -128,7 +128,7 @@ class KeystoneBackend(object):
         domain_name = kwargs.get('user_domain_name', None)
         domain_auth, domain_auth_ref = plugin.get_domain_scoped_auth(
             unscoped_auth, unscoped_auth_ref, domain_name)
-        if unscoped_auth_ref.project_name:
+        if unscoped_auth_ref.project_name and not recent_project:
             scoped_auth = unscoped_auth
             scoped_auth_ref = unscoped_auth_ref
         else:
