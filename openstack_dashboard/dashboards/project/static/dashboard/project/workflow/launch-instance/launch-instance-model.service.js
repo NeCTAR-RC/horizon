@@ -260,6 +260,7 @@
           novaAPI.getLimits(true).then(onGetNovaLimits, noop),
           securityGroup.query().then(onGetSecurityGroups, noop),
           serviceCatalog.ifTypeEnabled('network').then(getNetworks, noop),
+          launchInstanceDefaults.then(addAllowedBootSources, noop),
           launchInstanceDefaults.then(addImageSourcesIfEnabled, noop),
           launchInstanceDefaults.then(setDefaultValues, noop),
           launchInstanceDefaults.then(addVolumeSourcesIfEnabled, noop)
@@ -662,7 +663,6 @@
             (!image.properties || image.properties.image_type !== 'snapshot');
         }));
       });
-      addAllowedBootSource(model.images, bootSourceTypes.IMAGE, gettext('Image'));
     }
 
     function onGetSnapshots(data) {
@@ -673,27 +673,41 @@
             (image.properties && image.properties.image_type === 'snapshot');
         }));
       });
-      addAllowedBootSource(
-        model.imageSnapshots,
-        bootSourceTypes.INSTANCE_SNAPSHOT,
-        gettext('Instance Snapshot')
-      );
     }
 
     function onGetVolumes(data) {
       model.volumes.length = 0;
       push.apply(model.volumes, data.data.items);
-      addAllowedBootSource(model.volumes, bootSourceTypes.VOLUME, gettext('Volume'));
     }
 
     function onGetVolumeSnapshots(data) {
       model.volumeSnapshots.length = 0;
       push.apply(model.volumeSnapshots, data.data.items);
-      addAllowedBootSource(
-        model.volumeSnapshots,
-        bootSourceTypes.VOLUME_SNAPSHOT,
-        gettext('Volume Snapshot')
-      );
+    }
+
+    function addAllowedBootSources(config) {
+      var allEnabled = !config;
+
+      if (allEnabled || !config.disable_image) {
+        addAllowedBootSource(model.images, bootSourceTypes.IMAGE, gettext('Image'));
+      }
+      if (allEnabled || !config.disable_instance_snapshot) {
+        addAllowedBootSource(
+          model.imageSnapshots,
+          bootSourceTypes.INSTANCE_SNAPSHOT,
+          gettext('Instance Snapshot')
+        );
+      }
+      if (allEnabled || !config.disable_volume) {
+        addAllowedBootSource(model.volumes, bootSourceTypes.VOLUME, gettext('Volume'));
+      }
+      if (allEnabled || !config.disable_volume_snapshot) {
+        addAllowedBootSource(
+          model.volumeSnapshots,
+          bootSourceTypes.VOLUME_SNAPSHOT,
+          gettext('Volume Snapshot')
+        );
+      }
     }
 
     function addAllowedBootSource(rawTypes, type, label) {
