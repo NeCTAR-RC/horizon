@@ -246,6 +246,8 @@
         model.initializing = true;
 
         model.allowedBootSources.length = 0;
+        model.images.length = 0;
+        model.imageSnapshots.length = 0;
 
         var launchInstanceDefaults = settings.getSetting('LAUNCH_INSTANCE_DEFAULTS');
 
@@ -557,22 +559,22 @@
       var enabledSnapshot = allEnabled || !config.disable_instance_snapshot;
 
       if (enabledImage || enabledSnapshot) {
-        var filter = {status: 'active', sort_key: 'name', sort_dir: 'asc'};
-        var filterCommunity = angular.merge({}, filter, {visibility: 'community'})
 
-        var imagePromises = [
-          glanceAPI.getImages(filter),
-          glanceAPI.getImages(filterCommunity)
-        ]
-
-        $q.all(imagePromises).then(function getEnabledImages(data) {
-          if (enabledImage) {
-            onGetImages(data);
-          }
-          if (enabledSnapshot) {
-            onGetSnapshots(data);
-          }
-        });
+        getImages({status: 'active', sort_key: 'name', sort_dir: 'asc'});
+        // TODO(andybotting): community images no longer require a separate
+        // glance api request in stein
+        getImages({status: 'active', sort_key: 'name', sort_dir: 'asc', visibility: 'community'});
+      }
+      function getImages(filter) {
+        return glanceAPI.getImages(filter).then(handleImages);
+      }
+      function handleImages(images) {
+        if (enabledImage) {
+          onGetImages(images);
+        }
+        if (enabledSnapshot) {
+          onGetSnapshots(images);
+        }
       }
     }
 
@@ -656,23 +658,17 @@
     }
 
     function onGetImages(data) {
-      model.images.length = 0;
-      angular.forEach(data, function addData(data) {
-        push.apply(model.images, data.data.items.filter(function (image) {
-          return isBootableImageType(image) &&
-            (!image.properties || image.properties.image_type !== 'snapshot');
-        }));
-      });
+      push.apply(model.images, data.data.items.filter(function (image) {
+        return isBootableImageType(image) &&
+          (!image.properties || image.properties.image_type !== 'snapshot');
+      }));
     }
 
     function onGetSnapshots(data) {
-      model.imageSnapshots.length = 0;
-      angular.forEach(data, function addData(data) {
-        push.apply(model.imageSnapshots, data.data.items.filter(function (image) {
-          return isBootableImageType(image) &&
-            (image.properties && image.properties.image_type === 'snapshot');
-        }));
-      });
+      push.apply(model.imageSnapshots, data.data.items.filter(function (image) {
+        return isBootableImageType(image) &&
+          (image.properties && image.properties.image_type === 'snapshot');
+      }));
     }
 
     function onGetVolumes(data) {
