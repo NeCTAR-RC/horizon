@@ -84,7 +84,7 @@
 
     // override image facades for specific filtering
     ctrl.availableImageFacades = [];
-    ctrl.displayedAvailableImageFacades = [];
+    ctrl.availableImageSnapshotFacades = [];
 
     ctrl.tableHeadCells = [];
     ctrl.tableBodyCells = [];
@@ -101,11 +101,11 @@
       image: {
         available: ctrl.availableImageFacades,
         allocated: selection,
-        displayedAvailable: ctrl.displayedAvailableImageFacades,
+        displayedAvailable: ctrl.availableImageFacades,
         displayedAllocated: selection
       },
       snapshot: {
-        available: $scope.model.imageSnapshots,
+        available: ctrl.availableImageSnapshotFacades,
         allocated: selection,
         displayedAvailable: [],
         displayedAllocated: selection
@@ -357,51 +357,56 @@
     );
 
     // track if any image filters have been applied
-    var noImageFilterApplied = true;
+    var noSearchFilterApplied = true;
 
-    function addImage(image) {
+    function addImage(imageArr, image) {
       // we can get duplicates if a user owns a community image
       // so we must filter any duplicates
       var isDuplicate = false;
-      ctrl.availableImageFacades.forEach(function(existing) {
+      imageArr.forEach(function(existing) {
         if (existing.id == image.id) {
           isDuplicate = true;
         }
       });
       if (!isDuplicate) {
-        ctrl.availableImageFacades.push(image);
+        imageArr.push(image);
       }
     }
 
     function updateImageFacades() {
-      ctrl.availableImageFacades.length = 0;
+      updateImageFacade($scope.model.images, ctrl.availableImageFacades);
+      updateImageFacade($scope.model.imageSnapshots, ctrl.availableImageSnapshotFacades);
+    }
 
-      if (noImageFilterApplied) {
+    function updateImageFacade(source, imageArr) {
+      imageArr.length = 0;
+
+      if (noSearchFilterApplied) {
         userSession.get().then(function(session) {
-          $scope.model.images.forEach(function(image) {
+          source.forEach(function(image) {
             // Mimic standard glance api behaviour and hide community images
             // not owned by user by default, unless some user filtering has
             // been applied
             if (!(image.visibility == 'community' && image.owner != session.project_id)) {
-              addImage(image);
+              addImage(imageArr, image);
             }
           });
         });
       }
       else {
-        $scope.model.images.forEach(function(image) {
-          addImage(image);
+        source.forEach(function(image) {
+          addImage(imageArr, image);
         });
       }
     }
 
     $scope.$on(magicSearchEvents.SEARCH_UPDATED, function(event, data) {
-      noImageFilterApplied = magicSearchService.getQueryObject(data).hasOwnProperty("");
+      noSearchFilterApplied = magicSearchService.getQueryObject(data).hasOwnProperty("");
       updateImageFacades();
     });
 
     $scope.$on(magicSearchEvents.TEXT_SEARCH, function(event, data, filter_keys) {
-      noImageFilterApplied = !data;
+      noSearchFilterApplied = !data;
       updateImageFacades();
     });
 
@@ -433,6 +438,7 @@
             }
           });
         });
+        updateImageFacades();
       }
     );
 
