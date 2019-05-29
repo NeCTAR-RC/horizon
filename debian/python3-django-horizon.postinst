@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "configure" ] ; then
+	update-alternatives --install /usr/share/openstack-dashboard/openstack_dashboard openstack_dashboard \
+        /usr/lib/python3/dist-packages/openstack_dashboard 200
+fi
+
+#DEBHELPER#
+
+exit 0

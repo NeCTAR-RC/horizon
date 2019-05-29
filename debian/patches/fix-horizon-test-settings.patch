@@ -1,0 +1,16 @@
+Description: Set path to enable import from openstack_dashboard.static_settings.
+Author: Corey Bryant <corey.bryant@canonical.com>
+Forwarded: not-needed
+
+--- a/horizon/test/settings.py
++++ b/horizon/test/settings.py
+@@ -18,6 +18,9 @@
+ 
+ import os
+ import socket
++import sys
++
++sys.path.append("/usr/share/openstack-dashboard")
+ 
+ from openstack_dashboard.utils import settings as settings_utils
+ 
