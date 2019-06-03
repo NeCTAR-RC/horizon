@@ -49,8 +49,8 @@
 +# Ubuntu Settings
 +###############################################################################
 +
-+# The default theme if no cookie is present
-+DEFAULT_THEME = 'ubuntu'
++ # The default theme if no cookie is present
++DEFAULT_THEME = 'default'
 +
 +# Default Ubuntu apache configuration uses /horizon as the application root.
 +WEBROOT='/horizon/'
@@ -95,25 +95,3 @@
  LOGOUT_URL = WEBROOT + 'auth/logout/'
  
  POLICY_CHECK_FUNCTION = None
-@@ -69,7 +70,7 @@
- # AVAILABLE_THEMES
- THEME_COLLECTION_DIR = 'themes'
- THEME_COOKIE_NAME = 'theme'
--DEFAULT_THEME = 'default'
-+DEFAULT_THEME = 'ubuntu'
- 
- OPERATION_LOG_ENABLED = False
- OPERATION_LOG_OPTIONS = {
---- a/openstack_dashboard/defaults.py
-+++ b/openstack_dashboard/defaults.py
-@@ -94,6 +94,10 @@
- # 'key', 'label', 'path'
- AVAILABLE_THEMES = [
-     (
-+        'ubuntu',
-+        pgettext_lazy('Ubuntu theme', 'Ubuntu'),
-+        'themes/ubuntu'
-+    ), (
-         'default',
-         pgettext_lazy('Default style theme', 'Default'),
-         'themes/default'
