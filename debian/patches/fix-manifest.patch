@@ -1,0 +1,14 @@
+diff --git a/MANIFEST.in b/MANIFEST.in
+index 1a4326285..6cf2c27d1 100644
+--- a/MANIFEST.in
++++ b/MANIFEST.in
+@@ -1,6 +1,6 @@
+-recursive-include doc *.py *.rst *.scss *.js *.html *.conf *.jpg *.gif *.png
+-recursive-include horizon *.html *.scss *.js *.csv *.template *.tmpl *.mo *.po
+-recursive-include openstack_dashboard *.html *.js *.scss *.mo *.po *.example *.eot *.svg *.ttf *.woff *.png *.ico *.wsgi *.gif *.csv *.template
++recursive-include doc *.py *.rst *.scss *.css *.js *.html *.conf *.jpg *.gif *.png
++recursive-include horizon *.html *.scss *.css *.js *.csv *.template *.tmpl *.mo *.po
++recursive-include openstack_dashboard *.html *.js *.scss *.css *.mo *.po *.example *.eot *.svg *.ttf *.woff *.png *.ico *.wsgi *.gif *.csv *.template
+ recursive-include tools *.py *.sh
+ 
+ include AUTHORS
