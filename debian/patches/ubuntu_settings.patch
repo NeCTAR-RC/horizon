@@ -49,7 +49,7 @@
 +###############################################################################
 +
 + # The default theme if no cookie is present
-+DEFAULT_THEME = 'ubuntu'
++DEFAULT_THEME = 'default'
 +
 +# Default Ubuntu apache configuration uses /horizon as the application root.
 +WEBROOT='/horizon/'
@@ -76,26 +76,6 @@
  STATIC_URL = None
  SELECTABLE_THEMES = None
  INTEGRATION_TESTS_SUPPORT = False
-@@ -325,6 +325,10 @@
- # 'key', 'label', 'path'
- AVAILABLE_THEMES = [
-     (
-+        'ubuntu',
-+        pgettext_lazy('Ubuntu theme', 'Ubuntu'),
-+        'themes/ubuntu'
-+    ), (
-         'default',
-         pgettext_lazy('Default style theme', 'Default'),
-         'themes/default'
-@@ -336,7 +340,7 @@
- ]
- 
- # The default theme if no cookie is present
--DEFAULT_THEME = 'default'
-+DEFAULT_THEME = 'ubuntu'
- 
- # Theme Static Directory
- THEME_COLLECTION_DIR = 'themes'
 @@ -490,8 +494,7 @@
  
      # pylint: disable=ungrouped-imports
