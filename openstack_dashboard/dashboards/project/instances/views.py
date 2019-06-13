@@ -83,6 +83,8 @@ class IndexView(tables.PagedTableMixin, tables.DataTableView):
         try:
             # TODO(gabriel): Handle pagination.
             images = api.glance.image_list_detailed(self.request)[0]
+            images += api.glance.image_list_detailed(
+                self.request, filters={'visibility': 'community'})[0]
             return dict((str(image.id), image) for image in images)
         except Exception:
             exceptions.handle(self.request, ignore=True)
