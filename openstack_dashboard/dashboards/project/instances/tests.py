@@ -23,6 +23,7 @@ import sys
 from unittest import mock
 
 from django.conf import settings
+from django.core.cache import cache
 from django.forms import widgets
 from django import http
 import django.test
@@ -90,6 +91,7 @@ class InstanceTestBase(helpers.ResetImageAPIVersionMixin,
         else:
             self.versioned_images = self.imagesV2
             self.versioned_snapshots = self.snapshotsV2
+        cache.clear()
 
 
 class InstanceTableTestMixin(object):
@@ -441,7 +443,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         }
         servers = self._test_index_with_instance_booted_from_volume(
             image_metadata, expected_image_name=base_image.name)
-        self.assertEqual(base_image.name, servers[0].image.name)
+        self.assertEqual(base_image.name, servers[0].image_name)
 
     def test_index_with_instance_booted_from_volume_no_image_info(self):
         # Borrowed from bug #1834747
