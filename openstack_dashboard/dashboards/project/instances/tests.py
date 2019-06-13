@@ -216,8 +216,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
             self.mock_is_feature_available, expected_feature_count,
             mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -287,8 +286,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.assertMessageCount(res, error=1)
 
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
             sort_dir='desc',
@@ -345,8 +343,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), servers)
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         self.assert_mock_multiple_calls_with_same_arguments(
             self.mock_tenant_absolute_limits, 2,
             mock.call(helpers.IsHttpRequest(), reserved=True))
@@ -401,8 +398,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
             self.mock_is_feature_available, 8,
             mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -476,8 +472,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), servers)
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         self.mock_server_delete.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
 
@@ -512,8 +507,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), servers)
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         self.mock_server_delete.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
 
@@ -547,8 +541,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), servers)
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         self.mock_server_delete.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
 
@@ -580,8 +573,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -620,8 +612,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -660,8 +651,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -701,8 +691,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -736,8 +725,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -771,8 +759,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -806,8 +793,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -849,8 +835,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(
             helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -895,8 +880,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
             sort_dir='desc',
@@ -935,8 +919,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -976,8 +959,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1017,8 +999,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'AdminActions', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1056,8 +1037,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'Shelve', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1096,8 +1076,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'Shelve', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1137,8 +1116,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'Shelve', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1178,8 +1156,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_extension_supported.assert_called_once_with(
             'Shelve', helpers.IsHttpRequest())
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1220,8 +1197,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_is_feature_available.assert_called_once_with(
             helpers.IsHttpRequest(), 'locked_attribute')
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1264,8 +1240,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
             helpers.IsHttpRequest(), 'locked_attribute')
         self.mock_flavor_list.assert_called_once_with(
             helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1306,8 +1281,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
             helpers.IsHttpRequest(), 'locked_attribute')
         self.mock_flavor_list.assert_called_once_with(
             helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1348,8 +1322,7 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         self.mock_is_feature_available.assert_called_once_with(
             helpers.IsHttpRequest(), 'locked_attribute')
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -1875,8 +1848,7 @@ class InstanceTests(InstanceTestBase):
             self.mock_is_feature_available, 8,
             mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -4171,8 +4143,7 @@ class InstanceLaunchInstanceTests(InstanceTestBase,
             self.mock_is_feature_available, 8,
             mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -4236,8 +4207,7 @@ class InstanceLaunchInstanceTests(InstanceTestBase,
             self.mock_is_feature_available, 8,
             mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -4419,8 +4389,7 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
             self.mock_is_feature_available, 8,
             mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         search_opts = {'marker': None, 'paginate': True}
         self.mock_server_list_paged.assert_called_once_with(
             helpers.IsHttpRequest(),
@@ -5019,10 +4988,14 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
         self.assert_mock_multiple_calls_with_same_arguments(
             self.mock_flavor_list, 2,
             mock.call(helpers.IsHttpRequest()))
-        self.assert_mock_multiple_calls_with_same_arguments(
-            self.mock_image_list_detailed, 2,
-            mock.call(helpers.IsHttpRequest()))
-
+        self.mock_image_list_detailed.assert_has_calls([
+            mock.call(helpers.IsHttpRequest()),
+            mock.call(helpers.IsHttpRequest(), filters={
+                'visibility': 'community'}),
+            mock.call(helpers.IsHttpRequest()),
+            mock.call(helpers.IsHttpRequest(), filters={
+                'visibility': 'community'}),
+        ])
         self.mock_server_list_paged.assert_has_calls([
             mock.call(helpers.IsHttpRequest(),
                       sort_dir='desc',
@@ -5090,8 +5063,7 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), servers[page_size:])
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         self.mock_server_delete.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
 
@@ -5205,8 +5177,7 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), servers)
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
-        self.mock_image_list_detailed.assert_called_once_with(
-            helpers.IsHttpRequest())
+        self.mock_image_list_detailed.assert_called()
         self.mock_server_unrescue.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
 
