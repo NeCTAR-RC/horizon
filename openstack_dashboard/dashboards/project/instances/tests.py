@@ -4990,11 +4990,7 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
             mock.call(helpers.IsHttpRequest()))
         self.mock_image_list_detailed.assert_has_calls([
             mock.call(helpers.IsHttpRequest()),
-            mock.call(helpers.IsHttpRequest(), filters={
-                'visibility': 'community'}),
             mock.call(helpers.IsHttpRequest()),
-            mock.call(helpers.IsHttpRequest(), filters={
-                'visibility': 'community'}),
         ])
         self.mock_server_list_paged.assert_has_calls([
             mock.call(helpers.IsHttpRequest(),
