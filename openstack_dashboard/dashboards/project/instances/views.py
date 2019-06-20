@@ -23,6 +23,7 @@ from collections import OrderedDict
 import logging
 
 from django.conf import settings
+from django.core.cache import cache
 from django import http
 from django import shortcuts
 from django.urls import reverse
@@ -58,6 +59,9 @@ from openstack_dashboard.views import get_url_with_pagination
 
 LOG = logging.getLogger(__name__)
 
+CACHE_COMMUNITY_IMAGE_LIST_TIMEOUT = getattr(
+    settings, 'CACHE_COMMUNITY_IMAGE_LIST_TIMEOUT', 3600)
+
 
 class IndexView(tables.PagedTableMixin, tables.DataTableView):
     table_class = project_tables.InstancesTable
@@ -82,10 +86,20 @@ class IndexView(tables.PagedTableMixin, tables.DataTableView):
         # Gather our images to correlate our instances to them
         try:
             # TODO(gabriel): Handle pagination.
-            images = api.glance.image_list_detailed(self.request)[0]
-            images += api.glance.image_list_detailed(
-                self.request, filters={'visibility': 'community'})[0]
-            return dict((str(image.id), image) for image in images)
+            image_list = api.glance.image_list_detailed(self.request)[0]
+            images = dict((str(image.id), image.name) for image in image_list)
+
+            # Use cache for community image listing
+            community_images = cache.get('community_images')
+            if community_images is None:
+                community_images = {}
+                for image in api.glance.image_list_detailed(
+                        self.request, filters={'visibility': 'community'})[0]:
+                    community_images[str(image.id)] = image.name
+                cache.add('community_images', community_images,
+                          CACHE_COMMUNITY_IMAGE_LIST_TIMEOUT)
+            images.update(community_images)
+            return images
         except Exception:
             exceptions.handle(self.request, ignore=True)
             return {}
@@ -162,7 +176,7 @@ class IndexView(tables.PagedTableMixin, tables.DataTableView):
                 if isinstance(instance.image, dict):
                     image_id = instance.image.get('id')
                     if image_id in image_dict:
-                        instance.image = image_dict[image_id]
+                        instance.image['name'] = image_dict[image_id]
                     # In case image not found in image_dict, set name to empty
                     # to avoid fallback API call to Glance in api/nova.py
                     # until the call is deprecated in api itself
