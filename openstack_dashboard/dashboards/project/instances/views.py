@@ -150,6 +150,43 @@ class IndexView(tables.PagedTableMixin, tables.DataTableView):
             exceptions.handle(self.request, ignore=True)
             return {}
 
+    def _get_image_name(self, instance, image_dict):
+        # In case image not found in image_dict, set name to empty
+        # to avoid fallback API call to Glance in api/nova.py
+        # until the call is deprecated in api itself
+        image_name = _("-")
+        image_id = instance.image.get('id')
+        if image_id in image_dict:
+            image_name = image_dict[image_id]
+        return image_name
+
+    def _get_volume_image_data(self, instance, volume_dict, image_dict):
+        image_data = None
+        instance_volumes = [
+            attachment
+            for volume in volume_dict.values()
+            for attachment in volume.attachments
+            if attachment['server_id'] == instance.id
+        ]
+        # Sorting attached volumes by device name (eg '/dev/sda')
+        instance_volumes.sort(key=lambda attach: attach['device'])
+        # While instance from volume is being created,
+        # it does not have volumes
+        if instance_volumes:
+            # Getting volume object, which is as attached
+            # as the first device
+            boot_volume = volume_dict[instance_volumes[0]['id']]
+            if hasattr(boot_volume, "volume_image_metadata"):
+                image_id = \
+                    boot_volume.volume_image_metadata['image_id']
+                # If the image is hidden, it won't be found in the
+                # image dict, so leave name out to resolve it with
+                # the fallback API call to Glance in api/nova.py
+                image_data = {'id': image_id}
+                if 'name' in image_dict:
+                    image_data['name'] = image_dict['name']
+        return image_data
+
     def get_data(self):
         marker, sort_dir = self._get_marker()
         search_opts = self.get_filters({'marker': marker, 'paginate': True})
@@ -172,36 +209,14 @@ class IndexView(tables.PagedTableMixin, tables.DataTableView):
         # Loop through instances to get flavor info.
         for instance in instances:
             if hasattr(instance, 'image'):
-                # Instance from image returns dict
+                # Use the image information if we have it. If not, then
+                # we're probably booting from a volume.
                 if isinstance(instance.image, dict):
-                    image_id = instance.image.get('id')
-                    if image_id in image_dict:
-                        instance.image['name'] = image_dict[image_id]
-                    # In case image not found in image_dict, set name to empty
-                    # to avoid fallback API call to Glance in api/nova.py
-                    # until the call is deprecated in api itself
-                    else:
-                        instance.image['name'] = _("-")
-                # Otherwise trying to get image from volume metadata
+                    instance.image['name'] = self._get_image_name(
+                        instance, image_dict)
                 else:
-                    instance_volumes = [
-                        attachment
-                        for volume in volume_dict.values()
-                        for attachment in volume.attachments
-                        if attachment['server_id'] == instance.id
-                    ]
-                    # Sorting attached volumes by device name (eg '/dev/sda')
-                    instance_volumes.sort(key=lambda attach: attach['device'])
-                    # While instance from volume is being created,
-                    # it does not have volumes
-                    if instance_volumes:
-                        # Getting volume object, which is as attached
-                        # as the first device
-                        boot_volume = volume_dict[instance_volumes[0]['id']]
-                        if hasattr(boot_volume, "volume_image_metadata"):
-                            instance.image = image_dict[
-                                boot_volume.volume_image_metadata['image_id']
-                            ]
+                    instance.image = self._get_volume_image_data(
+                        instance, volume_dict, image_dict)
 
             flavor_id = instance.flavor["id"]
             if flavor_id in flavor_dict:
