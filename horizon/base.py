@@ -770,7 +770,8 @@ class Site(Registry, HorizonComponent):
                 dashboards.append(dashboard)
                 registered.pop(dashboard.__class__)
             if registered:
-                extra = sorted(registered.values())
+                extra = sorted(registered.values(),
+                               key=(lambda d: d.name))
                 dashboards.extend(extra)
             return dashboards
         else:
