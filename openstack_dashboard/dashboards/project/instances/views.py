@@ -177,14 +177,14 @@ class IndexView(tables.PagedTableMixin, tables.DataTableView):
             # as the first device
             boot_volume = volume_dict[instance_volumes[0]['id']]
             if hasattr(boot_volume, "volume_image_metadata"):
-                image_id = \
-                    boot_volume.volume_image_metadata['image_id']
-                # If the image is hidden, it won't be found in the
-                # image dict, so leave name out to resolve it with
-                # the fallback API call to Glance in api/nova.py
-                image_data = {'id': image_id}
-                if 'name' in image_dict:
-                    image_data['name'] = image_dict['name']
+                if 'image_id' in boot_volume.volume_image_metadata:
+                    image_id = boot_volume.volume_image_metadata['image_id']
+                    # If the image is hidden, it won't be found in the
+                    # image dict, so leave name out to resolve it with
+                    # the fallback API call to Glance in api/nova.py
+                    image_data = {'id': image_id}
+                    if 'name' in image_dict:
+                        image_data['name'] = image_dict['name']
         return image_data
 
     def get_data(self):
