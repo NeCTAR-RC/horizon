@@ -13,6 +13,7 @@
 # limitations under the License.
 """API for the glance service."""
 
+from django.conf import settings
 from django import forms
 from django.views.decorators.csrf import csrf_exempt
 from django.views import generic
@@ -98,7 +99,13 @@ class ImageProperties(generic.View):
     @rest_utils.ajax()
     def get(self, request, image_id):
         """Get custom properties of specific image."""
-        return api.glance.image_get(request, image_id).properties
+        reserved_properties = getattr(settings,
+                                      'IMAGE_RESERVED_CUSTOM_PROPERTIES', [])
+        properties = api.glance.image_get(request, image_id).properties
+        properties = {k: v
+                      for k, v in properties.items()
+                      if k not in reserved_properties}
+        return properties
 
     @rest_utils.ajax(data_required=True)
     def patch(self, request, image_id):
