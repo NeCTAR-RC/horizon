@@ -70,7 +70,7 @@ def availability_zones(request):
     if not zone_list:
         zone_list.insert(0, ("", _("No availability zones found")))
     elif len(zone_list) > 1:
-        zone_list.insert(0, ("", _("Any Availability Zone")))
+        zone_list.insert(0, ("", _("Choose an availability zone")))
 
     return zone_list
 
@@ -119,7 +119,7 @@ class CreateForm(forms.SelfHandlingForm):
     size = forms.IntegerField(min_value=1, initial=1, label=_("Size (GiB)"))
     availability_zone = forms.ChoiceField(
         label=_("Availability Zone"),
-        required=False,
+        required=True,
         widget=forms.ThemableSelectWidget(
             attrs={'class': 'switched',
                    'data-switch-on': 'source',
