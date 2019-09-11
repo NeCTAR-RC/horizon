@@ -63,6 +63,7 @@ def availability_zones(request):
             zones = api.cinder.availability_zone_list(request)
             zone_list = [(zone.zoneName, zone.zoneName)
                          for zone in zones if zone.zoneState['available']]
+            zone_list.insert(0, ("test1", "test1"))
             zone_list.sort()
         except Exception:
             exceptions.handle(request, _('Unable to retrieve availability '
@@ -70,7 +71,7 @@ def availability_zones(request):
     if not zone_list:
         zone_list.insert(0, ("", _("No availability zones found")))
     elif len(zone_list) > 1:
-        zone_list.insert(0, ("", _("Any Availability Zone")))
+        zone_list.insert(0, ("", _("Choose an availability zone")))
 
     return zone_list
 
@@ -325,6 +326,10 @@ class CreateForm(forms.SelfHandlingForm):
                 not cleaned_data.get('volume_source')):
             msg = _('Volume source must be specified')
             self._errors['volume_source'] = self.error_class([msg])
+        elif (source_type == 'no_source_type' and
+                not cleaned_data.get('availability_zone')):
+            msg = _('Availability zone must be specified')
+            self._errors['availability_zone'] = self.error_class([msg])
         return cleaned_data
 
     def get_volumes(self, request):
