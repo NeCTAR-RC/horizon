@@ -56,13 +56,26 @@ def cinder_az_supported(request):
         return False
 
 
+def get_quota_zones(request):
+    available_zones = []
+    tenant_id = request.user.tenant_id
+    quotas = cinder.tenant_quota_get(request, tenant_id)
+    for q in quotas:
+        if q.name.startswith('volumes_') and q.limit != 0:
+            zone_name = q.name.split('_')[-1]
+            available_zones.append(zone_name)
+    return available_zones
+
+
 def availability_zones(request):
     zone_list = []
     if cinder_az_supported(request):
         try:
             zones = api.cinder.availability_zone_list(request)
+            quota_zones = get_quota_zones(request)
             zone_list = [(zone.zoneName, zone.zoneName)
-                         for zone in zones if zone.zoneState['available']]
+                         for zone in zones if zone.zoneState['available'] and
+                         zone.zoneName.split('-')[0] in quota_zones]
             zone_list.sort()
         except Exception:
             exceptions.handle(request, _('Unable to retrieve availability '
@@ -70,7 +83,7 @@ def availability_zones(request):
     if not zone_list:
         zone_list.insert(0, ("", _("No availability zones found")))
     elif len(zone_list) > 1:
-        zone_list.insert(0, ("", _("Choose an availability zone")))
+        zone_list.insert(0, ("", _("Any Availability Zone")))
 
     return zone_list
 
