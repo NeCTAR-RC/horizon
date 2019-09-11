@@ -367,6 +367,7 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
                     'method': u'CreateForm',
                     'size': 50,
                     'type': '',
+                    'availability_zone': 'nova',
                     'volume_source_type': 'no_source_type',
                     'snapshot_source': self.cinder_volume_snapshots.first().id,
                     'image_source': self.images.first().id}
@@ -412,8 +413,8 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
         self.mock_volume_create.assert_called_once_with(
             test.IsHttpRequest(), formData['size'], formData['name'],
             formData['description'], '', metadata={}, snapshot_id=None,
-            group_id=None, image_id=None, availability_zone=None,
-            source_volid=None)
+            availability_zone=formData['availability_zone'],
+            group_id=None, image_id=None, source_volid=None)
         self.mock_group_list.assert_called_with(test.IsHttpRequest())
 
     @test.create_mocks({
