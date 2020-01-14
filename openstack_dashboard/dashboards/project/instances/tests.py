@@ -2233,32 +2233,32 @@ class InstanceLaunchInstanceTests(InstanceTestBase,
         if custom_flavor_sort == 'id':
             # Reverse sorted by id
             sorted_flavors = (
-                ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'm1.metadata'),
-                ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'm1.secret'),
-                ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'm1.massive'),
-                ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'm1.tiny'),
+                ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'm3.metadata'),
+                ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'm3.secret'),
+                ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'm3.massive'),
+                ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'm3.tiny'),
             )
         elif custom_flavor_sort == 'name':
             sorted_flavors = (
-                ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'm1.massive'),
-                ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'm1.metadata'),
-                ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'm1.secret'),
-                ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'm1.tiny'),
+                ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'm3.massive'),
+                ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'm3.metadata'),
+                ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'm3.secret'),
+                ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'm3.tiny'),
             )
         elif custom_flavor_sort == helpers.my_custom_sort:
             sorted_flavors = (
-                ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'm1.secret'),
-                ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'm1.tiny'),
-                ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'm1.massive'),
-                ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'm1.metadata'),
+                ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'm3.secret'),
+                ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'm3.tiny'),
+                ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'm3.massive'),
+                ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'm3.metadata'),
             )
         else:
             # Default - sorted by RAM
             sorted_flavors = (
-                ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'm1.tiny'),
-                ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'm1.massive'),
-                ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'm1.secret'),
-                ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'm1.metadata'),
+                ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'm3.tiny'),
+                ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'm3.massive'),
+                ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'm3.secret'),
+                ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'm3.metadata'),
             )
 
         select_options = ''.join([
@@ -4065,7 +4065,7 @@ class InstanceLaunchInstanceTests(InstanceTestBase,
                            quotas: ('tenant_quota_usages',)})
     def _test_launch_form_instance_volume_size(self, image, volume_size, msg,
                                                avail_volumes=None):
-        flavor = self.flavors.get(name='m1.massive')
+        flavor = self.flavors.get(name='m3.massive')
         keypair = self.keypairs.first()
         server = self.servers.first()
         sec_group = self.security_groups.first()
@@ -4332,7 +4332,7 @@ class InstanceLaunchInstanceTests(InstanceTestBase,
                                     'volume_snapshot_list',),
                            quotas: ('tenant_quota_usages',)})
     def test_launch_with_empty_device_name_allowed(self):
-        flavor = self.flavors.get(name='m1.massive')
+        flavor = self.flavors.get(name='m3.massive')
         image = self.versioned_images.first()
         keypair = self.keypairs.first()
         server = self.servers.first()

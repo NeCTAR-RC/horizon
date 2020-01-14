@@ -224,7 +224,7 @@ def data(TEST):
     # Flavors
     flavor_1 = flavors.Flavor(flavors.FlavorManager(None),
                               {'id': "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-                               'name': 'm1.tiny',
+                               'name': 'm3.tiny',
                                'vcpus': 1,
                                'disk': 0,
                                'ram': 512,
@@ -235,7 +235,7 @@ def data(TEST):
                                'OS-FLV-EXT-DATA:ephemeral': 0})
     flavor_2 = flavors.Flavor(flavors.FlavorManager(None),
                               {'id': "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-                               'name': 'm1.massive',
+                               'name': 'm3.massive',
                                'vcpus': 1000,
                                'disk': 1024,
                                'ram': 10000,
@@ -246,7 +246,7 @@ def data(TEST):
                                'OS-FLV-EXT-DATA:ephemeral': 2048})
     flavor_3 = flavors.Flavor(flavors.FlavorManager(None),
                               {'id': "dddddddd-dddd-dddd-dddd-dddddddddddd",
-                               'name': 'm1.secret',
+                               'name': 'm3.secret',
                                'vcpus': 1000,
                                'disk': 1024,
                                'ram': 10000,
@@ -257,7 +257,7 @@ def data(TEST):
                                'OS-FLV-EXT-DATA:ephemeral': 2048})
     flavor_4 = flavors.Flavor(flavors.FlavorManager(None),
                               {'id': "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
-                               'name': 'm1.metadata',
+                               'name': 'm3.metadata',
                                'vcpus': 1000,
                                'disk': 1024,
                                'ram': 10000,

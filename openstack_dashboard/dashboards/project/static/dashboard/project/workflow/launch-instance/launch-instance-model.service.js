@@ -386,7 +386,12 @@
 
     function onGetFlavors(data) {
       model.flavors.length = 0;
-      push.apply(model.flavors, data.data.items);
+      //TODO(andybotting) Remove filtering after m1/m2 go private
+      push.apply(model.flavors,
+        data.data.items.filter(function (flavor) {
+          return (! /^(m[1-2]\.\w+)$/.test(flavor.name));
+        })
+      );
     }
 
     function setFinalSpecFlavor(finalSpec) {
