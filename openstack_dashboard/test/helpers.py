@@ -529,10 +529,10 @@ class SeleniumAdminTestCase(SeleniumTestCase):
 
 def my_custom_sort(flavor):
     sort_order = {
-        'm1.secret': 0,
-        'm1.tiny': 1,
-        'm1.massive': 2,
-        'm1.metadata': 3,
+        'm3.secret': 0,
+        'm3.tiny': 1,
+        'm3.massive': 2,
+        'm3.metadata': 3,
     }
     return sort_order[flavor.name]
 
