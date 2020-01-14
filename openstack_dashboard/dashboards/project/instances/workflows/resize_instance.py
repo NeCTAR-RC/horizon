@@ -53,6 +53,9 @@ class SetFlavorChoiceAction(workflows.Action):
         # Remove current flavor from the list of flavor choices
         flavors = [flavor for flavor in flavors if flavor.id != old_flavor_id]
 
+        # TODO(andybotting) Remove filtering once m1/m2 flavors go private
+        flavors = [f for f in flavors if not f.name.startswith(('m1', 'm2'))]
+
         if flavors:
             if len(flavors) > 1:
                 flavors = instance_utils.sort_flavor_list(request, flavors)
