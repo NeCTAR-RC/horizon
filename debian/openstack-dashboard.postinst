@@ -1,0 +1,59 @@
+#!/bin/sh
+# vim: set ts=2 et:
+
+set -e
+
+CONF="openstack-dashboard.conf"
+
+if [ "$1" = "configure" ]; then
+
+  if ! getent group horizon > /dev/null 2>&1 ; then
+    addgroup --system horizon >/dev/null
+  fi
+
+  if ! getent passwd horizon > /dev/null 2>&1 ; then
+    adduser --system --home /var/lib/openstack-dashboard --ingroup horizon \
+            --no-create-home --shell /bin/false horizon
+  fi
+
+  (
+    cd /usr/share/openstack-dashboard
+    echo "Collecting and compressing static assets..."
+    rm -rf /var/lib/openstack-dashboard/static/ || :
+    python3 manage.py collectstatic --noinput 2>&1 > /dev/null
+    python3 manage.py compress --force 2>&1 > /dev/null
+  )
+
+  invoke-rc.d memcached restart > /dev/null 2>&1 || true
+
+  if [ -e /var/lib/openstack-dashboard ] ; then
+    chown -R horizon:horizon /var/lib/openstack-dashboard
+  fi
+
+  if [ -d /etc/openstack-dashboard/ ] ; then
+    chown root:horizon /etc/openstack-dashboard/
+    chmod 0750 /etc/openstack-dashboard/
+  fi
+
+  if [ -f /etc/openstack-dashboard/local_settings.py ]; then
+    chown root:horizon /etc/openstack-dashboard/local_settings.py
+    chmod 0640 /etc/openstack-dashboard/local_settings.py
+  fi
+
+  if [ -d /var/lib/openstack-dashboard ] ; then
+      chmod 755 /var/lib/openstack-dashboard
+  fi
+
+  if [ -e /var/lib/openstack-dashboard/secret_key ] ; then
+      chmod 600 /var/lib/openstack-dashboard/secret_key
+  fi
+
+  # apache 2.4
+  if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+      . /usr/share/apache2/apache2-maintscript-helper
+  fi
+  apache2_invoke enconf $CONF || exit $?
+
+fi
+
+#DEBHELPER#
