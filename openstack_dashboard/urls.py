@@ -79,7 +79,10 @@ if getattr(settings, 'REST_VIEW_SETS', ()):
         router = routers.DefaultRouter()
         for name, class_str, base_name in settings.REST_VIEW_SETS:
             klass = importutils.import_class(class_str)
-            router.register(name, klass, base_name=base_name)
+            try:
+                router.register(name, klass, basename=base_name)
+            except TypeError:
+                router.register(name, klass, base_name=base_name)
 
         urlpatterns.append(url(r'^rest_api/', include(router.urls)))
     except ImportError:
