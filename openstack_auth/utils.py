@@ -20,6 +20,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import models
 from django.utils import timezone
+from keystoneauth1.access import access
 from keystoneauth1 import exceptions as keystone_exceptions
 from keystoneauth1.identity import v3 as v3_auth
 from keystoneauth1 import session
@@ -27,6 +28,7 @@ from keystoneauth1 import token_endpoint
 from keystoneclient.v3 import client as client_v3
 
 from openstack_auth import defaults
+from openstack_auth import exceptions
 
 LOG = logging.getLogger(__name__)
 
@@ -346,6 +348,19 @@ def get_system_access(user_id, auth_url, token, is_federated):
     except keystone_exceptions.ClientException:
         return False
     return True
+
+
+def validate_token(token, remote_addr):
+    auth_url = settings.OPENSTACK_KEYSTONE_URL
+    auth = token_endpoint.Token(endpoint=auth_url, token=token)
+    sess = get_session(auth=auth, original_ip=remote_addr)
+    client = get_keystone_client().Client(session=sess, debug=settings.DEBUG)
+
+    try:
+        token_data = client.tokens.get_token_data(token)
+        return access.AccessInfoV3(token_data, token)
+    except keystone_exceptions.ClientException:
+        raise exceptions.KeystoneAuthException()
 
 
 def default_services_region(service_catalog, request=None,
