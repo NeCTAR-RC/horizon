@@ -95,7 +95,7 @@ class KeystoneBackend(object):
                         'configuration error that should be addressed.')
             raise exceptions.KeystoneNoBackendException(msg)
 
-    def authenticate(self, request, auth_url=None, **kwargs):
+    def authenticate(self, request, auth_url=None, auth_ref=None, **kwargs):
         """Authenticates a user via the Keystone Identity API."""
         LOG.debug('Beginning user authentication')
 
@@ -110,28 +110,34 @@ class KeystoneBackend(object):
                         "authentication.")
 
         plugin, unscoped_auth = self._get_auth_backend(auth_url, **kwargs)
+        domain_auth_ref = None
 
-        # the recent project id a user might have set in a cookie
-        recent_project = None
-        if request:
-            # Grab recent_project found in the cookie, try to scope
-            # to the last project used.
-            recent_project = request.COOKIES.get('recent_project')
-        unscoped_auth_ref = plugin.get_access_info(unscoped_auth)
-
-        # Check expiry for our unscoped auth ref.
-        self._check_auth_expiry(unscoped_auth_ref)
-
-        domain_name = kwargs.get('user_domain_name', None)
-        domain_auth, domain_auth_ref = plugin.get_domain_scoped_auth(
-            unscoped_auth, unscoped_auth_ref, domain_name)
-        if unscoped_auth_ref.project_name and not recent_project:
+        if auth_ref:
+            unscoped_auth_ref = auth_ref
             scoped_auth = unscoped_auth
             scoped_auth_ref = unscoped_auth_ref
         else:
-            scoped_auth, scoped_auth_ref = plugin.get_project_scoped_auth(
-                unscoped_auth, unscoped_auth_ref,
-                recent_project=recent_project)
+            # the recent project id a user might have set in a cookie
+            recent_project = None
+            if request:
+                # Grab recent_project found in the cookie, try to scope
+                # to the last project used.
+                recent_project = request.COOKIES.get('recent_project')
+            unscoped_auth_ref = plugin.get_access_info(unscoped_auth)
+
+            # Check expiry for our unscoped auth ref.
+            self._check_auth_expiry(unscoped_auth_ref)
+
+            domain_name = kwargs.get('user_domain_name', None)
+            domain_auth, domain_auth_ref = plugin.get_domain_scoped_auth(
+                unscoped_auth, unscoped_auth_ref, domain_name)
+            if unscoped_auth_ref.project_name and not recent_project:
+                scoped_auth = unscoped_auth
+                scoped_auth_ref = unscoped_auth_ref
+            else:
+                scoped_auth, scoped_auth_ref = plugin.get_project_scoped_auth(
+                    unscoped_auth, unscoped_auth_ref,
+                    recent_project=recent_project)
 
         # Abort if there are no projects for this user and a valid domain
         # token has not been obtained
