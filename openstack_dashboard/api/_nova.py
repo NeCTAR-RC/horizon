@@ -16,6 +16,8 @@ which need to be imported outside of openstack_dashboard.api.nova
 (like cinder.py) to avoid cyclic imports.
 """
 
+import collections
+
 from django.conf import settings
 from glanceclient import exc as glance_exceptions
 from novaclient import api_versions
@@ -132,6 +134,11 @@ class Server(base.APIResourceWrapper):
     def user_data(self):
         return getattr(self, 'OS-EXT-SRV-ATTR:user_data', "")
 
+    @property
+    def flavor(self):
+        flavor = getattr(self._apiresource, 'flavor')
+        return collections.namedtuple('Flavor', flavor.keys())(**flavor)
+
 
 @memoized.memoized
 def get_microversion(request, features):
@@ -195,5 +202,7 @@ def get_novaclient_with_instance_desc(request):
 
 @profiler.trace
 def server_get(request, instance_id):
-    return Server(get_novaclient_with_instance_desc(request).servers.get(
-        instance_id), request)
+    microversion = get_microversion(request, "instance_description")
+
+    client = novaclient(request, version=microversion)
+    return Server(client.servers.get(instance_id), request)
