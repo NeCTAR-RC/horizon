@@ -326,7 +326,6 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
     @helpers.create_mocks({
         api.nova: ('flavor_list',
                    'server_list_paged',
-                   'flavor_get',
                    'tenant_absolute_limits',
                    'extension_supported',
                    'is_feature_available',),
@@ -401,15 +400,6 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
         volume_server = servers[0]
         # Override the server is booted from a volume.
         volume_server.image = ""
-        # NOTE(amotoki): openstack_dashboard.api.nova.server_list should return
-        # a list of api.nova.Server instances, but the current test code
-        # returns a list of novaclient.v2.servers.Server instances.
-        # This leads to a situation that image_name property of api.nova.Server
-        # is not handled in our test case properly.
-        # TODO(amotoki): Refactor test_data/nova_data.py to use api.nova.Server
-        # (horizon API wrapper class).
-        volume_server = api.nova.Server(volume_server, self.request)
-        servers[0] = volume_server
 
         volumes = self.cinder_volumes.list()
         # 3rd volume in the list is attached to server with ID 1.
@@ -1428,7 +1418,6 @@ class InstanceDetailTests(InstanceTestBase):
         api.nova: (
             "server_get",
             "instance_volumes_list",
-            "flavor_get",
             "extension_supported",
             'is_feature_available',
         ),
@@ -1438,11 +1427,11 @@ class InstanceDetailTests(InstanceTestBase):
             "floating_ip_supported"
         ),
         api.network: ('servers_update_addresses',),
+        api.glance: ('image_get',),
     })
     def _get_instance_details(self, server, qs=None,
                               flavor_return=None, volumes_return=None,
-                              security_groups_return=None,
-                              flavor_exception=False):
+                              security_groups_return=None):
 
         url = reverse('horizon:project:instances:detail', args=[server.id])
         if qs:
@@ -1458,12 +1447,9 @@ class InstanceDetailTests(InstanceTestBase):
             security_groups_return = self.security_groups.list()
 
         self.mock_server_get.return_value = server
+        self.mock_image_get.return_value = self.images.first()
         self.mock_servers_update_addresses.return_value = None
         self.mock_instance_volumes_list.return_value = volumes_return
-        if flavor_exception:
-            self.mock_flavor_get.side_effect = self.exceptions.nova
-        else:
-            self.mock_flavor_get.return_value = flavor_return
         self.mock_server_security_groups.return_value = security_groups_return
         self.mock_floating_ip_simple_associate_supported.return_value = True
         self.mock_floating_ip_supported.return_value = True
@@ -1475,12 +1461,12 @@ class InstanceDetailTests(InstanceTestBase):
 
         self.mock_server_get.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
+        self.mock_image_get.assert_called_once_with(
+            helpers.IsHttpRequest(), server.image["id"])
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), mock.ANY)
         self.mock_instance_volumes_list.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
-        self.mock_flavor_get.assert_called_once_with(
-            helpers.IsHttpRequest(), server.flavor['id'])
         self.mock_server_security_groups.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
         self.mock_floating_ip_simple_associate_supported \
@@ -1654,17 +1640,6 @@ class InstanceDetailTests(InstanceTestBase):
 
         self.assertEqual(403, res.status_code)
         self.assertEqual(0, self.mock_server_get.call_count)
-
-    @helpers.create_mocks({api.neutron: ['is_extension_supported']})
-    def test_instance_details_flavor_not_found(self):
-        server = self.servers.first()
-        self.mock_is_extension_supported.return_value = False
-        res = self._get_instance_details(server, flavor_exception=True)
-        self.assertTemplateUsed(res,
-                                'project/instances/_detail_overview.html')
-        self.assertContains(res, "Not available")
-        self.mock_is_extension_supported.assert_called_once_with(
-            helpers.IsHttpRequest(), 'mac-learning')
 
     @helpers.create_mocks({api.nova: ['server_console_output'],
                            api.neutron: ['is_extension_supported']})
@@ -4629,7 +4604,7 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
 
         option = '<option value="%s">%s</option>'
         for flavor in self.flavors.list():
-            if flavor.id == server.flavor['id']:
+            if flavor.name == server.flavor.original_name:
                 self.assertNotContains(res, option % (flavor.id, flavor.name))
             else:
                 self.assertContains(res, option % (flavor.id, flavor.name))
@@ -4676,38 +4651,6 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
                                                      server.id)
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
 
-    @helpers.create_mocks({api.nova: ('server_get',
-                                      'flavor_list',
-                                      'flavor_get',
-                                      'tenant_absolute_limits',
-                                      'is_feature_available',
-                                      'extension_supported')})
-    def test_instance_resize_get_current_flavor_not_found(self):
-        server = self.servers.first()
-        self.mock_server_get.return_value = server
-        self.mock_flavor_list.return_value = []
-        self.mock_flavor_get.side_effect = self.exceptions.nova
-        self.mock_tenant_absolute_limits.return_value = self.limits['absolute']
-        self._mock_extension_supported({'DiskConfig': True,
-                                        'ServerGroups': False})
-
-        url = reverse('horizon:project:instances:resize', args=[server.id])
-        res = self.client.get(url)
-
-        self.assertTemplateUsed(res, views.WorkflowView.template_name)
-
-        self.mock_server_get.assert_called_once_with(helpers.IsHttpRequest(),
-                                                     server.id)
-        self.assert_mock_multiple_calls_with_same_arguments(
-            self.mock_flavor_list, 2,
-            mock.call(helpers.IsHttpRequest()))
-        self.mock_flavor_get.assert_called_once_with(
-            helpers.IsHttpRequest(), server.flavor['id'])
-        self.mock_tenant_absolute_limits.assert_called_once_with(
-            helpers.IsHttpRequest(), reserved=True)
-        self._check_extension_supported({'DiskConfig': 1,
-                                         'ServerGroups': 1})
-
     def _instance_resize_post(self, server_id, flavor_id, disk_config):
         formData = {'flavor': flavor_id,
                     'default_role': 'member',
@@ -4718,7 +4661,7 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
 
     instance_resize_post_stubs = {
         api.nova: ('server_get', 'server_resize',
-                   'flavor_list', 'flavor_get',
+                   'flavor_list',
                    'is_feature_available',
                    'extension_supported')}
 
@@ -4726,7 +4669,7 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
     def test_instance_resize_post(self):
         server = self.servers.first()
         flavors = [flavor for flavor in self.flavors.list()
-                   if flavor.id != server.flavor['id']]
+                   if flavor.name != server.flavor.original_name]
         flavor = flavors[0]
 
         self.mock_server_get.return_value = server
@@ -4751,7 +4694,7 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
     def test_instance_resize_post_api_exception(self):
         server = self.servers.first()
         flavors = [flavor for flavor in self.flavors.list()
-                   if flavor.id != server.flavor['id']]
+                   if flavor.name != server.flavor.original_name]
         flavor = flavors[0]
 
         self.mock_server_get.return_value = server
@@ -5272,7 +5215,6 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
 
 class InstanceAjaxTests(helpers.TestCase, InstanceTestHelperMixin):
     @helpers.create_mocks({api.nova: ("server_get",
-                                      "flavor_get",
                                       "extension_supported",
                                       "is_feature_available",
                                       "tenant_absolute_limits"),
@@ -5280,15 +5222,11 @@ class InstanceAjaxTests(helpers.TestCase, InstanceTestHelperMixin):
     def test_row_update(self):
         server = self.servers.first()
         instance_id = server.id
-        flavor_id = server.flavor["id"]
-        flavors = self.flavors.list()
-        full_flavors = collections.OrderedDict([(f.id, f) for f in flavors])
 
         self._mock_extension_supported({'AdminActions': True,
                                         'Shelve': True})
         self.mock_is_feature_available.return_value = True
         self.mock_server_get.return_value = server
-        self.mock_flavor_get.return_value = full_flavors[flavor_id]
         self.mock_servers_update_addresses.return_value = None
         self.mock_tenant_absolute_limits.return_value = self.limits['absolute']
 
@@ -5307,15 +5245,12 @@ class InstanceAjaxTests(helpers.TestCase, InstanceTestHelperMixin):
             mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
         self.mock_server_get.assert_called_once_with(helpers.IsHttpRequest(),
                                                      instance_id)
-        self.mock_flavor_get.assert_called_once_with(helpers.IsHttpRequest(),
-                                                     flavor_id)
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), [server])
         self.mock_tenant_absolute_limits.assert_called_once_with(
             helpers.IsHttpRequest(), reserved=True)
 
     @helpers.create_mocks({api.nova: ("server_get",
-                                      "flavor_get",
                                       'is_feature_available',
                                       "extension_supported",
                                       "tenant_absolute_limits"),
@@ -5323,9 +5258,6 @@ class InstanceAjaxTests(helpers.TestCase, InstanceTestHelperMixin):
     def test_row_update_instance_error(self):
         server = self.servers.first()
         instance_id = server.id
-        flavor_id = server.flavor["id"]
-        flavors = self.flavors.list()
-        full_flavors = collections.OrderedDict([(f.id, f) for f in flavors])
 
         server.status = 'ERROR'
         server.fault = {"message": "NoValidHost",
@@ -5342,7 +5274,6 @@ class InstanceAjaxTests(helpers.TestCase, InstanceTestHelperMixin):
                                         'Shelve': True})
         self.mock_is_feature_available.return_value = True
         self.mock_server_get.return_value = server
-        self.mock_flavor_get.return_value = full_flavors[flavor_id]
         self.mock_servers_update_addresses.return_value = None
         self.mock_tenant_absolute_limits.return_value = self.limits['absolute']
 
@@ -5371,49 +5302,6 @@ class InstanceAjaxTests(helpers.TestCase, InstanceTestHelperMixin):
             mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
         self.mock_server_get.assert_called_once_with(helpers.IsHttpRequest(),
                                                      instance_id)
-        self.mock_flavor_get.assert_called_once_with(helpers.IsHttpRequest(),
-                                                     flavor_id)
-        self.mock_servers_update_addresses.assert_called_once_with(
-            helpers.IsHttpRequest(), [server])
-        self.mock_tenant_absolute_limits.assert_called_once_with(
-            helpers.IsHttpRequest(), reserved=True)
-
-    @helpers.create_mocks({api.nova: ("server_get",
-                                      "flavor_get",
-                                      'is_feature_available',
-                                      "extension_supported",
-                                      "tenant_absolute_limits"),
-                           api.network: ('servers_update_addresses',)})
-    def test_row_update_flavor_not_found(self):
-        server = self.servers.first()
-        instance_id = server.id
-
-        self._mock_extension_supported({'AdminActions': True,
-                                        'Shelve': True})
-        self.mock_is_feature_available.return_value = True
-        self.mock_server_get.return_value = server
-        self.mock_flavor_get.side_effect = self.exceptions.nova
-        self.mock_servers_update_addresses.return_value = None
-        self.mock_tenant_absolute_limits.return_value = self.limits['absolute']
-
-        params = {'action': 'row_update',
-                  'table': 'instances',
-                  'obj_id': instance_id,
-                  }
-        res = self.client.get('?'.join((INDEX_URL, urlencode(params))),
-                              HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertContains(res, server.name)
-        self.assertContains(res, "Not available")
-
-        self._check_extension_supported({'AdminActions': 4,
-                                         'Shelve': 1})
-        self.assert_mock_multiple_calls_with_same_arguments(
-            self.mock_is_feature_available, 2,
-            mock.call(helpers.IsHttpRequest(), 'locked_attribute'))
-        self.mock_server_get.assert_called_once_with(helpers.IsHttpRequest(),
-                                                     instance_id)
-        self.mock_flavor_get.assert_called_once_with(helpers.IsHttpRequest(),
-                                                     server.flavor['id'])
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), [server])
         self.mock_tenant_absolute_limits.assert_called_once_with(

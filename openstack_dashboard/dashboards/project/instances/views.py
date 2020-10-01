@@ -19,7 +19,7 @@
 """
 Views for managing instances.
 """
-from collections import OrderedDict
+import collections
 import logging
 
 from django.conf import settings
@@ -173,18 +173,9 @@ class IndexView(tables.PagedTableMixin, tables.DataTableView):
 
         instances = self._get_instances(search_opts, sort_dir)
 
-        # Loop through instances to get flavor info.
+        # Loop through instances to get image info.
         for instance in instances:
             self._populate_image_info(instance, image_dict, volume_dict)
-
-            flavor_id = instance.flavor["id"]
-            if flavor_id in flavor_dict:
-                instance.full_flavor = flavor_dict[flavor_id]
-            else:
-                # If the flavor_id is not in flavor_dict,
-                # put info in the log file.
-                LOG.info('Unable to retrieve flavor "%s" for instance "%s".',
-                         flavor_id, instance.id)
 
         return instances
 
@@ -523,17 +514,6 @@ class DetailView(tabs.TabView):
                                                'id': instance_id}
             exceptions.handle(self.request, msg, ignore=True)
 
-    def _get_flavor(self, instance):
-        instance_id = instance.id
-        try:
-            instance.full_flavor = api.nova.flavor_get(
-                self.request, instance.flavor["id"])
-        except Exception:
-            msg = _('Unable to retrieve flavor information for instance '
-                    '"%(name)s" (%(id)s).') % {'name': instance.name,
-                                               'id': instance_id}
-            exceptions.handle(self.request, msg, ignore=True)
-
     def _get_security_groups(self, instance):
         instance_id = instance.id
         try:
@@ -577,7 +557,6 @@ class DetailView(tabs.TabView):
 
         futurist_utils.call_functions_parallel(
             (self._get_volumes, [instance]),
-            (self._get_flavor, [instance]),
             (self._get_security_groups, [instance]),
             (self._update_addresses, [instance]),
         )
@@ -607,26 +586,14 @@ class ResizeView(workflows.WorkflowView):
             redirect = reverse("horizon:project:instances:index")
             msg = _('Unable to retrieve instance details.')
             exceptions.handle(self.request, msg, redirect=redirect)
-        flavor_id = instance.flavor['id']
-        flavors = self.get_flavors()
-        if flavor_id in flavors:
-            instance.flavor_name = flavors[flavor_id].name
-        else:
-            try:
-                flavor = api.nova.flavor_get(self.request, flavor_id)
-                instance.flavor_name = flavor.name
-            except Exception:
-                msg = _('Unable to retrieve flavor information for instance '
-                        '"%s".') % instance_id
-                exceptions.handle(self.request, msg, ignore=True)
-                instance.flavor_name = _("Not available")
         return instance
 
     @memoized.memoized_method
     def get_flavors(self, *args, **kwargs):
         try:
             flavors = api.nova.flavor_list(self.request)
-            return OrderedDict((str(flavor.id), flavor) for flavor in flavors)
+            return collections.OrderedDict((str(flavor.id), flavor)
+                                           for flavor in flavors)
         except Exception:
             redirect = reverse("horizon:project:instances:index")
             exceptions.handle(self.request,
@@ -635,13 +602,13 @@ class ResizeView(workflows.WorkflowView):
 
     def get_initial(self):
         initial = super(ResizeView, self).get_initial()
-        _object = self.get_object()
-        if _object:
+        instance = self.get_object()
+        if instance:
             initial.update(
                 {'instance_id': self.kwargs['instance_id'],
-                 'name': getattr(_object, 'name', None),
-                 'old_flavor_id': _object.flavor['id'],
-                 'old_flavor_name': getattr(_object, 'flavor_name', ''),
+                 'name': getattr(instance, 'name', None),
+                 'old_flavor_name': getattr(instance.flavor,
+                                            'original_name', ''),
                  'flavors': self.get_flavors()})
         return initial
 

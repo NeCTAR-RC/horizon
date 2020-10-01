@@ -46,20 +46,18 @@
   <h4>{% trans "Specs" %}</h4>
   <hr class="header_rule">
   <dl class="dl-horizontal">
-    {% if instance.full_flavor %}
+    {% if instance.flavor %}
       <dt>{% trans "Flavor Name" %}</dt>
-      <dd class="word-wrap">{{ instance.full_flavor.name }}</dd>
-      <dt>{% trans "Flavor ID" %}</dt>
-      <dd>{{ instance.full_flavor.id }}</dd>
+      <dd class="word-wrap">{{ instance.flavor.original_name }}</dd>
       <dt>{% trans "RAM" %}</dt>
-      <dd>{{ instance.full_flavor.ram|mb_float_format }}</dd>
+      <dd>{{ instance.flavor.ram|mb_float_format }}</dd>
       <dt>{% trans "VCPUs" %}</dt>
-      <dd>{{ instance.full_flavor.vcpus }} {% trans "VCPU" %}</dd>
+      <dd>{{ instance.flavor.vcpus }} {% trans "VCPU" %}</dd>
       <dt>{% trans "Disk" %}</dt>
-      <dd>{{ instance.full_flavor.disk }}{% trans "GB" %}</dd>
-      {% if instance.full_flavor.ephemeral %}
+      <dd>{{ instance.flavor.disk }}{% trans "GB" %}</dd>
+      {% if 'ephemeral' in instance.flavor %}
         <dt>{% trans "Ephemeral Disk" %}</dt>
-        <dd>{{ instance.full_flavor.ephemeral }}{% trans "GB" %}</dd>
+        <dd>{{ instance.flavor.ephemeral }}{% trans "GB" %}</dd>
       {% endif %}
     {% else %}
       <dt>{% trans "Flavor" %}</dt>

@@ -30,7 +30,6 @@ from openstack_dashboard.dashboards.project.instances.workflows \
 
 
 class SetFlavorChoiceAction(workflows.Action):
-    old_flavor_id = forms.CharField(required=False, widget=forms.HiddenInput())
     old_flavor_name = forms.CharField(
         label=_("Old Flavor"),
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
@@ -47,11 +46,12 @@ class SetFlavorChoiceAction(workflows.Action):
                               "_flavors_and_quotas.html")
 
     def populate_flavor_choices(self, request, context):
-        old_flavor_id = context.get('old_flavor_id')
+        old_flavor_name = context.get('old_flavor_name')
         flavors = context.get('flavors').values()
 
         # Remove current flavor from the list of flavor choices
-        flavors = [flavor for flavor in flavors if flavor.id != old_flavor_id]
+        flavors = [flavor for flavor in flavors
+                   if flavor.name != old_flavor_name]
 
         # TODO(andybotting) Remove filtering once m1/m2 flavors go private
         flavors = [f for f in flavors if not f.name.startswith(('m1', 'm2'))]
@@ -86,7 +86,7 @@ class SetFlavorChoiceAction(workflows.Action):
 class SetFlavorChoice(workflows.Step):
     action_class = SetFlavorChoiceAction
     depends_on = ("instance_id", "name")
-    contributes = ("old_flavor_id", "old_flavor_name", "flavors", "flavor")
+    contributes = ("old_flavor_name", "flavors", "flavor")
 
 
 class ResizeInstance(workflows.Workflow):

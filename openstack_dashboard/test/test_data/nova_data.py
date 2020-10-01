@@ -14,6 +14,7 @@
 
 import json
 
+from django import http
 from novaclient.v2 import aggregates
 from novaclient.v2 import availability_zones
 from novaclient.v2 import flavor_access
@@ -27,6 +28,7 @@ from novaclient.v2 import services
 from novaclient.v2 import usage
 from novaclient.v2 import volumes
 
+from openstack_dashboard.api import _nova
 from openstack_dashboard.api import base
 from openstack_dashboard.usage import quotas as usage_quotas
 
@@ -79,13 +81,13 @@ SERVER_DATA = """
         },
         "OS-EXT-STS:vm_state": "active",
         "flavor": {
-            "id": "%(flavor_id)s",
-            "links": [
-                {
-                    "href": "%(host)s/%(tenant_id)s/flavors/%(flavor_id)s",
-                    "rel": "bookmark"
-                }
-            ]
+            "vcpus": 1,
+            "ram": 512,
+            "disk": 0,
+            "ephemeral": 0,
+            "swap": 0,
+            "original_name": "m3.tiny",
+            "extra_specs": {}
         },
         "id": "%(server_id)s",
         "user_id": "%(user_id)s",
@@ -349,27 +351,34 @@ def data(TEST):
             "tenant_id": TEST.tenants.first().id,
             "user_id": TEST.user.id,
             "server_id": "1",
-            "flavor_id": flavor_1.id,
             "image_id": TEST.images.first().id,
             "key_name": keypair.name}
-    server_1 = servers.Server(servers.ServerManager(None),
-                              json.loads(SERVER_DATA % vals)['server'])
+    server_1 = _nova.Server(
+        servers.Server(servers.ServerManager(None),
+                       json.loads(SERVER_DATA % vals)['server']),
+        request=http.HttpRequest())
     vals.update({"name": "server_2",
                  "status": "BUILD",
                  "server_id": "2"})
-    server_2 = servers.Server(servers.ServerManager(None),
-                              json.loads(SERVER_DATA % vals)['server'])
+    server_2 = _nova.Server(
+        servers.Server(servers.ServerManager(None),
+                       json.loads(SERVER_DATA % vals)['server']),
+        request=http.HttpRequest())
     vals.update({"name": u'\u4e91\u89c4\u5219',
                  "status": "ACTIVE",
                  "tenant_id": tenant3.id,
                 "server_id": "3"})
-    server_3 = servers.Server(servers.ServerManager(None),
-                              json.loads(SERVER_DATA % vals)['server'])
+    server_3 = _nova.Server(
+        servers.Server(servers.ServerManager(None),
+                       json.loads(SERVER_DATA % vals)['server']),
+        request=http.HttpRequest())
     vals.update({"name": "server_4",
                  "status": "PAUSED",
                  "server_id": "4"})
-    server_4 = servers.Server(servers.ServerManager(None),
-                              json.loads(SERVER_DATA % vals)['server'])
+    server_4 = _nova.Server(
+        servers.Server(servers.ServerManager(None),
+                       json.loads(SERVER_DATA % vals)['server']),
+        request=http.HttpRequest())
     TEST.servers.add(server_1, server_2, server_3, server_4)
 
     # VNC Console Data

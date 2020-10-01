@@ -784,14 +784,7 @@ class UpdateRow(tables.Row):
 
     def get_data(self, request, instance_id):
         instance = api.nova.server_get(request, instance_id)
-        try:
-            instance.full_flavor = api.nova.flavor_get(request,
-                                                       instance.flavor["id"])
-        except Exception:
-            exceptions.handle(request,
-                              _('Unable to retrieve flavor information '
-                                'for instance "%s".') % instance_id,
-                              ignore=True)
+
         try:
             api.network.servers_update_addresses(request, [instance])
         except Exception:
@@ -1028,23 +1021,21 @@ def get_ips(instance):
 
 
 def get_flavor(instance):
-    if hasattr(instance, "full_flavor"):
-        template_name = 'project/instances/_instance_flavor.html'
-        size_ram = sizeformat.mb_float_format(instance.full_flavor.ram)
-        if instance.full_flavor.disk > 0:
-            size_disk = sizeformat.diskgbformat(instance.full_flavor.disk)
-        else:
-            size_disk = _("%s GB") % "0"
-        context = {
-            "name": instance.full_flavor.name,
-            "id": instance.id,
-            "size_disk": size_disk,
-            "size_ram": size_ram,
-            "vcpus": instance.full_flavor.vcpus,
-            "flavor_id": instance.full_flavor.id
-        }
-        return template.loader.render_to_string(template_name, context)
-    return _("Not available")
+    flavor = instance.flavor
+    template_name = 'project/instances/_instance_flavor.html'
+    size_ram = sizeformat.mb_float_format(flavor.ram)
+    if flavor.disk > 0:
+        size_disk = sizeformat.diskgbformat(flavor.disk)
+    else:
+        size_disk = _("%s GB") % "0"
+    context = {
+        "name": flavor.original_name,
+        "id": instance.id,
+        "size_disk": size_disk,
+        "size_ram": size_ram,
+        "vcpus": flavor.vcpus,
+    }
+    return template.loader.render_to_string(template_name, context)
 
 
 def get_keyname(instance):

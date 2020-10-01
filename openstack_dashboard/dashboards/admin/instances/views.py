@@ -167,7 +167,7 @@ class AdminIndexView(tables.PagedTableMixin, tables.DataTableView):
             self._more = False
             return []
 
-        # Loop through instances to get image, flavor and tenant info.
+        # Loop through instances to get image and tenant info.
         for inst in instances:
             if hasattr(inst, 'image') and isinstance(inst.image, dict):
                 image_id = inst.image.get('id')
@@ -178,19 +178,6 @@ class AdminIndexView(tables.PagedTableMixin, tables.DataTableView):
                 # until the call is deprecated in api itself
                 else:
                     inst.image['name'] = _("-")
-
-            flavor_id = inst.flavor["id"]
-            try:
-                if flavor_id in flavor_dict:
-                    inst.full_flavor = flavor_dict[flavor_id]
-                else:
-                    # If the flavor_id is not in flavor_dict list,
-                    # gets it via nova api.
-                    inst.full_flavor = api.nova.flavor_get(
-                        self.request, flavor_id)
-            except Exception:
-                msg = _('Unable to retrieve instance size information.')
-                exceptions.handle(self.request, msg)
             tenant = tenant_dict.get(inst.tenant_id, None)
             inst.tenant_name = getattr(tenant, "name", None)
         return instances

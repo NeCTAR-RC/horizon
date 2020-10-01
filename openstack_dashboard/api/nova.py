@@ -460,11 +460,6 @@ def server_delete(request, instance_id):
     request.session['server_deleted'] = instance_id
 
 
-def get_novaclient_with_locked_status(request):
-    microversion = get_microversion(request, "locked_attribute")
-    return _nova.novaclient(request, version=microversion)
-
-
 @profiler.trace
 def server_list_paged(request,
                       search_opts=None,
@@ -472,7 +467,10 @@ def server_list_paged(request,
                       sort_dir="desc"):
     has_more_data = False
     has_prev_data = False
-    nova_client = get_novaclient_with_locked_status(request)
+    microversion = get_microversion(request,
+                                    ("locked_attribute",
+                                     "instance_flavor_info"))
+    nova_client = _nova.novaclient(request, version=microversion)
     page_size = utils.get_page_size(request)
     search_opts = {} if search_opts is None else search_opts
     marker = search_opts.get('marker', None)
