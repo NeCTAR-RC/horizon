@@ -148,6 +148,7 @@
     init();
 
     function init() {
+      cinder.getVolumeTypes().success(onGetVolumeTypes);
       cinder.getAbsoluteLimits().success(onGetAbsoluteLimits);
       cinder.getAvailabilityZones().success(onGetAvailabilityZones);
     }
