@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import binascii
 import datetime
 import decimal
 import math
@@ -192,3 +193,16 @@ def format_value(value):
 def one_year_from_now():
     now = datetime.datetime.utcnow()
     return now + datetime.timedelta(days=365)
+
+
+def hexlify(text):
+    """Hexlify raw text, return hexlified text."""
+    if six.PY3:
+        text = text.encode('utf-8')
+
+    hexlified = binascii.hexlify(text)
+
+    if six.PY3:
+        hexlified = hexlified.decode('utf-8')
+
+    return hexlified
