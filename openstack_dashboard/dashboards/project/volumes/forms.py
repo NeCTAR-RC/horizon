@@ -56,17 +56,33 @@ def cinder_az_supported(request):
         return False
 
 
-def availability_zones(request):
+def get_availability_zones(request):
     zone_list = []
     if cinder_az_supported(request):
         try:
             zones = api.cinder.availability_zone_list(request)
-            zone_list = [(zone.zoneName, zone.zoneName)
-                         for zone in zones if zone.zoneState['available']]
+            zone_list = [zone.zoneName for zone in zones
+                         if zone.zoneState['available']]
             zone_list.sort()
         except Exception:
             exceptions.handle(request, _('Unable to retrieve availability '
                                          'zones.'))
+    return zone_list
+
+
+def get_volume_types(request):
+    volume_types = []
+    try:
+        volume_types = cinder.volume_type_list(request)
+    except Exception:
+        redirect_url = reverse("horizon:project:volumes:index")
+        error_message = _('Unable to retrieve the volume type list.')
+        exceptions.handle(request, error_message, redirect=redirect_url)
+    return volume_types
+
+
+def availability_zones(request):
+    zone_list = [(az, az) for az in get_availability_zones(request)]
     if not zone_list:
         zone_list.insert(0, ("", _("No availability zones found")))
     elif len(zone_list) > 1:
@@ -120,20 +136,13 @@ class CreateForm(forms.SelfHandlingForm):
             data_attrs=('size', 'name'),
             transform=lambda x: "%s (%s GiB)" % (x.name, x.size)),
         required=False)
-    type = forms.ChoiceField(
-        label=_("Type"),
-        required=False,
-        widget=forms.ThemableSelectWidget(
-            attrs={'class': 'switched',
-                   'data-switch-on': 'source',
-                   'data-source-no_source_type': _('Type'),
-                   'data-source-image_source': _('Type')}))
     size = forms.IntegerField(min_value=1, initial=1, label=_("Size (GiB)"))
     availability_zone = forms.ChoiceField(
         label=_("Availability Zone"),
         required=False,
         widget=forms.ThemableSelectWidget(
-            attrs={'class': 'switched',
+            attrs={'class': 'switchable switched',
+                   'data-slug': 'availability_zone',
                    'data-switch-on': 'source',
                    'data-source-no_source_type': _('Availability Zone'),
                    'data-source-image_source': _('Availability Zone')}))
@@ -294,22 +303,80 @@ class CreateForm(forms.SelfHandlingForm):
         group_choices.insert(0, ("", _("No group")))
         self.fields['group'].choices = group_choices
 
+    def _populate_type_choices(self, request):
+        volume_types = get_volume_types(request)
+        availability_zones = get_availability_zones(request)
+
+        # The default Cinder policy disallows unprivileged users from reading
+        # the RESKEY:availability_zones key assigned to a volume type, so
+        # check if they key exists or is set on any volume types
+        has_az_types = any(['RESKEY:availability_zones'
+                           in getattr(vtype, 'extra_specs', {})
+                           for vtype in volume_types])
+
+        if availability_zones and has_az_types:
+            for az in availability_zones:
+                self._add_az_volume_type_field(request, az, volume_types)
+        else:
+            # Show a single volume type field not filtered by AZ
+            self.fields['type'] = forms.ChoiceField(
+                label=_("Type"),
+                required=False,
+                widget=forms.ThemableSelectWidget(
+                    attrs={'class': 'switched',
+                           'data-switch-on': 'source',
+                           'data-source-no_source_type': _('Type'),
+                           'data-source-image_source': _('Type')}))
+
+            type_choices = [(vtype.name, vtype.name) for vtype in volume_types]
+            type_choices.insert(0, ("", _("No volume type")))
+            self.fields['type'].choices = type_choices
+
+    def _get_volume_type_az_field_name(self, availability_zone):
+        # Since field names cannot contain an uppercase character, we generate
+        # a hex encodeded string representaion of the availability zone name
+        return 'type-' + functions.hexlify(availability_zone)
+
+    def _add_az_volume_type_field(self, request, availability_zone,
+                                  volume_types):
+        field_name = self._get_volume_type_az_field_name(availability_zone)
+        attr_key = 'data-availability_zone-' + availability_zone
+
+        self.fields[field_name] = forms.ChoiceField(
+            label=_("Type"),
+            required=False,
+            widget=forms.ThemableSelectWidget(
+                attrs={'class': 'switched',
+                       'data-switch-on': 'availability_zone',
+                       attr_key: _('Type')}
+            ))
+
+        type_choices = []
+        for vtype in volume_types:
+            extra_specs = getattr(vtype, 'extra_specs', {})
+            type_azs = extra_specs.get('RESKEY:availability_zones')
+            if type_azs:
+                availability_zones = type_azs.split(',')
+                if availability_zone in availability_zones:
+                    type_choices.append((vtype.name, vtype.name))
+            else:
+                # Include types that don't specify an az
+                type_choices.append((vtype.name, vtype.name))
+
+        type_choices.insert(0, ("", _("Default volume type")))
+        self.fields[field_name].choices = type_choices
+
     def __init__(self, request, *args, **kwargs):
         super(CreateForm, self).__init__(request, *args, **kwargs)
-        volume_types = []
-        try:
-            volume_types = cinder.volume_type_list(request)
-        except Exception:
-            redirect_url = reverse("horizon:project:volumes:index")
-            error_message = _('Unable to retrieve the volume type list.')
-            exceptions.handle(request, error_message, redirect=redirect_url)
-        self.fields['type'].choices = [("", _("No volume type"))] + \
-                                      [(type.name, type.name)
-                                       for type in volume_types]
+
+        self._populate_type_choices(request)
+
         if 'initial' in kwargs and 'type' in kwargs['initial']:
             # if there is a default volume type to select, then remove
             # the first ""No volume type" entry
-            self.fields['type'].choices.pop(0)
+            # TODO(andybotting): Set default for az specific type fields
+            if 'type' in self.fields:
+                self.fields['type'].choices.pop(0)
 
         if "snapshot_id" in request.GET:
             self.prepare_source_fields_if_snapshot_specified(request)
@@ -366,7 +433,11 @@ class CreateForm(forms.SelfHandlingForm):
             volume_id = None
             source_type = data.get('volume_source_type', None)
             az = data.get('availability_zone', None) or None
-            volume_type = data.get('type')
+            volume_type = data.get('type', None)
+
+            if not volume_type and az:
+                type_field_name = self._get_volume_type_az_field_name(az)
+                volume_type = data.get(type_field_name, None)
 
             if (data.get("snapshot_source", None) and
                     source_type in ['', None, 'snapshot_source']):
@@ -376,6 +447,7 @@ class CreateForm(forms.SelfHandlingForm):
                 snapshot_id = snapshot.id
                 if data['size'] < snapshot.size:
                     error_message = (_('The volume size cannot be less than '
+
                                        'the snapshot size (%sGiB)')
                                      % snapshot.size)
                     raise ValidationError(error_message)

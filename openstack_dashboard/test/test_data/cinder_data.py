@@ -41,6 +41,7 @@ def data(TEST):
     TEST.cinder_volume_backups = utils.TestDataContainer()
     TEST.cinder_volume_encryption_types = utils.TestDataContainer()
     TEST.cinder_volume_types = utils.TestDataContainer()
+    TEST.cinder_volume_types_with_az = utils.TestDataContainer()
     TEST.cinder_type_access = utils.TestDataContainer()
     TEST.cinder_volume_encryption = utils.TestDataContainer()
     TEST.cinder_bootable_volumes = utils.TestDataContainer()
@@ -145,7 +146,6 @@ def data(TEST):
          'created_at': '2013-04-01 10:30:00',
          'volume_type': None,
          'bootable': 'false',
-         'bootable': False,
          'attachments': [{"id": "21023e92-8008-1234-8059-7f2293ff3890",
                           "server_id": '1',
                           "device": "/dev/hda"}]})
@@ -180,6 +180,23 @@ def data(TEST):
          'is_public': False,
          'description': 'type 3 description'})
     TEST.cinder_volume_types.add(vol_type1, vol_type2, vol_type3)
+
+    vol_type4 = volume_types.VolumeType(
+        volume_types.VolumeTypeManager(None),
+        {'id': u'4',
+         'name': u'vol_type_4',
+         'is_public': False,
+         'description': 'type 4 description',
+         'extra_specs': {'RESKEY:availability_zones': 'notnova'}})
+    vol_type5 = volume_types.VolumeType(
+        volume_types.VolumeTypeManager(None),
+        {'id': u'5',
+         'name': u'vol_type_5',
+         'is_public': False,
+         'description': 'type 5 description',
+         'extra_specs': {'RESKEY:availability_zones': 'nova'}})
+    TEST.cinder_volume_types_with_az.add(vol_type3, vol_type4, vol_type5)
+
     vol_type_access1 = volume_type_access.VolumeTypeAccess(
         volume_type_access.VolumeTypeAccessManager(None),
         {'volume_type_id': u'1', 'project_id': u'1'})
