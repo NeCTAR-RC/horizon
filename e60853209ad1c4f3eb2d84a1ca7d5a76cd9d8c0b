@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f818877c_f8978f61",
+        "filename": "horizon/utils/functions.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-02-10T04:47:38Z",
+      "side": 1,
+      "message": "all the six stuff is being ripped out of openstack since its not py3 only so might not be needed",
+      "range": {
+        "startLine": 205,
+        "startChar": 4,
+        "endLine": 205,
+        "endChar": 15
+      },
+      "revId": "e60853209ad1c4f3eb2d84a1ca7d5a76cd9d8c0b",
+      "serverId": "f182a8af-62ca-4ceb-ab81-14f8fec9c6c5",
+      "unresolved": true
+    }
+  ]
+}
