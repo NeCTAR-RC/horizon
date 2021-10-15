@@ -242,6 +242,8 @@
         model.initializing = true;
 
         model.allowedBootSources.length = 0;
+        model.images.length = 0;
+        model.imageSnapshots.length = 0;
 
         var launchInstanceDefaults = settings.getSetting('LAUNCH_INSTANCE_DEFAULTS');
         settings.getSetting('DEFAULT_BOOT_SOURCE').then(
@@ -260,6 +262,7 @@
           novaAPI.getLimits(true).then(onGetNovaLimits, noop),
           securityGroup.query().then(onGetSecurityGroups, noop),
           serviceCatalog.ifTypeEnabled('network').then(getNetworks, noop),
+          launchInstanceDefaults.then(addAllowedBootSources, noop),
           launchInstanceDefaults.then(addImageSourcesIfEnabled, noop),
           launchInstanceDefaults.then(setDefaultValues, noop),
           launchInstanceDefaults.then(addVolumeSourcesIfEnabled, noop)
@@ -566,17 +569,20 @@
       var enabledSnapshot = allEnabled || !config.disable_instance_snapshot;
 
       if (enabledImage || enabledSnapshot) {
-        var filter = {status: 'active', sort_key: 'name', sort_dir: 'asc'};
-        var filterCommunity = angular.merge({}, filter, {visibility: 'community'});
-        var imagePromises = [
-          glanceAPI.getImages(filter),
-          glanceAPI.getImages(filterCommunity)
-        ];
-        $q.all(imagePromises).then(
-          function(data) {
-            onGetImageSources(data, enabledImage, enabledSnapshot);
-          }
-        );
+        getImages({status: 'active', sort_key: 'name', sort_dir: 'asc'});
+        getImages({status: 'active', sort_key: 'name', sort_dir: 'asc', visibility: 'community'});
+      }
+
+      function getImages(filter) {
+        return glanceAPI.getImages(filter).then(handleImages);
+      }
+      function handleImages(images) {
+        if (enabledImage) {
+          onGetImages(images);
+        }
+        if (enabledSnapshot) {
+          onGetSnapshots(images);
+        }
       }
     }
 
@@ -674,45 +680,43 @@
       return getImageType(image) === 'snapshot' && isBootableImageType(image);
     }
 
-    function onGetImageSources(data, enabledImage, enabledSnapshot) {
-      model.imageSnapshots.length = 0;
-      model.images.length = 0;
-
+    function onGetImages(data) {
       var imageIdsProcessed = [];
 
       angular.forEach(data, function(data) {
-        angular.forEach(data.data.items, function(image) {
+        angular.forEach(data.items, function(image) {
           if (imageIdsProcessed.includes(image.id)) {
             return;
           }
           imageIdsProcessed.push(image.id);
-          if (isValidSnapshot(image) && enabledSnapshot) {
-            model.imageSnapshots.push(image);
-          } else if (isValidImage(image) && enabledImage) {
+          if (isValidImage(image)) {
             image.name_or_id = image.name || image.id;
             model.images.push(image);
           }
         });
       });
+    }
 
-      if (enabledImage) {
-        addAllowedBootSource(
-          model.images, bootSourceTypes.IMAGE, gettext('Image')
-        );
-      }
+    function onGetSnapshots(data) {
+      var imageIdsProcessed = [];
 
-      if (enabledSnapshot) {
-        addAllowedBootSource(
-          model.imageSnapshots, bootSourceTypes.INSTANCE_SNAPSHOT,
-          gettext('Instance Snapshot')
-        );
-      }
+      angular.forEach(data, function(data) {
+        angular.forEach(data.items, function(image) {
+          if (imageIdsProcessed.includes(image.id)) {
+            return;
+          }
+          imageIdsProcessed.push(image.id);
+          if (isValidSnapshot(image)) {
+            image.name_or_id = image.name || image.id;
+            model.imageSnapshots.push(image);
+          }
+        });
+      });
     }
 
     function onGetVolumes(data) {
       model.volumes.length = 0;
       push.apply(model.volumes, data.data.items);
-      addAllowedBootSource(model.volumes, bootSourceTypes.VOLUME, gettext('Volume'));
     }
 
     function onGetVolumeSnapshots(data) {
@@ -730,11 +734,31 @@
       push.apply(model.volumeSnapshots, volumeSnapshots.filter(function (volumeSnapshot) {
         return bootableVolumeIds.indexOf(volumeSnapshot.volume_id) !== -1;
       }));
-      addAllowedBootSource(
-        model.volumeSnapshots,
-        bootSourceTypes.VOLUME_SNAPSHOT,
-        gettext('Volume Snapshot')
-      );
+    }
+
+    function addAllowedBootSources(config) {
+      var allEnabled = !config;
+
+      if (allEnabled || !config.disable_image) {
+        addAllowedBootSource(model.images, bootSourceTypes.IMAGE, gettext('Image'));
+      }
+      if (allEnabled || !config.disable_instance_snapshot) {
+        addAllowedBootSource(
+          model.imageSnapshots,
+          bootSourceTypes.INSTANCE_SNAPSHOT,
+          gettext('Instance Snapshot')
+        );
+      }
+      if (allEnabled || !config.disable_volume) {
+        addAllowedBootSource(model.volumes, bootSourceTypes.VOLUME, gettext('Volume'));
+      }
+      if (allEnabled || !config.disable_volume_snapshot) {
+        addAllowedBootSource(
+          model.volumeSnapshots,
+          bootSourceTypes.VOLUME_SNAPSHOT,
+          gettext('Volume Snapshot')
+        );
+      }
     }
 
     function addAllowedBootSource(rawTypes, type, label) {

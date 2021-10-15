@@ -35,14 +35,18 @@
     'horizon.dashboard.project.workflow.launch-instance.boot-source-types',
     'horizon.dashboard.project.workflow.launch-instance.basePath',
     'horizon.framework.widgets.transfer-table.events',
-    'horizon.framework.widgets.magic-search.events'
+    'horizon.framework.widgets.magic-search.events',
+    'horizon.framework.widgets.magic-search.service',
+    'horizon.app.core.openstack-service-api.userSession',
   ];
 
   function LaunchInstanceSourceController($scope,
     bootSourceTypes,
     basePath,
     events,
-    magicSearchEvents
+    magicSearchEvents,
+    magicSearchService,
+    userSession
   ) {
 
     var ctrl = this;
@@ -68,6 +72,11 @@
     /*
      * Transfer table
      */
+
+    // override image facades for specific filtering
+    ctrl.availableImageFacades = [];
+    ctrl.availableImageSnapshotFacades = [];
+
     ctrl.tableData = {
       available: [],
       allocated: selection,
@@ -93,13 +102,13 @@
 
     var bootSources = {
       image: {
-        available: $scope.model.images,
+        available: ctrl.availableImageFacades,
         allocated: selection,
         displayedAvailable: $scope.model.images,
         displayedAllocated: selection
       },
       snapshot: {
-        available: $scope.model.imageSnapshots,
+        available: ctrl.availableImageSnapshotFacades,
         allocated: selection,
         displayedAvailable: $scope.model.imageSnapshots,
         displayedAllocated: selection
@@ -347,6 +356,60 @@
       }
     );
 
+    // track if any image filters have been applied
+    var noSearchFilterApplied = true;
+
+    function addImage(imageArr, image) {
+      // we can get duplicates if a user owns a community image
+      // so we must filter any duplicates
+      var isDuplicate = false;
+      imageArr.forEach(function(existing) {
+        if (existing.id == image.id) {
+          isDuplicate = true;
+        }
+      });
+      if (!isDuplicate) {
+        imageArr.push(image);
+      }
+    }
+
+    function updateImageFacades() {
+      updateImageFacade($scope.model.images, ctrl.availableImageFacades);
+      updateImageFacade($scope.model.imageSnapshots, ctrl.availableImageSnapshotFacades);
+    }
+
+    function updateImageFacade(source, imageArr) {
+      imageArr.length = 0;
+
+      if (noSearchFilterApplied) {
+        userSession.get().then(function(session) {
+          source.forEach(function(image) {
+            // Mimic standard glance api behaviour and hide community images
+            // not owned by user by default, unless some user filtering has
+            // been applied
+            if (!(image.visibility == 'community' && image.owner != session.project_id)) {
+              addImage(imageArr, image);
+            }
+          });
+        });
+      }
+      else {
+        source.forEach(function(image) {
+          addImage(imageArr, image);
+        });
+      }
+    }
+
+    $scope.$on(magicSearchEvents.SEARCH_UPDATED, function(event, data) {
+      noSearchFilterApplied = magicSearchService.getQueryObject(data).hasOwnProperty("");
+      updateImageFacades();
+    });
+
+    $scope.$on(magicSearchEvents.TEXT_SEARCH, function(event, data, filter_keys) {
+      noSearchFilterApplied = !data;
+      updateImageFacades();
+    });
+
     var imagesWatcher = $scope.$watchCollection(
       function getImages() {
         return $scope.model.images;
@@ -359,6 +422,7 @@
             }
           });
         });
+        updateImageFacades();
       }
     );
 
@@ -374,6 +438,7 @@
             }
           });
         });
+        updateImageFacades();
       }
     );
 
