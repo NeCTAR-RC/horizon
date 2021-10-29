@@ -568,7 +568,9 @@ class VolumeBackupsViewTests(test.TestCase):
         self.mock_message_list.assert_called_once_with(
             test.IsHttpRequest(), search_opts=search_opts)
 
-    @test.create_mocks({api.cinder: ('volume_list',
+    @test.create_mocks({api.cinder: ('availability_zone_list',
+                                     'extension_supported',
+                                     'volume_list',
                                      'volume_backup_restore')})
     def test_restore_backup(self):
         mock_backup = self.cinder_volume_backups.first()
@@ -596,4 +598,4 @@ class VolumeBackupsViewTests(test.TestCase):
         self.mock_volume_list.assert_called_once_with(test.IsHttpRequest(),
                                                       {'status': 'available'})
         self.mock_volume_backup_restore.assert_called_once_with(
-            test.IsHttpRequest(), mock_backup.id, mock_backup.volume_id)
+            test.IsHttpRequest(), mock_backup.id, mock_backup.volume_id, None)
