@@ -257,7 +257,9 @@ class AdminVolumeBackupsViewTests(test.BaseAdminViewTests):
         self.mock_volume_get.assert_called_once_with(
             test.IsHttpRequest(), backup.volume_id)
 
-    @test.create_mocks({api.cinder: ('volume_list',
+    @test.create_mocks({api.cinder: ('availability_zone_list',
+                                     'extension_supported',
+                                     'volume_list',
                                      'volume_backup_restore')})
     def test_restore_backup(self):
         mock_backup = self.cinder_volume_backups.first()
@@ -285,7 +287,7 @@ class AdminVolumeBackupsViewTests(test.BaseAdminViewTests):
         self.mock_volume_list.assert_called_once_with(test.IsHttpRequest(),
                                                       {'status': 'available'})
         self.mock_volume_backup_restore.assert_called_once_with(
-            test.IsHttpRequest(), mock_backup.id, mock_backup.volume_id)
+            test.IsHttpRequest(), mock_backup.id, mock_backup.volume_id, None)
 
     @test.create_mocks({api.cinder: ('volume_backup_get',
                                      'volume_backup_reset_state')})
