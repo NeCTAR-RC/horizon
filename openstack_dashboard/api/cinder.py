@@ -393,7 +393,7 @@ def volume_get(request, volume_id):
 def volume_create(request, size, name, description, volume_type,
                   snapshot_id=None, metadata=None, image_id=None,
                   availability_zone=None, source_volid=None,
-                  group_id=None):
+                  group_id=None, backup_id=None):
     client = _cinderclient_with_generic_groups(request)
     data = {'name': name,
             'description': description,
@@ -403,7 +403,8 @@ def volume_create(request, size, name, description, volume_type,
             'imageRef': image_id,
             'availability_zone': availability_zone,
             'source_volid': source_volid,
-            'group_id': group_id}
+            'group_id': group_id,
+            'backup_id': backup_id}
 
     volume = client.volumes.create(size, **data)
     return Volume(volume)
@@ -687,9 +688,21 @@ def volume_backup_delete(request, backup_id, force=None):
 
 
 @profiler.trace
-def volume_backup_restore(request, backup_id, volume_id):
-    return cinderclient(request).restores.restore(backup_id=backup_id,
-                                                  volume_id=volume_id)
+def volume_backup_restore(request, backup_id, volume_id=None,
+                          availability_zone=None, name=None,
+                          volume_type=None):
+    if volume_id:
+        return cinderclient(request).restores.restore(backup_id=backup_id,
+                                                      volume_id=volume_id)
+
+    volume_name = name or 'restore_backup_%s' % backup_id
+
+    backup = volume_backup_get(request, backup_id)
+
+    return volume_create(request=request, size=backup.size, name=volume_name,
+                         description=None, volume_type=volume_type,
+                         availability_zone=availability_zone,
+                         backup_id=backup_id)
 
 
 @profiler.trace

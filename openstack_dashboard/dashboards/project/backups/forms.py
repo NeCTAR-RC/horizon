@@ -27,6 +27,8 @@ from horizon import messages
 from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.containers \
     import utils as containers_utils
+from openstack_dashboard.dashboards.project.volumes \
+    import forms as volume_forms
 
 
 class CreateBackupForm(forms.SelfHandlingForm):
@@ -128,10 +130,23 @@ class CreateBackupForm(forms.SelfHandlingForm):
 
 
 class RestoreBackupForm(forms.SelfHandlingForm):
-    volume_id = forms.ThemableChoiceField(label=_('Select Volume'),
-                                          required=False)
+    volume_id = forms.ThemableChoiceField(
+        label=_('Select Volume'),
+        required=False,
+        widget=forms.ThemableSelectWidget(
+            attrs={'class': 'switchable',
+                   'data-slug': 'volume_id'}))
     backup_id = forms.CharField(widget=forms.HiddenInput())
     backup_name = forms.CharField(widget=forms.HiddenInput())
+    availability_zone = forms.ChoiceField(
+        label=_("Availability Zone"),
+        required=False,
+        widget=forms.ThemableSelectWidget(
+            attrs={'class': 'switched',
+                   'data-slug': 'availability_zone',
+                   'data-switch-on': 'volume_id',
+                   'data-volume_id-': _('Availability Zone'),
+                   'data-required-when-shown': 'true'}))
     redirect_url = 'horizon:project:backups:index'
 
     def __init__(self, request, *args, **kwargs):
@@ -150,19 +165,25 @@ class RestoreBackupForm(forms.SelfHandlingForm):
         choices = [('', _('Create a New Volume'))]
         choices.extend((volume.id, volume.name) for volume in volumes)
         self.fields['volume_id'].choices = choices
+        self.fields['availability_zone'].choices = \
+            volume_forms.availability_zones(request)
 
     def handle(self, request, data):
         backup_id = data['backup_id']
         backup_name = data['backup_name'] or None
         volume_id = data['volume_id'] or None
-
+        availability_zone = data['availability_zone'] or None
         try:
             restore = api.cinder.volume_backup_restore(request,
                                                        backup_id,
-                                                       volume_id)
+                                                       volume_id,
+                                                       availability_zone)
 
             # Needed for cases when a new volume is created.
-            volume_id = restore.volume_id
+            try:
+                volume_id = restore.volume_id
+            except Exception:
+                volume_id = restore.id
 
             message = _('Request for restoring backup %(backup_name)s '
                         'to volume with id: %(volume_id)s '
