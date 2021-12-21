@@ -273,3 +273,5 @@ TEST_GLOBAL_MOCKS_ON_PANELS = {
         'return_value': True,
     },
 }
+
+NECTAR_FLOATING_NETWORK_TAG = None

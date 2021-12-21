@@ -568,6 +568,9 @@ class FloatingIpManager(object):
         :returns: List of FloatingIpPool objects
         """
         search_opts = {'router:external': True}
+        if settings.NECTAR_FLOATING_NETWORK_TAG:
+            search_opts['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
+
         return [FloatingIpPool(pool) for pool
                 in self.client.list_networks(**search_opts).get('networks')]
 
@@ -704,7 +707,11 @@ class FloatingIpManager(object):
                                 if p.device_id in gw_routers)
         # we have to include any shared subnets as well because we may not
         # have permission to see the router interface to infer connectivity
-        shared = set(s.id for n in network_list(self.request, shared=True)
+        search_opts = {'shared': True}
+        if settings.NECTAR_FLOATING_NETWORK_TAG:
+            search_opts['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
+
+        shared = set(s.id for n in network_list(self.request, **search_opts)
                      for s in n.subnets)
         return reachable_subnets | shared
 
@@ -1087,6 +1094,11 @@ def network_list_for_tenant(request, tenant_id, include_external=False,
         networks += network_list(request, tenant_id=tenant_id,
                                  shared=False, **params)
 
+    if settings.NECTAR_FLOATING_NETWORK_TAG:
+        params['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
+        networks = network_list(
+            request, id='00000000-0000-0000-0000-000000000000') + networks
+
     if shared in (None, True):
         # In the current Neutron API, there is no way to retrieve
         # both owner networks and public networks in a single API call.
@@ -1177,6 +1189,8 @@ def network_delete(request, network_id):
 @memoized
 def subnet_list(request, **params):
     LOG.debug("subnet_list(): params=%s", params)
+    if settings.NECTAR_FLOATING_NETWORK_TAG and 'tenant_id' not in params:
+        params['tenant_id'] = request.user.tenant_id
     subnets = neutronclient(request).list_subnets(**params).get('subnets')
     return [Subnet(s) for s in subnets]
 
