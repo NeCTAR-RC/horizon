@@ -673,6 +673,9 @@ class FloatingIpManager(object):
         :returns: List of FloatingIpPool objects
         """
         search_opts = {'router:external': True}
+        if settings.NECTAR_FLOATING_NETWORK_TAG:
+            search_opts['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
+
         return [FloatingIpPool(pool) for pool
                 in self.client.list_networks(**search_opts).get('networks')]
 
@@ -808,7 +811,11 @@ class FloatingIpManager(object):
                                 if p.device_id in gw_routers)
         # we have to include any shared subnets as well because we may not
         # have permission to see the router interface to infer connectivity
-        shared = set(s.id for n in network_list(self.request, shared=True)
+        search_opts = {'shared': True}
+        if settings.NECTAR_FLOATING_NETWORK_TAG:
+            search_opts['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
+
+        shared = set(s.id for n in network_list(self.request, **search_opts)
                      for s in n.subnets)
         return reachable_subnets | shared
 
@@ -1259,6 +1266,9 @@ def _query_external_nets(request, include_external, page_data, **params):
         params['router:external'] = True
         params['shared'] = False
 
+        if settings.NECTAR_FLOATING_NETWORK_TAG:
+            params['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
+
         return _perform_net_query(request, {}, page_data, 'ext', **params)
 
     return []
@@ -1279,6 +1289,8 @@ def _query_shared_nets(request, page_data, **params):
         # Grab only all shared networks
         # May include shared external nets based on external filter
         params['shared'] = True
+        if settings.NECTAR_FLOATING_NETWORK_TAG:
+            params['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
 
         return _perform_net_query(request, {}, page_data, 'shr', **params)
 
@@ -1301,8 +1313,13 @@ def _query_project_nets(request, tenant_id, page_data, **params):
             params['router:external'] = page_data['filter_external']
         params['shared'] = False
 
-        return _perform_net_query(
+        networks = _perform_net_query(
             request, {'tenant_id': tenant_id}, page_data, 'proj', **params)
+        if settings.NECTAR_FLOATING_NETWORK_TAG and page_data.get(
+                'marker_id') is None:
+            networks = network_list(
+                request, id='00000000-0000-0000-0000-000000000000') + networks
+        return networks
 
     return []
 
@@ -1617,6 +1634,8 @@ def network_delete(request, network_id):
 @memoized
 def subnet_list(request, **params):
     LOG.debug("subnet_list(): params=%s", params)
+    if settings.NECTAR_FLOATING_NETWORK_TAG and 'tenant_id' not in params:
+        params['tenant_id'] = request.user.tenant_id
     subnets = neutronclient(request).list_subnets(**params).get('subnets')
     return [Subnet(s) for s in subnets]
 

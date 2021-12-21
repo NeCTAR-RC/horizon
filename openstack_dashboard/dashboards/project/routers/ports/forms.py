@@ -14,6 +14,7 @@
 
 import logging
 
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -166,6 +167,9 @@ class SetGatewayForm(forms.SelfHandlingForm):
 
     def populate_network_id_choices(self, request):
         search_opts = {'router:external': True}
+        if settings.NECTAR_FLOATING_NETWORK_TAG:
+            search_opts['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
+
         try:
             networks = api.neutron.network_list(request, **search_opts)
         except Exception as e:
