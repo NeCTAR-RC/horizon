@@ -49,8 +49,6 @@ class AddInterface(forms.SelfHandlingForm):
 
         try:
             search_opts = {}
-            if settings.NECTAR_FLOATING_NETWORK_TAG:
-                search_opts['tags-any'] = settings.NECTAR_FLOATING_NETWORK_TAG
             networks = api.neutron.network_list_for_tenant(
                 request, tenant_id, **search_opts)
             if router_id:
