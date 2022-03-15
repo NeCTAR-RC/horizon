@@ -30,10 +30,10 @@ limitations under the License.
         <th st-sort="name" class="rsp-p1" translate>Name</th>
         <th st-sort="vcpus" class="rsp-p1" translate>VCPUS</th>
         <th st-sort="ram" class="rsp-p1" translate>RAM</th>
-        <th st-sort="totalDisk" class="rsp-p1" translate>Total Disk</th>
         <th st-sort="rootDisk" class="rsp-p2" translate>Root Disk</th>
         <th st-sort="ephemeralDisk" class="rsp-p2" translate>Ephemeral Disk</th>
         <th st-sort="isPublic" class="rsp-p1" translate>Public</th>
+        <th st-sort="suHour" class="rsp-p1" translate>SU/hour</th>
         <th></th>
       </tr>
     </thead>
@@ -67,7 +67,6 @@ limitations under the License.
             popover-trigger="'mouseenter'"/>
           {$ ::item.ram | mb $}
         </td>
-        <td class="rsp-p1">{$ ::item.totalDisk | gb $}</td>
         <td class="rsp-p2">
           <span class="invalid fa fa-exclamation-triangle"
             ng-show="item.errors.disk"
@@ -78,6 +77,7 @@ limitations under the License.
         </td>
         <td class="rsp-p2">{$ ::item.ephemeralDisk | gb $}</td>
         <td class="rsp-p1">{$ ::item.isPublic | yesno $}</td>
+        <td class="rsp-p1">{$ ::item.extras['nectar:rate'] $}</td>
         <td class="action-col">
           <action-list button-tooltip="item.disabledMessage"
               bt-model="tooltipModel"
@@ -151,10 +151,10 @@ limitations under the License.
         <th st-sort="name" class="rsp-p1" translate>Name</th>
         <th st-sort="vcpus" class="rsp-p1" translate>VCPUS</th>
         <th st-sort-default st-sort="ram" class="rsp-p1" translate>RAM</th>
-        <th st-sort="totalDisk" class="rsp-p1" translate>Total Disk</th>
         <th st-sort="rootDisk" class="rsp-p2" translate>Root Disk</th>
         <th st-sort="ephemeralDisk" class="rsp-p2" translate>Ephemeral Disk</th>
         <th st-sort="isPublic" class="rsp-p1" translate>Public</th>
+        <th st-sort="suHour" class="rsp-p1" translate>SU/hour</th>
         <th></th>
       </tr>
     </thead>
@@ -188,7 +188,6 @@ limitations under the License.
             popover-trigger="'mouseenter'"/>
           {$ ::item.ram | mb $}
         </td>
-        <td class="rsp-p1">{$ ::item.totalDisk | gb $}</td>
         <td class="rsp-p2">
           <span class="invalid fa fa-exclamation-triangle"
             ng-show="item.errors.disk"
@@ -199,6 +198,7 @@ limitations under the License.
         </td>
         <td class="rsp-p2">{$ ::item.ephemeralDisk | gb $}</td>
         <td class="rsp-p1">{$ ::item.isPublic | yesno $}</td>
+        <td class="rsp-p1">{$ ::item.extras['nectar:rate'] $}</td>
         <td class="action-col">
           <action-list button-tooltip="item.disabledMessage"
               bt-model="tooltipModel"
