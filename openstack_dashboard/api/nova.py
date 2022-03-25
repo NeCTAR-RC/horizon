@@ -463,7 +463,7 @@ def server_list_paged(request,
                       sort_dir="desc"):
     has_more_data = False
     has_prev_data = False
-    microversion = get_microversion(request, "instance_description")
+    microversion = get_microversion(request, "server_filters_extra")
     nova_client = _nova.novaclient(request, version=microversion)
 
     page_size = utils.get_page_size(request)

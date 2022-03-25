@@ -28,6 +28,7 @@ LOG = logging.getLogger(__name__)
 # microversion_support.html
 MICROVERSION_FEATURES = {
     "nova": {
+        "server_filters_extra": ["2.83", "2.87"],
         "locked_attribute": ["2.9", "2.42"],
         "instance_description": ["2.19", "2.60"],
         "instance_flavor_info": ["2.47"],
