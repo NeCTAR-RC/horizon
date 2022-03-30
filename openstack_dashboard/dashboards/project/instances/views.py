@@ -165,7 +165,7 @@ class IndexView(tables.PagedTableMixin, tables.DataTableView):
             )
 
         non_api_filter_info = (
-            ('image_name', 'image', image_dict.values()),
+            ('image_name', 'image', image_dict),
             ('flavor_name', 'flavor', flavor_dict.values()),
         )
         if not process_non_api_filters(search_opts, non_api_filter_info):
@@ -255,12 +255,24 @@ def _swap_filter(resources, search_opts, fake_field, real_field):
     if fake_field not in search_opts:
         return True
     filter_string = search_opts[fake_field]
-    matched = [resource for resource in resources
-               if (resource.name is not None and
-                   resource.name.lower() == filter_string.lower())]
+
+    if type(resources) == dict:
+        # We need this as image_dict is in a different format due to caching
+        # We can't cache the objects as not pickleable so it's a dict
+        matched = [id for id, name in resources.items()
+                   if name and name.lower() == filter_string.lower()]
+    else:
+        matched = [resource for resource in resources
+                   if (resource.name is not None and
+                       resource.name.lower() == filter_string.lower())]
+
     if not matched:
         return False
-    search_opts[real_field] = matched[0].id
+    if type(resources) == dict:
+        search_opts[real_field] = matched[0]
+    else:
+        search_opts[real_field] = matched[0].id
+
     del search_opts[fake_field]
     return True
 
