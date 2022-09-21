@@ -181,7 +181,7 @@
         ctrl.validateFlavor();
       }
     });
-
+    
     //
     $scope.$on('$destroy', function() {
       novaLimitsWatcher();
@@ -345,6 +345,12 @@
       var messages = {};
       var source = ctrl.source;
       var instanceCount = ctrl.instanceCount;
+      
+      // Check if flavor is a preemptible flavor
+      var flavorExtras = flavor.extras;
+      if (flavorExtras.hasOwnProperty("flavor_class:name") && flavorExtras["flavor_class:name"] == "preemptible") {
+        messages.name = gettext('This flavor is preemptible and has a max lifetime of 24 hours.');
+      }
 
       // Check RAM resources
       var totalRamUsed = ctrl.defaultIfUndefined(
