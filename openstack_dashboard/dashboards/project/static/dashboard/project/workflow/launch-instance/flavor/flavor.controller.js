@@ -302,7 +302,13 @@
 
         var errors = ctrl.getErrors(facade.flavor);
         facade.errors = errors;
-        facade.enabled = Object.keys(errors).length === 0;
+        if(Object.keys(errors).length === 1 && 'name' in errors) {
+          // If the only error is a preemtible alert then enable the facade
+          facade.enabled = true;
+        }
+        else {
+          facade.enabled = Object.keys(errors).length === 0;
+        }
       }
     }
 
