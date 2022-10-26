@@ -338,6 +338,7 @@
       },
       function (newValue) {
         checkVolumeForImage(newValue);
+        validateBootSourceType();
       }
     );
 
@@ -531,8 +532,7 @@
       }
       if ((selectedSource === bootSourceTypes.IMAGE ||
            selectedSource === bootSourceTypes.INSTANCE_SNAPSHOT) && $scope.model.volumeBootable) {
-        $scope.model.newInstanceSpec.vol_create =
-          $scope.model.newInstanceSpec.create_volume_default;
+        $scope.model.newInstanceSpec.vol_create = $scope.model.newInstanceSpec.create_volume_default;
       } else {
         $scope.model.newInstanceSpec.vol_create = false;
       }
@@ -623,14 +623,19 @@
     function validateBootSourceType() {
       var bootSourceType = ctrl.currentBootSource;
       var instanceCount = $scope.model.newInstanceSpec.instance_count;
-
+      var instanceSelected = ctrl.tableData.allocated.length;
+      var isValid = false;
       /*
-       * Field is valid if boot source type is not volume, instance count is blank/undefined
-       * (this is an error with instance count) or instance count is 1
+       * Field is valid if boot source type is image and an image has been selected, 
+       * or if boot source type is instance snapshot and an instance has been selected, 
+       * or boot source type is volume and instanceCount is 1
        */
-      var isValid = bootSourceType !== bootSourceTypes.VOLUME ||
-                    !instanceCount ||
-                    instanceCount === 1;
+      if((bootSourceType === bootSourceTypes.IMAGE || bootSourceType === bootSourceTypes.INSTANCE_SNAPSHOT) && instanceSelected) {
+        isValid = true;
+      }
+      else if ((bootSourceType === bootSourceTypes.VOLUME || bootSourceType === bootSourceTypes.VOLUME_SNAPSHOT) && instanceCount == 1) {
+        isValid = true;
+      }
 
       $scope.launchInstanceSourceForm['boot-source-type']
             .$setValidity('bootSourceType', isValid);
