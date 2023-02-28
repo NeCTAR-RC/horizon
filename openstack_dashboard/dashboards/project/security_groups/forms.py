@@ -220,7 +220,7 @@ class AddRule(forms.SelfHandlingForm):
 
     cidr = forms.IPField(label=_("CIDR"),
                          required=False,
-                         initial="0.0.0.0/0",
+                         initial="",
                          help_text=_("Classless Inter-Domain Routing "
                                      "(e.g. 192.168.0.0/24, or "
                                      "2001:db8::/128)"),
