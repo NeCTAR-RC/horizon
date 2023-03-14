@@ -14,7 +14,8 @@ limitations under the License.
 -->
 <div ng-controller="LaunchInstanceFlavorController as ctrl">
   <p class="step-description" translate>
-    Flavors manage the sizing for the compute, memory and storage capacity of the instance.
+    Flavors manage the sizing for the compute, memory and storage capacity of the instance. A full list of available flavors can be viewed <a href="https://support.ehelp.edu.au/support/solutions/articles/6000205341-nectar-flavors" target="_blank">here</a>.<br /><br />
+    <strong>Do you need huge RAM or GPU flavors?</strong> You must first be approved for an allocation with these <a href="https://support.ehelp.edu.au/support/solutions/articles/6000258960-nectar-gpu-large-memory-reservation-service" target="_blank">specialised resources</a>, then you can <a href="/project/reservations/">create a reservation</a>.
   </p>
 
   <p class="alert alert-warning" ng-show="ctrl.allocatedFlavorFacades[0].errors.name">
