@@ -45,7 +45,7 @@ class Networks(generic.View):
         # other operations other than server create.
         result = api.neutron.network_list_for_tenant(
             request, tenant_id,
-            include_pre_auto_allocate=True)
+            include_pre_auto_allocate=True, shared=False)
         return{'items': [n.to_dict() for n in result]}
 
     @rest_utils.ajax(data_required=True)

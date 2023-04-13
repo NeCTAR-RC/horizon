@@ -41,7 +41,8 @@ class NeutronNetworksTestCase(test.RestAPITestCase):
         self.assertItemsCollectionEqual(response, exp_resp)
         mock_network_list_for_tenant.assert_called_once_with(
             request, request.user.tenant_id,
-            include_pre_auto_allocate=True)
+            include_pre_auto_allocate=True,
+            shared=False)
 
     def test_create(self):
         self._test_create(
