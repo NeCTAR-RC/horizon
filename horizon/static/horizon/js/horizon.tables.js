@@ -620,7 +620,7 @@ horizon.datatables.set_table_query_filter = function (parent) {
     horizon.datatables.qs = {};
   }
   $(parent).find('table').each(function (index, elm) {
-    var input = $($(elm).find('div.table_search.client input')),
+    var input = $($(elm).closest("form").find('div.table_search.client input')),
         table_selector;
     if (input.length > 0) {
       // Disable server-side searching if we have client-side searching since
