@@ -111,7 +111,13 @@
       trackId: 'id',
       detailsTemplateUrl: basePath + 'flavor/flavor-details.html',
       columns: [
-        {id: 'name', title: gettext('Name'), priority: 1},
+        {id: 'name', title: gettext('Name'), priority: 1,
+          template: `<span class="invalid fa fa-exclamation-triangle"
+            ng-show="item.errors.name"
+            uib-popover="{$ item.errors.name $}"
+            popover-placement="top" popover-append-to-body="true"
+            popover-trigger="'mouseenter'"></span>
+            <span>{$ item.name $}</span>`},
         {id: 'vcpus', title: gettext('VCPUS'), priority: 1,
           template: `<span class="invalid fa fa-exclamation-triangle"
             ng-show="item.errors.vcpus"
@@ -354,7 +360,12 @@
 
         var errors = ctrl.getErrors(facade.flavor);
         facade.errors = errors;
-        facade.enabled = Object.keys(errors).length === 0;
+        if(Object.keys(errors).length === 1 && 'name' in errors) {
+          // If the only error is a preemtible alert then enable the facade
+          facade.enabled = true;
+        } else {
+          facade.enabled = Object.keys(errors).length === 0;
+        }
       }
     }
 
@@ -397,6 +408,12 @@
       var messages = {};
       var source = ctrl.source;
       var instanceCount = ctrl.instanceCount;
+
+      // Check if flavor is a preemptible flavor
+      var flavorExtras = flavor.extras;
+      if (flavorExtras.hasOwnProperty("flavor_class:name") && flavorExtras["flavor_class:name"] == "preemptible") {
+        messages.name = gettext('This flavor is preemptible and has a max lifetime of 24 hours.');
+      }
 
       // Check RAM resources
       var totalRamUsed = ctrl.defaultIfUndefined(

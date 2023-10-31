@@ -17,6 +17,11 @@ limitations under the License.
     Flavors manage the sizing for the compute, memory and storage capacity of the instance.
   </p>
 
+  <p class="alert alert-warning" ng-show="ctrl.allocatedFlavorFacades[0].errors.name">
+    <strong>WARNING:</strong> {$ ctrl.allocatedFlavorFacades[0].errors.name $}
+    For more information, check out the <a href="https://support.ehelp.edu.au/support/solutions/articles/6000243910-nectar-preemptible-instance-service" target="_blank">support article</a>.
+  </p>
+
   <transfer-table tr-model="ctrl.tableData"
       limits="ctrl.tableLimits" clone-content>
     <hz-dynamic-table
