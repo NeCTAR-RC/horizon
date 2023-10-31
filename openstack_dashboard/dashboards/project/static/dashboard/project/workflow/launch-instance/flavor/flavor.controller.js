@@ -126,7 +126,6 @@
             popover-placement="top" popover-append-to-body="true"
             popover-trigger="'mouseenter'"></span>
             <span>{$ item.ram | mb $}</span>`},
-        {id: 'totalDisk', title: gettext('Total Disk'), filters: ['gb'], priority: 1},
         {id: 'rootDisk', title: gettext('Root Disk'), priority: 2,
           template: `<span class="invalid fa fa-exclamation-triangle"
             ng-show="item.errors.disk"
@@ -135,7 +134,9 @@
             popover-trigger="'mouseenter'"></span>
             <span>{$ item.rootDisk | gb $}</span>`},
         {id: 'ephemeralDisk', title: gettext('Ephemeral Disk'), filters: ['gb'], priority: 2},
-        {id: 'isPublic', title: gettext('Public'), filters: ['yesno'], priority: 1}
+        {id: 'isPublic', title: gettext('Public'), filters: ['yesno'], priority: 1},
+        {id: 'suHour', title: gettext('SU/hour'), priority: 1,
+	  template: `<span>{$ item.extras['nectar:rate'] $}</span>`}
       ]
     };
 
