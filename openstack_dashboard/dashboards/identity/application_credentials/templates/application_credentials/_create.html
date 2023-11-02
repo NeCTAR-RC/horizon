@@ -21,10 +21,12 @@
   <p>
   {% blocktrans trimmed %}
   <b>Expiration Date/Time</b>:
-  You may give the application credential an expiration. The expiration will
-  be in UTC. If you provide an expiration date with no expiration time, the
-  time will be assumed to be 00:00:00. If you provide an expiration time with
-  no expiration date, the date will be assumed to be today.
+  The expiration time will be in UTC. The default expiration date is 3
+  months from today. If you provide an expiration date with no expiration
+  time, the time will be assumed to be 00:00:00 UTC. If you provide an
+  expiration time with no expiration date, the date will be assumed to be
+  today. If you do not provide an expiration date and time, the application
+  credential will not expire. For security,this is not recommended.
   {% endblocktrans %}
   </p>
   <p>
