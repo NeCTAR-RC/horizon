@@ -15,8 +15,11 @@
 import datetime
 import logging
 
+from dateutil.relativedelta import relativedelta
+
 from django.conf import settings
 from django.forms import widgets
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.debug import sensitive_variables
 import yaml
@@ -30,7 +33,14 @@ from openstack_dashboard import api
 LOG = logging.getLogger(__name__)
 
 
+def _expireDateDefault():
+    today = timezone.now()
+    expire = today + relativedelta(months=3)
+    return expire.strftime('%Y-%m-%d')
+
+
 class CreateApplicationCredentialForm(forms.SelfHandlingForm):
+
     # Hide the domain_id and domain_name by default
     name = forms.CharField(max_length=255, label=_("Name"))
     description = forms.CharField(
@@ -39,7 +49,8 @@ class CreateApplicationCredentialForm(forms.SelfHandlingForm):
         required=False)
     secret = forms.CharField(max_length=255, label=_("Secret"), required=False)
     expiration_date = forms.DateField(
-        widget=forms.widgets.DateInput(attrs={'type': 'date'}),
+        widget=forms.widgets.DateInput(attrs={'type': 'date',
+                                              'value': _expireDateDefault}),
         label=_("Expiration Date"),
         required=False)
     expiration_time = forms.TimeField(
