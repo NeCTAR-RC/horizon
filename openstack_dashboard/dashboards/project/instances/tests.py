@@ -314,11 +314,12 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
     def test_index_flavor_list_exception(self):
         servers = self.servers.list()
         search_opts = {'marker': None, 'paginate': True}
-
+        flavor = self.flavors.list()[0]
         self.mock_is_feature_available.return_value = True
         self.mock_server_list_paged.return_value = [servers, False, False]
         self.mock_servers_update_addresses.return_value = None
         self.mock_flavor_list.side_effect = self.exceptions.nova
+        self.mock_flavor_get.return_value = flavor
         self.mock_image_list_detailed.return_value = (self.images.list(),
                                                       False, False)
         self.mock_tenant_absolute_limits.return_value = self.limits['absolute']
@@ -341,6 +342,9 @@ class InstanceTableTests(InstanceTestBase, InstanceTableTestMixin):
             search_opts=search_opts)
         self.mock_servers_update_addresses.assert_called_once_with(
             helpers.IsHttpRequest(), servers)
+        self.assert_mock_multiple_calls_with_same_arguments(
+            self.mock_flavor_get, 5,
+            mock.call(helpers.IsHttpRequest(), flavor.id))
         self.mock_flavor_list.assert_called_once_with(helpers.IsHttpRequest())
         self._assert_mock_image_list_detailed_calls()
 
