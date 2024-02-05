@@ -96,12 +96,14 @@
     syncInstanceChartAndLimits();
 
     var specifiedInstancesWatcher = createWatcher(getInstanceCount, updateChart);
+    var azWatcher = createWatcher(getAvaiabilityZone, setCreateVolumeVisibilty)
     var maxInstancesWatcher = createWatcher(getMaxInstances, resetMaxInstances);
     var instancesUsedWatcher = createWatcher(getTotalInstancesUsed, resetTotalInstancesUsed);
 
     // Explicitly remove watchers on desruction of this controller
     $scope.$on('$destroy', function() {
       specifiedInstancesWatcher();
+      azWatcher();
       maxInstancesWatcher();
       instancesUsedWatcher();
     });
@@ -115,6 +117,19 @@
 
     function isDescriptionSupported(data) {
       ctrl.isDescriptionSupported = data.data;
+    }
+
+    function getAvaiabilityZone() {
+      return $scope.model.newInstanceSpec.availability_zone;
+    }
+
+    function setCreateVolumeVisibilty() {
+      if($scope.model.newInstanceSpec.availability_zone) {
+        $scope.model.newInstanceSpec.hide_create_volume = false;
+      }
+      else {
+        $scope.model.newInstanceSpec.hide_create_volume = true;
+      }
     }
 
     function getMaxInstances() {
