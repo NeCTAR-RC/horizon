@@ -83,3 +83,13 @@ if getattr(settings, 'REST_VIEW_SETS', ()):
         urlpatterns.append(re_path(r'^rest_api/', include(router.urls)))
     except ImportError:
         pass
+
+try:
+    # pylint: disable=unused-import
+    import tz_detect  # noqa
+except ImportError:
+    pass
+else:
+    urlpatterns += [
+        re_path('^tz_detect/', include('tz_detect.urls')),
+    ]
