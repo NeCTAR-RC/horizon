@@ -93,3 +93,13 @@ else:
     urlpatterns += [
         re_path('^tz_detect/', include('tz_detect.urls')),
     ]
+
+try:
+    # pylint: disable=unused-import
+    import health_check  # noqa
+except ImportError:
+    pass
+else:
+    urlpatterns += [
+        re_path(r'ht/', include('health_check.urls')),
+    ]
