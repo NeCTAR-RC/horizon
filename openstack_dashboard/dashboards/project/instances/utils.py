@@ -213,7 +213,9 @@ def port_field_data(request, with_network=False):
             in api.neutron.port_list_with_trunk_types(
                 request, tenant_id=request.user.tenant_id)
             if (not port.device_owner and
-                not isinstance(port, api.neutron.PortTrunkSubport))
+                not isinstance(port, api.neutron.PortTrunkSubport) and
+                port.network_id in network_dict
+                )
         ]
     ports.sort(key=lambda obj: obj[1])
     return ports
