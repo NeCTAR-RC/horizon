@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Instance actions for locked instances will now only show actions that are
+    allowed on locked instances.

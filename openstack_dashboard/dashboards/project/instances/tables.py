@@ -108,6 +108,8 @@ class DeleteInstance(policy.PolicyTargetMixin, tables.DeleteAction):
         error_state = False
         if instance:
             error_state = (instance.status == 'ERROR')
+        if getattr(instance, 'locked', False):
+            return False
         return error_state or not is_deleting(instance)
 
     def action(self, request, obj_id):
@@ -141,6 +143,8 @@ class RebootInstance(policy.PolicyTargetMixin, tables.BatchAction):
     def allowed(self, request, instance=None):
         if instance is None:
             return True
+        if getattr(instance, 'locked', False):
+            return False
         return ((instance.status in ACTIVE_STATES or
                  instance.status == 'SHUTOFF') and
                 not is_deleting(instance))
@@ -173,6 +177,8 @@ class SoftRebootInstance(RebootInstance):
 
     def allowed(self, request, instance=None):
         if instance is not None:
+            if getattr(instance, 'locked', False):
+                return False
             return instance.status in ACTIVE_STATES
         return True
 
@@ -189,6 +195,8 @@ class RescueInstance(policy.PolicyTargetMixin, tables.LinkAction):
         return urls.reverse(self.url, args=[instance_id])
 
     def allowed(self, request, instance):
+        if getattr(instance, 'locked', False):
+            return False
         return instance.status in ACTIVE_STATES
 
 
@@ -258,6 +266,8 @@ class TogglePause(tables.BatchAction):
     def allowed(self, request, instance=None):
         if not instance:
             return False
+        if getattr(instance, 'locked', False):
+            return False
         self.paused = instance.status == "PAUSED"
         if self.paused:
             self.current_present_action = UNPAUSE
@@ -321,6 +331,8 @@ class ToggleSuspend(tables.BatchAction):
 
     def allowed(self, request, instance=None):
         if not instance:
+            return False
+        if getattr(instance, 'locked', False):
             return False
         self.suspended = instance.status == "SUSPENDED"
         if self.suspended:
@@ -595,6 +607,8 @@ class ResizeLink(policy.PolicyTargetMixin, tables.LinkAction):
         return "?".join([base_url, param])
 
     def allowed(self, request, instance):
+        if getattr(instance, 'locked', False):
+            return False
         return ((instance.status in ACTIVE_STATES or
                  instance.status == 'SHUTOFF') and
                 not is_deleting(instance))
@@ -648,6 +662,8 @@ class RebuildInstance(policy.PolicyTargetMixin, tables.LinkAction):
     action_type = "danger"
 
     def allowed(self, request, instance):
+        if getattr(instance, 'locked', False):
+            return False
         return ((instance.status in ACTIVE_STATES or
                  instance.status == 'SHUTOFF') and
                 not is_deleting(instance))
@@ -750,8 +766,11 @@ class UpdateMetadata(policy.PolicyTargetMixin, tables.LinkAction):
         return "javascript:void(0);"
 
     def allowed(self, request, instance=None):
-        return (instance and
-                instance.status.lower() != 'error')
+        if instance is None:
+            return False
+        if getattr(instance, 'locked', False):
+            return False
+        return instance.status.lower() != 'error'
 
 
 def instance_fault_to_friendly_message(instance):
@@ -826,6 +845,9 @@ class StartInstance(policy.PolicyTargetMixin, tables.BatchAction):
         )
 
     def allowed(self, request, instance):
+        if instance and getattr(instance, 'locked', False):
+            return False
+
         return ((instance is None) or
                 (instance.status in ("SHUTDOWN", "SHUTOFF", "CRASHED")))
 
@@ -858,6 +880,9 @@ class StopInstance(policy.PolicyTargetMixin, tables.BatchAction):
         )
 
     def allowed(self, request, instance):
+        if instance and getattr(instance, 'locked', False):
+            return False
+
         return (instance is None or
                 (get_power_state(instance) in ("RUNNING", "SUSPENDED") and
                  not is_deleting(instance)))
@@ -942,6 +967,8 @@ class AttachVolume(tables.LinkAction):
     # is not active, or the instance is being deleted
     # or cinder is not enabled
     def allowed(self, request, instance=None):
+        if instance and getattr(instance, 'locked', False):
+            return False
         return (instance.status in ("ACTIVE") and
                 not is_deleting(instance) and
                 api.cinder.is_volume_service_enabled(request))
@@ -958,6 +985,8 @@ class DetachVolume(AttachVolume):
     # is not active, or the instance is being deleted
     # or cinder is not enabled
     def allowed(self, request, instance=None):
+        if instance and getattr(instance, 'locked', False):
+            return False
         return (instance.status in ("ACTIVE") and
                 not is_deleting(instance) and
                 api.cinder.is_volume_service_enabled(request))
@@ -971,6 +1000,8 @@ class AttachInterface(policy.PolicyTargetMixin, tables.LinkAction):
     policy_rules = (("compute", "os_compute_api:os-attach-interfaces"),)
 
     def allowed(self, request, instance):
+        if instance and getattr(instance, 'locked', False):
+            return False
         return ((instance.status in ACTIVE_STATES or
                  instance.status == 'SHUTOFF') and
                 not is_deleting(instance) and
@@ -989,6 +1020,8 @@ class DetachInterface(policy.PolicyTargetMixin, tables.LinkAction):
     policy_rules = (("compute", "os_compute_api:os-attach-interfaces:delete"),)
 
     def allowed(self, request, instance):
+        if instance and getattr(instance, 'locked', False):
+            return False
         if not api.base.is_service_enabled(request, 'network'):
             return False
         if is_deleting(instance):
