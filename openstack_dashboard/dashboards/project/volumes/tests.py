@@ -86,7 +86,7 @@ class VolumeIndexViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
         self.mock_volume_backup_supported.assert_called_with(
             test.IsHttpRequest())
         self.mock_volume_list_paged.assert_called_once_with(
-            test.IsHttpRequest(), marker=None, search_opts=None,
+            test.IsHttpRequest(), marker=None, search_opts={},
             sort_dir='desc', paginate=True)
         self.mock_tenant_absolute_limits.assert_called_with(
             test.IsHttpRequest())
@@ -129,7 +129,7 @@ class VolumeIndexViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
         self.assertEqual(2, self.mock_volume_backup_supported.call_count)
         self.mock_volume_list_paged.assert_called_once_with(
             test.IsHttpRequest(), marker=marker, sort_dir=sort_dir,
-            search_opts=None, paginate=True)
+            search_opts={}, paginate=True)
         self.mock_volume_snapshot_list.assert_called_once_with(
             test.IsHttpRequest(), search_opts=None)
         self.mock_tenant_absolute_limits.assert_called_with(
@@ -1184,9 +1184,8 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
                       [m.message for m in res.context['messages']])
 
         self.mock_volume_list_paged.assert_called_with(
-            test.IsHttpRequest(), marker=None,
-            paginate=True, sort_dir='desc',
-            search_opts=None)
+            test.IsHttpRequest(), marker=None, paginate=True,
+            sort_dir='desc', search_opts={})
         self.assertEqual(2, self.mock_volume_snapshot_list.call_count)
         self.mock_volume_delete.assert_called_once_with(test.IsHttpRequest(),
                                                         volume.id)
@@ -1441,7 +1440,7 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
         self.assertEqual(5, self.mock_volume_backup_supported.call_count)
         self.mock_volume_list_paged.assert_called_once_with(
             test.IsHttpRequest(), sort_dir='desc', marker=None,
-            paginate=True, search_opts=None)
+            paginate=True, search_opts={})
         self.mock_volume_snapshot_list.assert_called_once_with(
             test.IsHttpRequest(), search_opts=None)
         self.mock_server_list.assert_called_once_with(test.IsHttpRequest(),
@@ -1477,9 +1476,8 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
                       'The create button should be disabled')
         self.assertEqual(5, self.mock_volume_backup_supported.call_count)
         self.mock_volume_list_paged.assert_called_once_with(
-            test.IsHttpRequest(), marker=None,
-            paginate=True, sort_dir='desc',
-            search_opts=None)
+            test.IsHttpRequest(), marker=None, paginate=True,
+            sort_dir='desc', search_opts={})
         self.mock_server_list.assert_called_once_with(test.IsHttpRequest(),
                                                       search_opts=None)
         self.assertEqual(9, self.mock_tenant_absolute_limits.call_count)
@@ -1960,9 +1958,8 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
 
         self.assertEqual(10, self.mock_volume_backup_supported.call_count)
         self.mock_volume_list_paged.assert_called_once_with(
-            test.IsHttpRequest(), marker=None,
-            sort_dir='desc', search_opts=None,
-            paginate=True)
+            test.IsHttpRequest(), marker=None, sort_dir='desc',
+            search_opts={}, paginate=True)
         self.mock_volume_snapshot_list.assert_called_once_with(
             test.IsHttpRequest(), search_opts=None)
         self.assertEqual(13, self.mock_tenant_absolute_limits.call_count)
@@ -2023,9 +2020,8 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
 
         self.assertEqual(10, self.mock_volume_backup_supported.call_count)
         self.mock_volume_list_paged.assert_called_once_with(
-            test.IsHttpRequest(), marker=None,
-            sort_dir='desc', search_opts=None,
-            paginate=True)
+            test.IsHttpRequest(), marker=None, sort_dir='desc',
+            search_opts={}, paginate=True)
         self.mock_volume_snapshot_list.assert_called_once_with(
             test.IsHttpRequest(), search_opts=None)
         self.mock_server_list.assert_called_once_with(test.IsHttpRequest(),
@@ -2093,9 +2089,8 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
 
         self.assertEqual(5, self.mock_volume_backup_supported.call_count)
         self.mock_volume_list_paged.assert_called_once_with(
-            test.IsHttpRequest(), marker=None,
-            search_opts=None, sort_dir='desc',
-            paginate=True)
+            test.IsHttpRequest(), marker=None, search_opts={},
+            sort_dir='desc', paginate=True)
         self.mock_volume_snapshot_list.assert_called_once_with(
             test.IsHttpRequest(), search_opts=None)
         self.mock_transfer_delete.assert_called_once_with(test.IsHttpRequest(),
@@ -2183,9 +2178,8 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
 
         self.assertEqual(10, self.mock_volume_backup_supported.call_count)
         self.mock_volume_list_paged.assert_called_once_with(
-            test.IsHttpRequest(), marker=None,
-            sort_dir='desc', search_opts=None,
-            paginate=True)
+            test.IsHttpRequest(), marker=None, sort_dir='desc',
+            search_opts={}, paginate=True)
         self.mock_volume_snapshot_list.assert_called_once_with(
             test.IsHttpRequest(), search_opts=None)
         self.mock_server_list.assert_called_once_with(test.IsHttpRequest(),
