@@ -259,6 +259,26 @@
     }
 
     /*
+     * Pre-select a flavor by ID from the available list.
+     * Used when launching from the Reservations panel, where the
+     * reserved Nova flavor ID is passed via launchContext.flavorId.
+     *
+     * Moves the matching facade from available to allocated,
+     * which triggers the facadesWatcher to set the model's flavor.
+     */
+    function preselectFlavorById(flavorId) {
+      for (var i = 0; i < ctrl.availableFlavorFacades.length; i++) {
+        if (ctrl.availableFlavorFacades[i].id === flavorId) {
+          var facade = ctrl.availableFlavorFacades.splice(i, 1)[0];
+          ctrl.allocatedFlavorFacades.push(facade);
+          // Clear so we don't re-select on subsequent watcher firings
+          delete $scope.launchContext.flavorId;
+          return;
+        }
+      }
+    }
+
+    /*
      * Validator for flavor selected. Checks if this flavor is
      * valid based on instance count and source selected.
      * If flavor is invalid, enabled is false.
@@ -366,6 +386,15 @@
         } else {
           facade.enabled = Object.keys(errors).length === 0;
         }
+      }
+
+      // Pre-select flavor if launched with a flavorId in the context
+      // (e.g., from the Reservations panel "Launch Instance" button).
+      // Placed here (not in a single watcher) because updateFlavorFacades
+      // is called by multiple watchers, and facades must be fully built
+      // before we can search and move one to the allocated list.
+      if ($scope.launchContext && $scope.launchContext.flavorId) {
+        preselectFlavorById($scope.launchContext.flavorId);
       }
     }
 
