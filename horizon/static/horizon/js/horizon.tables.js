@@ -280,6 +280,13 @@ horizon.datatables.confirm = function(action) {
 
   // Add the display name defined by table.get_object_display(datum)
   var $closest_table = $action.closest("table");
+  // The Nectar theme renders the table actions toolbar in a <caption> that
+  // sits outside the <table> element, so a table action button has no <table>
+  // ancestor. Fall back to the table within the same wrapper so the selected
+  // rows (and their data-display names) can still be found.
+  if ($closest_table.length === 0) {
+    $closest_table = $action.closest(".table_wrapper").find("table");
+  }
 
   // Check if data-display attribute is available
   $data_display = $closest_table.find('tr[data-display]');
