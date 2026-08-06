@@ -67,7 +67,7 @@ class SetFlavorChoiceAction(workflows.Action):
         # Remove current flavor from the list of flavor choices
         flavors = [flavor for flavor in flavors
                    if flavor.name != old_flavor_name and not
-                   flavor.name.startswith('p1.')]
+                   flavor.name.startswith(('p1.', 'p3.'))]
 
         if flavors:
             if len(flavors) > 1:
