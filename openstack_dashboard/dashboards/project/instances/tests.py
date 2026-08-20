@@ -37,6 +37,8 @@ from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.instances import console
 from openstack_dashboard.dashboards.project.instances import tables
 from openstack_dashboard.dashboards.project.instances import tabs
+from openstack_dashboard.dashboards.project.instances import utils \
+    as instance_utils
 from openstack_dashboard.dashboards.project.instances import workflows
 from openstack_dashboard.test import helpers
 from openstack_dashboard.views import get_url_with_pagination
@@ -2800,6 +2802,29 @@ class InstanceTests2(InstanceTestBase, InstanceTableTestMixin):
 
         self.mock_server_unrescue.assert_called_once_with(
             helpers.IsHttpRequest(), server.id)
+
+
+class NetworkFieldDataTests(helpers.APITestCase):
+    @helpers.create_mocks({api.neutron: ('network_list_for_tenant',)})
+    def test_for_launch_excludes_shared_networks(self):
+        # Nectarism: shared networks are provider and floating networks
+        # here, and neutron returns them ahead of the default network.
+        self.mock_network_list_for_tenant.return_value = []
+
+        instance_utils.network_field_data(self.request, for_launch=True)
+
+        self.mock_network_list_for_tenant.assert_called_once_with(
+            self.request, self.request.user.tenant_id,
+            include_pre_auto_allocate=True, shared=False)
+
+    @helpers.create_mocks({api.neutron: ('network_list_for_tenant',)})
+    def test_without_for_launch_leaves_shared_alone(self):
+        self.mock_network_list_for_tenant.return_value = []
+
+        instance_utils.network_field_data(self.request)
+
+        self.mock_network_list_for_tenant.assert_called_once_with(
+            self.request, self.request.user.tenant_id)
 
 
 class InstanceAjaxTests(helpers.TestCase):

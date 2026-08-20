@@ -97,6 +97,11 @@ def network_field_data(request, include_empty_option=False, with_cidr=False,
         extra_params = {}
         if for_launch:
             extra_params['include_pre_auto_allocate'] = True
+            # Nectarism: our shared networks are provider and floating
+            # networks, not somewhere to boot a server, and neutron
+            # returns them ahead of the default network. Same filter the
+            # launch instance REST endpoint passes.
+            extra_params['shared'] = False
         try:
             networks = api.neutron.network_list_for_tenant(
                 request, tenant_id, **extra_params)
