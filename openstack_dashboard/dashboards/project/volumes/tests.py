@@ -592,6 +592,110 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
 
     @test.create_mocks({
         quotas: ['tenant_quota_usages'],
+        cinder: ['extension_supported',
+                 'availability_zone_list',
+                 'volume_type_list',
+                 'volume_type_default',
+                 'volume_snapshot_get',
+                 'volume_create',
+                 'group_list'],
+    })
+    def test_create_volume_from_snapshot_with_az_types(self):
+        # With per-AZ volume type fields active there is no single
+        # 'type' field; the snapshot source path must cope with that
+        volume = self.cinder_volumes.first()
+        snapshot = self.cinder_volume_snapshots.first()
+
+        self.mock_volume_type_default.return_value = \
+            self.cinder_volume_types.first()
+        self.mock_volume_type_list.return_value = \
+            self.cinder_volume_types_with_az.list()
+        self.mock_extension_supported.return_value = True
+        self.mock_availability_zone_list.return_value = \
+            self.cinder_availability_zones.list()
+        self.mock_tenant_quota_usages.return_value = \
+            self.cinder_quota_usages.first()
+        self.mock_volume_snapshot_get.return_value = snapshot
+        self.mock_volume_create.return_value = volume
+        self.mock_group_list.return_value = []
+
+        az = self.cinder_availability_zones.first().zoneName
+        url = "?".join([reverse('horizon:project:volumes:create'),
+                        "snapshot_id=" + str(snapshot.id)])
+
+        res = self.client.get(url)
+        self.assertNotContains(res, 'Unable to load the specified snapshot')
+        # The per-AZ volume type fields must not be offered - the new
+        # volume inherits its type from the snapshot's volume
+        self.assertNotContains(res, 'type-' + functions.hexlify(az))
+
+        formData = {'name': 'A Volume I Am Making',
+                    'description': 'This is a volume I am making for a test.',
+                    'method': 'CreateForm',
+                    'size': 50,
+                    'snapshot_source': snapshot.id}
+        res = self.client.post(url, formData)
+        self.assertNoFormErrors(res)
+        self.assertRedirectsNoFollow(res, INDEX_URL)
+        self.mock_volume_create.assert_called_once_with(
+            test.IsHttpRequest(), formData['size'], formData['name'],
+            formData['description'], '', metadata={},
+            snapshot_id=snapshot.id, group_id=None, image_id=None,
+            availability_zone=None, source_volid=None)
+
+    @test.create_mocks({
+        quotas: ['tenant_quota_usages'],
+        cinder: ['extension_supported',
+                 'availability_zone_list',
+                 'volume_type_list',
+                 'volume_type_default',
+                 'volume_get',
+                 'volume_create',
+                 'group_list'],
+    })
+    def test_create_volume_from_volume_with_az_types(self):
+        # With per-AZ volume type fields active there is no single
+        # 'type' field; the volume source path must cope with that
+        volume = self.cinder_volumes.first()
+
+        self.mock_volume_type_default.return_value = \
+            self.cinder_volume_types.first()
+        self.mock_volume_type_list.return_value = \
+            self.cinder_volume_types_with_az.list()
+        self.mock_extension_supported.return_value = True
+        self.mock_availability_zone_list.return_value = \
+            self.cinder_availability_zones.list()
+        self.mock_tenant_quota_usages.return_value = \
+            self.cinder_quota_usages.first()
+        self.mock_volume_get.return_value = volume
+        self.mock_volume_create.return_value = volume
+        self.mock_group_list.return_value = []
+
+        az = self.cinder_availability_zones.first().zoneName
+        url = "?".join([reverse('horizon:project:volumes:create'),
+                        "volume_id=" + str(volume.id)])
+
+        res = self.client.get(url)
+        # The per-AZ volume type fields must not be offered - the new
+        # volume inherits its type from the source volume
+        self.assertNotContains(res, 'type-' + functions.hexlify(az))
+
+        formData = {'name': 'A copy of a volume',
+                    'description': 'This is a volume I am making for a test.',
+                    'method': 'CreateForm',
+                    'size': 50,
+                    'volume_source': volume.id}
+        res = self.client.post(url, formData)
+        self.assertNoFormErrors(res)
+        self.assertRedirectsNoFollow(res, INDEX_URL)
+        self.mock_volume_create.assert_called_once_with(
+            test.IsHttpRequest(), formData['size'], formData['name'],
+            formData['description'], None, metadata={}, snapshot_id=None,
+            group_id=None, image_id=None, availability_zone=None,
+            source_volid=volume.id)
+
+    @test.create_mocks({
+        quotas: ['tenant_quota_usages'],
         api.glance: ['image_list_detailed'],
         cinder: ['extension_supported',
                  'volume_snapshot_list',

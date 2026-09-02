@@ -159,17 +159,22 @@ class CreateForm(forms.SelfHandlingForm):
             self.fields['size'].initial = snapshot.size
             self.fields['snapshot_source'].choices = ((snapshot.id,
                                                        snapshot),)
-            try:
-                # Set the volume type from the original volume
-                orig_volume = cinder.volume_get(request,
-                                                snapshot.volume_id)
-                self.fields['type'].initial = orig_volume.volume_type
-            except Exception:
-                pass
+            # The 'type' field doesn't exist when per-AZ volume type
+            # fields are in use; the new volume inherits its type from
+            # the snapshot's volume either way
+            if 'type' in self.fields:
+                try:
+                    # Set the volume type from the original volume
+                    orig_volume = cinder.volume_get(request,
+                                                    snapshot.volume_id)
+                    self.fields['type'].initial = orig_volume.volume_type
+                except Exception:
+                    pass
+                self.fields['type'].widget = forms.widgets.HiddenInput()
+            self._delete_az_volume_type_fields()
             self.fields['size'].help_text = (
                 _('Volume size must be equal to or greater than the '
                   'snapshot size (%sGiB)') % snapshot.size)
-            self.fields['type'].widget = forms.widgets.HiddenInput()
             del self.fields['image_source']
             del self.fields['volume_source']
             del self.fields['volume_source_type']
@@ -231,7 +236,12 @@ class CreateForm(forms.SelfHandlingForm):
             self.fields['size'].initial = min_vol_size
             self.fields['size'].help_text = size_help_text
             self.fields['volume_source'].choices = ((volume.id, volume),)
-            self.fields['type'].initial = volume.type
+            # The 'type' field doesn't exist when per-AZ volume type
+            # fields are in use; the new volume inherits its type from
+            # the source volume either way
+            if 'type' in self.fields:
+                self.fields['type'].initial = volume.type
+            self._delete_az_volume_type_fields()
             del self.fields['snapshot_source']
             del self.fields['image_source']
             del self.fields['volume_source_type']
@@ -307,6 +317,7 @@ class CreateForm(forms.SelfHandlingForm):
         self.fields['group'].choices = group_choices
 
     def _populate_type_choices(self, request):
+        self.az_type_field_names = []
         volume_types = get_volume_types(request)
         availability_zones = get_availability_zones(request)
 
@@ -372,6 +383,16 @@ class CreateForm(forms.SelfHandlingForm):
 
         type_choices.insert(0, ("", _("Default volume type")))
         self.fields[field_name].choices = type_choices
+        self.az_type_field_names.append(field_name)
+
+    def _delete_az_volume_type_fields(self):
+        # When the volume type is determined by the volume source
+        # (snapshot or volume), the per-AZ volume type fields don't
+        # apply. They must be removed because their availability zone
+        # switchable field may no longer exist, leaving them all shown.
+        for field_name in self.az_type_field_names:
+            del self.fields[field_name]
+        self.az_type_field_names = []
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(request, *args, **kwargs)
