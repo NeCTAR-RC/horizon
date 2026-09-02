@@ -525,6 +525,15 @@ horizon.addInitFunction(horizon.forms.init = function () {
         var $input = $(input),
           data = $input.data(slug + "-" + val);
 
+        if (typeof data === "undefined" && typeof val === "string") {
+          // Browsers lowercase HTML attribute names when parsing, and
+          // jQuery's .data() mangles uppercase characters in lookup keys,
+          // so a value containing uppercase characters (e.g. the
+          // "QRIScloud" availability zone) can never match its data
+          // attribute directly. Retry with a lowercased value.
+          data = $input.data(slug + "-" + val.toLowerCase());
+        }
+
         if (typeof data === "undefined" || !visible) {
           $input.closest('.form-group').hide();
           //The required verification should be removed and recorded

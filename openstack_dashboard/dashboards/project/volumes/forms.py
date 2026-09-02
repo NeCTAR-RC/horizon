@@ -343,7 +343,11 @@ class CreateForm(forms.SelfHandlingForm):
     def _add_az_volume_type_field(self, request, availability_zone,
                                   volume_types):
         field_name = self._get_volume_type_az_field_name(availability_zone)
-        attr_key = 'data-availability_zone-' + availability_zone
+        # Lowercase the whole attribute key: HTML attribute names are
+        # case-insensitive (browsers lowercase them when parsing) and the
+        # switchable-field javascript in horizon.forms.js looks the key up
+        # with a lowercased value, so an uppercase key would never match.
+        attr_key = ('data-availability_zone-' + availability_zone).lower()
 
         self.fields[field_name] = forms.ChoiceField(
             label=_("Type"),

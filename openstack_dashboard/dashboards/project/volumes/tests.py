@@ -16,6 +16,7 @@ import copy
 from unittest import mock
 from urllib import parse
 
+from cinderclient.v3 import availability_zones
 from django.conf import settings
 from django.forms import widgets
 from django.template.defaultfilters import slugify
@@ -423,6 +424,47 @@ class VolumeViewTests(test.ResetImageAPIVersionMixin, test.TestCase):
             test.IsHttpRequest(),
             targets=('volumes', 'gigabytes'))
         self.mock_group_list.assert_called_with(test.IsHttpRequest())
+
+    @test.create_mocks({
+        cinder: ['volume_snapshot_list',
+                 'volume_type_list', 'volume_type_default',
+                 'volume_list', 'availability_zone_list',
+                 'extension_supported', 'group_list'],
+        quotas: ['tenant_quota_usages'],
+        api.glance: ['image_list_detailed'],
+    })
+    def test_create_volume_type_az_field_upper_case_az(self):
+        # AZ names containing uppercase characters (e.g. QRIScloud) must
+        # render their per-AZ volume type field with a fully lowercased
+        # data attribute key, otherwise the switchable-field javascript
+        # lookup never matches and the field is never shown.
+        az_name = 'QRIScloud'
+        az = availability_zones.AvailabilityZone(
+            availability_zones.AvailabilityZoneManager(None),
+            {'zoneName': az_name, 'zoneState': {'available': True}})
+
+        self.mock_volume_type_list.return_value = \
+            self.cinder_volume_types_with_az.list()
+        self.mock_volume_type_default.return_value = \
+            self.cinder_volume_types.first()
+        self.mock_tenant_quota_usages.return_value = \
+            self.cinder_quota_usages.first()
+        self.mock_volume_snapshot_list.return_value = \
+            self.cinder_volume_snapshots.list()
+        self.mock_image_list_detailed.return_value = [[], False, False]
+        self.mock_availability_zone_list.return_value = [az]
+        self.mock_extension_supported.return_value = True
+        self.mock_volume_list.return_value = self.cinder_volumes.list()
+        self.mock_group_list.return_value = []
+
+        url = reverse('horizon:project:volumes:create')
+        res = self.client.get(url)
+
+        # The per-AZ volume type field is rendered
+        self.assertContains(res, 'type-' + functions.hexlify(az_name))
+        # with a lowercased data attribute key
+        self.assertContains(res, 'data-availability_zone-qriscloud')
+        self.assertNotContains(res, 'data-availability_zone-QRIScloud')
 
     @test.create_mocks({
         quotas: ['tenant_quota_usages'],
